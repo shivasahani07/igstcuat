@@ -1,0 +1,25 @@
+<apex:page standardController="Application_Proposal__c" showHeader="false" sidebar="false">
+    <apex:includeLightning />
+
+    <script>
+        var recordId = '{!Application_Proposal__c.Id}';
+
+        function loadAuraApp() {
+            $Lightning.use("c:AuraWrapperApp", function() {
+                $Lightning.createComponent(
+                    "c:approvedExpenseComponent",
+                    { recordId: recordId },
+                    "lwcContainer",
+                    function(cmp) {
+                        console.log("✅ LWC initialized inside Visualforce page.");
+                    }
+                );
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadAuraApp);
+    </script>
+
+    <!-- LWC container -->
+    <div id="lwcContainer"></div>
+</apex:page>

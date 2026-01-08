@@ -1,0 +1,90 @@
+<template>
+    <lightning-card title="All Accounts" icon-name="standard:account">
+        <div slot="actions">
+            <lightning-button 
+                label="Refresh" 
+                onclick={handleRefresh} 
+                variant="neutral"
+                icon-name="utility:refresh">
+            </lightning-button>
+        </div>
+        
+        <div class="slds-p-horizontal_medium">
+            <!-- Header with account count -->
+            <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-2">
+                    <p class="slds-text-heading_small">
+                        Total Accounts: <strong>{totalAccounts}</strong>
+                    </p>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <p class="slds-text-heading_small">
+                        Displayed: <strong>{displayedAccountsCount}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div class="slds-m-bottom_medium">
+                <lightning-input
+                    type="search"
+                    label="Search Accounts"
+                    placeholder="Search by name, type, industry, or location..."
+                    value={searchKey}
+                    onchange={handleSearch}
+                    class="search-input">
+                </lightning-input>
+            </div>
+
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center slds-p-vertical_large">
+                    <lightning-spinner 
+                        alternative-text="Loading accounts..." 
+                        size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Data Table -->
+            <template if:false={isLoading}>
+                <template if:true={hasAccounts}>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={filteredAccounts}
+                        columns={columns}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortDirection}
+                        onsort={handleSort}
+                        hide-checkbox-column="true"
+                        show-row-number-column="true"
+                        resize-column-disabled="false"
+                        class="account-table">
+                    </lightning-datatable>
+                </template>
+                
+                <!-- No Accounts Message -->
+                <template if:false={hasAccounts}>
+                    <div class="slds-align_absolute-center slds-p-vertical_large">
+                        <lightning-icon 
+                            icon-name="utility:info" 
+                            size="large" 
+                            alternative-text="No accounts">
+                        </lightning-icon>
+                        <p class="slds-text-heading_medium slds-m-top_small">
+                            No accounts found
+                        </p>
+                        <p class="slds-text-body_regular slds-text-color_weak">
+                            <template if:true={searchKey}>
+                                Try adjusting your search criteria
+                            </template>
+                            <template if:false={searchKey}>
+                                There are no accounts in the system
+                            </template>
+                        </p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

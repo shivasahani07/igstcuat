@@ -1,0 +1,841 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" controller="ApplicantPortal_Contoller">
+    <html>
+
+    <head>
+        <apex:stylesheet value="{!$Resource.ApplicantPortalCSS}" />
+        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.min.js"></script>
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.1.1/ui-bootstrap-tpls.min.js"></script>
+        <script src="https://cdn.ckeditor.com/4.6.2/full/ckeditor.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ng.ckeditor/2.0.2/ng-ckeditor.min.js"></script>
+        <script>
+            debugger;
+            var userId = '{!$CurrentPage.parameters.id}';
+            var proposalStage = '{!JSENCODE(proposalStage)}';
+            var isCoordinator = '{!isCoordinator}';
+
+            // window.secondStage = {!JSENCODE(secondStage)};
+            // window.proposalStage = '{!JSENCODE(proposalStage)}';
+            // window.isCoordinator = {!isCoordinator};
+            // window.proposalWrapperList = {!proposalWrapperList};
+            // var proposalWrapperListJSON = {!JSENCODE(proposalWrapperListJSON)};
+            // console.log('proposalWrapperListJSON on VFFF : ' + proposalWrapperListJSON);
+
+            var proposalWrapperList = JSON.parse('{!JSENCODE(proposalWrapperListJSON)}');
+        </script>
+    </head>
+    <div ng-controller="projectCtrl">
+
+        <body>
+
+            <div class="container mt-5">
+                <div class="row mx-5">
+                    <div class="col-md-12">
+                        <div class="tab-link" ng-show="proposalStage">
+                            <div class="progress">
+                                <div class="progress-success w-100"></div>
+                            </div>
+                            <ul>
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('ProjectDetailPage')">
+                                        <div class="icon-circle">
+                                            <i class="fa fa-home"></i>
+                                        </div>
+                                        <span>Basic Details</span>
+                                    </a>
+                                </li>
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('Consortia')">
+                                        <div class="icon-circle">
+                                            <i class="fa fa-user"></i>
+                                        </div>
+                                        <span>Consortium Details</span>
+                                    </a>
+                                </li>
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('ConsortiaContacts')">
+                                        <div class="icon-circle">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </div>
+                                        <span>CV Details</span>
+                                    </a>
+                                </li>
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('Financial_Overview')">
+                                        <div class="icon-circle">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span>Financial Contribution</span>
+                                    </a>
+                                </li>
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('ProjectDetail')">
+                                        <div class="icon-circle">
+                                            <i class="far fa-address-card"></i>
+                                        </div>
+                                        <span>Project Details</span>
+                                    </a>
+                                </li>
+                                <li class="active pb-cursor" ng-hide="secondStage">
+                                    <a ng-click="redirectPageURL('Declartion_2plus2')">
+                                        <div class="icon-circle">
+                                            <i class="fa-solid fa-box"></i>
+                                        </div>
+                                        <span>Declaration</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div ng-show="proposalStage">
+                            <div class="tab-link" ng-show="secondStage">
+                                <div class="progress">
+                                    <div class="progress-success w-100"></div>
+                                </div>
+                                <ul>
+                                    <!-- <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('WorkPackages')">
+                                            <div class="icon-circle">
+                                                <i class="fa-solid fa-box"></i>
+                                            </div>
+                                            <span>Work Package</span>
+                                        </a>
+                                    </li> -->
+                                    <!-- <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('PIDeliverables')">
+                                            <div class="icon-circle">
+                                                <i class="fa-solid fa-business-time"></i>
+                                            </div>
+                                            <span>PI Deliverables</span>
+                                        </a>
+                                    </li>
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('Network_Meeting')">
+                                            <div class="icon-circle">
+                                                <i class="fa fa-group"></i>
+                                            </div>
+                                            <span>Network Meeting</span>
+                                        </a>
+                                    </li> -->
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('ExpenseDeclaration')">
+                                            <div class="icon-circle">
+                                                <i class="fa fa-money"></i>
+                                            </div>
+                                            <span>Expense Details</span>
+                                        </a>
+                                    </li>
+                                    <!-- <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('GrantApplication')">
+                                            <div class="icon-circle">
+                                                <i class="fas fa-donate"></i>
+                                            </div>
+                                            <span>Grant Application</span>
+                                        </a>
+                                    </li> -->
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('Declartion_2plus2')">
+                                            <div class="icon-circle">
+                                                <i class="fas fa-donate"></i>
+                                            </div>
+                                            <span>Declaration</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tab-link" ng-hide="proposalStage">
+                            <div class="progress">
+                                <div class="progress-success wp-8"></div>
+                            </div>
+                            <ul>
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fa fa-home"></i>
+                                        </div>
+                                        <span>Basic Details</span>
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fas fa-user-alt"></i>
+                                        </div>
+                                        <span>Consortium Details</span>
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </div>
+                                        <span>CV Details</span>
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span>Financial Contribution</span>
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="far fa-address-card"></i>
+                                        </div>
+                                        <span>Project Details</span>
+                                    </a>
+                                </li>
+                                <li ng-hide="secondStage">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fa-solid fa-box"></i>
+                                        </div>
+                                        <span>Declaration</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div ng-hide="proposalStage">
+                            <div class="tab-link" ng-show="secondStage">
+                                <div class="progress">
+                                    <div class=""></div>
+                                </div>
+                                <ul>
+                                    <!-- <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa-solid fa-box"></i>
+                                            </div>
+                                            <span>Work Packages</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa-solid fa-business-time"></i>
+                                            </div>
+                                            <span>PI Deliverables</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa fa-group"></i>
+                                            </div>
+                                            <span>Network Meeting</span>
+                                        </a>
+                                    </li> -->
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa fa-money"></i>
+                                            </div>
+                                            <span>Expense Details</span>
+                                        </a>
+                                    </li>
+                                    <!-- <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fas fa-donate"></i>
+                                            </div>
+                                            <span>Grant Details</span>
+                                        </a>
+                                    </li> -->
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fas fa-donate"></i>
+                                            </div>
+                                            <span>Declaration</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal" id="filePreview">
+                    <div class="modal-dialog" style="min-width:120rem">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    <div class="d-flex" style="background:unset;">
+                                        <h3 style="text-align: center">
+                                            <b>{{selectedFile.userDocument.Name}}</b>
+                                        </h3>
+                                    </div>
+                                </h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <iframe style="width:100%;height:75vh;border: 0px;border-radius: 10px;" id="file_frame" title="File"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mx-5 mt-5">
+                    <div class="alert bg-color-list font-if" role="alert">
+                        <li class="ps-4">
+                            <i class="fa-solid fa-circle text-success me-3"></i>Only the coordinator can upload the filled project details pdf. </li>
+                        <li class="ps-4">
+                            <i class="fa-solid fa-circle text-success me-3"></i>The project details must be in format. The template can be downloaded from
+                            <a href="https://www.igstc.org/home/scheme_forms" target="_blank">here.</a>
+                        </li>
+                        <!--<div ng-show="sampleDoc.Category_Template__r.Document_Public_Link__c!=''">
+                            <li class="ps-4"><i class="fa-solid fa-circle text-success me-3"></i>Download the Sample Document <a href="{{sampleDoc.Category_Template__r.Document_Public_Link__c}}" target="_blank">here.</a></li>
+                        </div>-->
+                        <li class="ps-4">
+                            <i class="fa-solid fa-circle text-success me-3"></i>Only PDF files allowed. (Max. size 4 MB)</li>
+                    </div>
+                </div>
+                <div class="row box-shadow-2 mt-5 mx-5 mb-5">
+                    <!-- <div class="accordion mt-5 mx-5" id="accordionExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true"
+                                        aria-controls="collapseOne">
+                                        Main objectives of the research approach - as bullet points
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                    <small class="label-rtf mx-4">
+                                        <b>To use the below RTF box more efficiently, make sure you write your content in word document first
+                                            and then copy paste here</b>
+                                    </small>
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Research_Approach_Objectives__c" ng-config="config" ng-change="readCharacter(proposalDetails.Research_Approach_Objectives__c,0)"></ng-ckeditor>
+                                        <span>Total characters : {{objRtf[0].charCount}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false"
+                                        aria-controls="collapseTwo">
+                                        Current state of the art in the field
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                    <small class="label-rtf mx-4">
+                                        <b>To use the below RTF box more efficiently, make sure you write your content in word document first
+                                            and then copy paste here</b>
+                                    </small>
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Current_State_Of_The_Art__c" ng-config="config" ng-change="readCharacter(proposalDetails.Current_State_Of_The_Art__c,1)"></ng-ckeditor>
+                                        <span>Total characters : {{objRtf[1].charCount}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false"
+                                        aria-controls="collapseThree">
+                                        Project description including work packages/work distribution amongst partners
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                    <small class="label-rtf mx-4">
+                                        <b>To use the below RTF box more efficiently, make sure you write your content in word document first
+                                            and then copy paste here</b>
+                                    </small>
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Project_Description__c" ng-config="config" ng-change="readCharacter(proposalDetails.Project_Description__c,2)"></ng-ckeditor>
+                                        <span>Total characters : {{objRtf[2].charCount}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false"
+                                        aria-controls="collapseFour">
+                                        Expected deliverables as bullet points
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+                                    <small class="label-rtf mx-4">
+                                        <b>To use the below RTF box more efficiently, make sure you write your content in word document first
+                                            and then copy paste here</b>
+                                    </small>
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Expected_Deliverables__c" ng-config="config" ng-change="readCharacter(proposalDetails.Expected_Deliverables__c,3)"></ng-ckeditor>
+                                        <span>Total characters : {{objRtf[3].charCount}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFive">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false"
+                                        aria-controls="collapseFive">
+                                        Reasons for and benefits of cooperation including previous collaboration with the partner country
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
+                                    <small class="label-rtf mx-4">
+                                        <b>To use the below RTF box more efficiently, make sure you write your content in word document first
+                                            and then copy paste here</b>
+                                    </small>
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Reasons_For_And_Benefits_Of_Cooperation__c" ng-config="config" ng-change="readCharacter(proposalDetails.Reasons_For_And_Benefits_Of_Cooperation__c,4)"></ng-ckeditor>
+                                        <span>Total characters : {{objRtf[4].charCount}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingSix">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false"
+                                        aria-controls="collapseSix">
+                                        Equipment
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionExample">
+                                    <small class="label-rtf mx-4">
+                                        <b>To use the below RTF box more efficiently, make sure you write your content in word document first
+                                            and then copy paste here</b>
+                                    </small>
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Equipment__c" ng-config="config" ng-change="readCharacter(proposalDetails.Equipment__c,5)"></ng-ckeditor>
+                                        <span>Total characters : {{objRtf[5].charCount}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div ng-show="secondstage">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingSeven">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false"
+                                            aria-controls="collapseSeven">
+                                            Criteria For Abandoning the Project
+                                            <span class="required-asterisk" style="color:red;">*</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionExample">
+                                        <small class="label-rtf mx-4">
+                                            <b>To use the below RTF box more efficiently, make sure you write your content in word document
+                                                first and then copy paste here</b>
+                                        </small>
+                                        <div class="accordion-body">
+                                            <ng-ckeditor ng-model="proposalDetails.Criteria_For_Abandoning_The_Project__c" ng-config="config" ng-change="readCharacter(proposalDetails.Criteria_For_Abandoning_The_Project__c,6)"></ng-ckeditor>
+                                            <span>Total characters : {{objRtf[6].charCount}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingEight">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false"
+                                            aria-controls="collapseEight">
+                                            Innovative Aspects / IP and Future Potential Utilization Plan
+                                            <span class="required-asterisk" style="color:red;">*</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionExample">
+                                        <small class="label-rtf mx-4">
+                                            <b>To use the below RTF box more efficiently, make sure you write your content in word document
+                                                first and then copy paste here</b>
+                                        </small>
+                                        <div class="accordion-body">
+                                            <ng-ckeditor ng-model="proposalDetails.Innovative_Aspects__c" ng-config="config" ng-change="readCharacter(proposalDetails.Innovative_Aspects__c,7)"></ng-ckeditor>
+                                            <span>Total characters : {{objRtf[7].charCount}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingNine">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false"
+                                            aria-controls="collapseNine">
+                                            Involvement of young scientists / Research Scholars
+                                            <span class="required-asterisk" style="color:red;">*</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionExample">
+                                        <small class="label-rtf mx-4">
+                                            <b>To use the below RTF box more efficiently, make sure you write your content in word document
+                                                first and then copy paste here</b>
+                                        </small>
+                                        <div class="accordion-body">
+                                            <ng-ckeditor ng-model="proposalDetails.Research_Scholars__c" ng-config="config" ng-change="readCharacter(proposalDetails.Research_Scholars__c,8)"></ng-ckeditor>
+                                            <span>Total characters : {{objRtf[8].charCount}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingTen">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false"
+                                            aria-controls="collapseTen">
+                                            Necessity Of Funding
+                                            <span class="required-asterisk" style="color:red;">*</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionExample">
+                                        <small class="label-rtf mx-4">
+                                            <b>To use the below RTF box more efficiently, make sure you write your content in word document
+                                                first and then copy paste here</b>
+                                        </small>
+                                        <div class="accordion-body">
+                                            <ng-ckeditor ng-model="proposalDetails.Necessity_Of_Funding__c" ng-config="config" ng-change="readCharacter(proposalDetails.Necessity_Of_Funding__c,9)"></ng-ckeditor>
+                                            <span>Total characters : {{objRtf[9].charCount}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                        </div> -->
+                    <div class="row mt-5">
+                        <p ng-show="stage === '1st Stage'">1st stage</p>
+                        <p ng-show="stage === '2nd Stage'">2nd stage</p>
+
+                        <div class="col-md-6">
+                            <div class="input-group ms-4">
+
+                                <label class="font-if">Upload Project Proposal
+                                    <span class="ms-2 text-danger">*</span>
+                                </label>
+
+                                <!-- <input type="file" accept=".pdf" class="form-control" ng-disabled="uploadDisable || isUploading || doc.userDocument.Status__c=='Uploaded'"
+                                    id="fileSignature" /> -->
+
+                                <input type="file" accept=".pdf" class="form-control" ng-disabled="uploadDisable || isUploading || (doc.userDocument.Status__c=='Uploaded' && currentProposalStage == 'Submitted')"
+                                    id="fileSignature" />
+
+                                <!-- <input type="file" accept=".pdf" class="form-control" ng-disabled="uploadDisable" id="fileSignature" /> -->
+                                <!-- <input type="file" accept=".pdf" class="form-control" ng-disabled="isUploading || doc.userDocument.Status__c=='Uploaded'" -->
+                                <span class="input-group-btn pt-3" ng-hide="uploadDisable">
+                                    <!-- <button class="btn btn-success mt-4 py-3" ng-click="uploadFile(doc.userDocument.Name,doc.userDocument.Id,'','1048576','1048576')"
+type="button" ng-disabled="isUploading"> -->
+                                    <!-- <button class="btn btn-success mt-4 py-3" ng-click="uploadFile(doc.userDocument.Name, doc.userDocument.Id, '')" type="button"
+                                        ng-disabled="isUploading || doc.userDocument.Status__c=='Uploaded'">
+                                        <span ng-if="!isUploading">Upload</span>
+                                        <span ng-if="isUploading">
+                                            <i class="fa fa-spinner fa-spin"></i> Uploading...
+                                        </span>
+                                    </button> -->
+
+                                    <button class="btn btn-success mt-4 py-3" ng-click="uploadFile(doc.userDocument.Name, doc.userDocument.Id, '')" type="button"
+                                        ng-disabled="isUploading || (doc.userDocument.Status__c=='Uploaded' && currentProposalStage == 'Submitted')">
+                                        <span ng-if="!isUploading">Upload</span>
+                                        <span ng-if="isUploading">
+                                            <i class="fa fa-spinner fa-spin"></i> Uploading...
+                                        </span>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="progress ms-4 mt-2" ng-show="showProgressBar" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{uploadProgress}}" aria-valuemin="0"
+                                    aria-valuemax="100" ng-style="{ 'width': uploadProgress + '%' }">
+                                    <span style="font-size:14px; font-weight:bold;">{{uploadProgress}}%</span>
+                                </div>
+                            </div>
+                            <div ng-if="doc.userDocument.Status__c=='Uploaded' && !isUploading" class="alert alert-success ms-4 mt-2 py-2">
+                                <i class="fa fa-check-circle"></i> Project proposal uploaded successfully.
+                            </div>
+                        </div>
+                        <!--<div class="col-md-2" ng-show="doc.userDocument.Status__c=='Uploaded'">
+<a class="blue-btn float-end mt-5 py-3" ng-click="filePreviewHandler(doc)">View</a>
+</div>-->
+                        <div class="col-md-2" ng-show="doc.userDocument.Status__c=='Uploaded'">
+                            <a class="blue-btn float-end mt-5 py-3" ng-class="{'disabled': isUploading}" href="{{previewFileLink}}" target="_blank">View</a>
+                        </div>
+                    </div>
+
+                    <div class="row my-5" ng-if="!proposalStage">
+                        <div class="col-md-12">
+                            <button class="blue-btn float-end" id="btnSubmit" ng-click="saveDetails()" type="button">
+                                <i class="fa-solid fa-check me-2"></i>Save and Next</button>
+                            <button class="btn btn-secondary float-end me-2" style="padding: 8px 20px !important;font-size: 16px !important;" ng-click="redirectPageURL('Financial_Overview')"
+                                type="button">Previous</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+
+
+            <!-- <div class="container px-4">
+                <div class="card mt-5 mx-5">
+                    <div class="card-header">
+                        <h2 class="p-3">
+                            <b>Project Details</b>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="container px-4">
+                <div class="card m-5">
+                    <div class="accordion" id="accordionPanelsStayOpenExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+                                    aria-controls="panelsStayOpen-collapseOne">
+                                    <h4>Main objectives of the research approach - as bullet points</h4>
+                                    <span class="required-asterisk" style="color:red;">*</span>
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+                                <div class="accordion-body">
+                                    <ng-ckeditor ng-model="proposalDetails.Research_Approach_Objectives__c" ng-config="config" required="true" ng-required="proposalDetails.Research_Approach_Objectives__c"></ng-ckeditor>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo"
+                                    aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                    <h4>Current state of the art in the field</h4>
+                                    <span class="required-asterisk" style="color:red;">*</span>
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                                <div class="accordion-body">
+                                    <ng-ckeditor ng-model="proposalDetails.Current_State_Of_The_Art__c" ng-config="config" required="true" ng-required="proposalDetails.Current_State_Of_The_Art__c"></ng-ckeditor>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree"
+                                    aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                                    <h4>Project description including work packages/work distribution amongst partners</h4>
+                                    <span class="required-asterisk" style="color:red;">*</span>
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                                <div class="accordion-body">
+                                    <ng-ckeditor ng-model="proposalDetails.Project_Description__c" ng-config="config" required="true" ng-required="proposalDetails.Project_Description__c"></ng-ckeditor>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour"
+                                    aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                                    <h4>Expected deliverables as bullet points</h4>
+                                    <span class="required-asterisk" style="color:red;">*</span>
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingFour">
+                                <div class="accordion-body">
+                                    <ng-ckeditor ng-model="proposalDetails.Expected_Deliverables__c" ng-config="config" required="true" ng-required="proposalDetails.Expected_Deliverables__c"></ng-ckeditor>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="panelsStayOpen-headingFive">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFive"
+                                    aria-expanded="false" aria-controls="panelsStayOpen-collapseFive">
+                                    <h4>Reasons for and benefits of cooperation including previous collaboration with the partner
+                                        country
+                                    </h4>
+                                    <span class="required-asterisk" style="color:red;">*</span>
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingFive">
+                                <div class="accordion-body">
+                                    <ng-ckeditor ng-model="proposalDetails.Reasons_For_And_Benefits_Of_Cooperation__c" ng-config="config" required="true" ng-required="proposalDetails.Reasons_For_And_Benefits_Of_Cooperation__c"></ng-ckeditor>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="panelsStayOpen-headingSix">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseSix"
+                                    aria-expanded="false" aria-controls="panelsStayOpen-collapseSix">
+                                    <h4>Equipment</h4>
+                                    <span class="required-asterisk" style="color:red;">*</span>
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseSix" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingSix">
+                                <div class="accordion-body">
+                                    <ng-ckeditor ng-model="proposalDetails.Equipment__c" ng-config="config" required="true" ng-required="proposalDetails.Equipment__c"></ng-ckeditor>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="secondstage">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingSeven">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseSeven"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapseSeven">
+                                        <h4>Criteria For Abandoning the Project</h4>
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseSeven" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingSeven">
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Criteria_For_Abandoning_The_Project__c" ng-config="config" required="true" ng-required="proposalDetails.Criteria_For_Abandoning_The_Project__c"></ng-ckeditor>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingEight">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseEight"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapseEight">
+                                        <h4>Innovative Aspects / IP and Future Potential Utilization Plan</h4>
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseEight" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingEight">
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Innovative_Aspects__c" ng-config="config"></ng-ckeditor>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingNine">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseNine"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapseNine">
+                                        <h4>Involvement of young scientists / Research Scholars</h4>
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseNine" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingNine">
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Research_Scholars__c" ng-config="config"></ng-ckeditor>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingTen">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTen"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapseTen">
+                                        <h4>Necessity Of Funding</h4>
+                                        <span class="required-asterisk" style="color:red;">*</span>
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseTen" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTen">
+                                    <div class="accordion-body">
+                                        <ng-ckeditor ng-model="proposalDetails.Necessity_Of_Funding__c" ng-config="config" required="true" ng-required="proposalDetails.Necessity_Of_Funding__c"></ng-ckeditor>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="blue-btn float-end me-4" ng-click="saveDetails()">Save and Next
+                            <i class="fa-solid fa-arrow-right ms-3"></i>
+                        </button>
+                        <button type="button" class="blue-bordered-btn float-end me-4" ng-click="redirectPageURL('Financial_Overview')">
+                            <i class="fa-solid fa-arrow-left i-padding"></i>Previous</button>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- <div class="container px-4">
+                <div class="card h-100 m-5">
+                    <div class="card-header">
+                        <h2 class="p-3">
+                            <b>Project Details</b>
+                        </h2>
+                    </div>
+                    <div class="row p-5">
+                        <div class="col-md-12 mb-5">
+                            <h4 class="mb-3">
+                                <b>Main objectives of the research approach - as bullet points</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Research_Approach_Objectives__c" ta-disabled='true'
+                                ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5">
+                            <h4 class="mb-3">
+                                <b>Current state of the art in the field</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Current_State_Of_The_Art__c" ta-disabled='true'
+                                ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5">
+                            <h4 class="mb-3">
+                                <b>Project description including work packages/work distribution amongst partners</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Project_Description__c" ta-disabled='true'
+                                ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5">
+                            <h4 class="mb-3">
+                                <b>Expected deliverables as bullet points</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Expected_Deliverables__c" ta-disabled='true'
+                                ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5">
+                            <h4 class="mb-3">
+                                <b>Reasons for and benefits of cooperation including previous collaboration with the partner
+                                    country</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Reasons_For_And_Benefits_Of_Cooperation__c"
+                                ta-disabled='true' ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5">
+                            <h4 class="mb-3">
+                                <b>Equipment</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Equipment__c" ta-disabled='true' ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5" ng-show="secondstage">
+                            <h4 class="mb-3">
+                                <b>Criteria For Abandoning the Project</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Criteria_For_Abandoning_The_Project__c" ta-disabled='true'
+                                ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5" ng-show="secondstage">
+                            <h4 class="mb-3">
+                                <b>Innovative Aspects / IP and Future Potential Utilization Plan</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Innovative_Aspects__c" ta-disabled='true' ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12 mb-5" ng-show="secondstage">
+                            <h4 class="mb-3">
+                                <b>Involvement of young scientists / Research Scholars</b>
+                            </h4>
+                            <div text-angular="text-angular" name="htmlcontent" ng-model="proposalDetails.Research_Scholars__c" ta-disabled='true' ng-readonly="true"></div>
+                        </div>
+                        <div class="col-md-12" ng-show="secondstage">
+                            <label class="control-label">
+                                <h4 class="mb-3">
+                                    <b>Necessity Of Funding</b>
+                                </h4>
+                            </label>
+                            <textarea class="form-control" rows="4" cols="50" ng-model="proposalDetails.Necessity_Of_Funding__c" size="100" maxlength="255"
+                                ng-disabled="disable"></textarea>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="blue-btn float-end me-4" ng-click="saveDetails()">Submit and Next
+                            <i class="fa-solid fa-arrow-right ms-3"></i>
+                        </button>
+                        <button type="button" class="blue-bordered-btn float-end me-4" ng-click="redirectPageURL('Financial_Overview')">
+                            <i class="fa-solid fa-arrow-left i-padding"></i>Previous</button>
+                    </div>
+                </div>
+            </div> -->
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        </body>
+    </div>
+
+    </html>
+</apex:page>

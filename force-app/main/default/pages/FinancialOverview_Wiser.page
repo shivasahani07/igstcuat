@@ -1,0 +1,504 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" controller="IndustrialFellowshipController">
+    <html>
+    <div ng-controller="financialWiser_Ctrl">
+
+        <head>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+            <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+            <apex:stylesheet value="{!$Resource.ApplicantPortalCSS}" />
+        </head>
+
+        <body>
+
+            <div class="container mt-5">
+                <div class="row mx-5">
+                    <div class="col-md-12">
+                        <div class="tab-link" ng-show="proposalStage">
+                            <div class="progress">
+                                <div class="progress-success w-100"></div>
+                            </div>
+                            <ul>
+                                
+                                
+                                <!-- Not Confirmed Yet -->
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('ProjectDetailsInWiserPage')">
+                                        <div class="icon-circle">
+                                            <i class="fa fa-home"></i>
+                                        </div>
+                                        <span>Pairing Details</span>
+                                    </a>
+                                </li>
+
+                                <!-- Pair Project Details -->
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('HostProjectDetails')">
+                                        <div class="icon-circle">
+                                            <i class="far fa-address-card"></i>
+                                        </div>
+                                        <span>Paired Project Details</span>
+                                    </a>
+                                </li>
+
+                                <!-- Pair Details -->
+                                <!-- <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('HostInfoApplicationPage')">
+                                        <div class="icon-circle">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </div>
+                                        <span>Host Details</span>
+                                    </a>
+                                </li> -->
+
+                                <!-- Applicant Details -->
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('WiserApplicationPage')">
+                                        <div class="icon-circle">
+                                            <i class="fas fa-user-alt"></i>
+                                        </div>
+                                        <span>Applicant Details</span>
+                                    </a>
+                                </li>
+
+                                <!-- Financial Details -->
+                                <li class="active pb-cursor">
+                                    <a ng-click="redirectPageURL('FinancialOverview_wiser')">
+                                        <div class="icon-circle">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span>Financial Overview</span>
+                                    </a>
+                                </li>
+
+                                
+                            </ul>
+                        </div>
+                        <div class="tab-link" ng-hide="proposalStage">
+                            <div class="progress">
+                                <div class="progress-success w-100"></div>
+                            </div>
+                            <ul>
+                                
+
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="far fa-address-card"></i>
+                                        </div>
+                                        <span>Pairing Details</span>
+                                    </a>
+                                </li>
+
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fas fa-user-alt"></i>
+                                        </div>
+                                        <span>Paired Project Details</span>
+                                    </a>
+                                </li>
+
+                                <!-- <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </div>
+                                        <span>Host Details</span>
+                                    </a>
+                                </li> -->
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fa fa-home"></i>
+                                        </div>
+                                        <span>Applicant Details</span>
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a>
+                                        <div class="icon-circle">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span>Financial Overview</span>
+                                    </a>
+                                </li>
+
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mx-5">
+                    <div class="col-md-12">
+                        <div class="tab-link" ng-show="proposalStage">
+                                <div class="progress">
+                                    <div class="progress-success w-100"></div>
+                                </div>
+                                <ul>
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('TwoReferenceWiser')">
+                                            <div class="icon-circle">
+                                                <i class="fas fa-user-friends"></i>
+                                            </div>
+                                            <span>References</span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('ExistingGrantWISER')">
+                                            <div class="icon-circle">
+                                                <i class="fas fa-money-bill"></i>
+                                            </div>
+                                            <span>Grant Details</span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('AttachmentsInWiser')">
+                                            <div class="icon-circle">
+                                                <i class="fas fa-upload"></i>
+                                            </div>
+                                            <span>Attachments</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('CV_Wiser')">
+                                            <div class="icon-circle">
+                                                <i class="fa-solid fa-address-book"></i>
+                                            </div>
+                                            <span>Curriculum Vitae</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('Declaration_Wiser')">
+                                            <div class="icon-circle">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            <span>Declaration</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-link" ng-hide="proposalStage">
+                                <div class="progress">
+                                    <div class="progress-success wp-0"></div>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fas fa-user-friends"></i>
+                                            </div>
+                                            <span>References</span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fas fa-money-bill"></i>
+                                            </div>
+                                            <span>Grant Details</span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fas fa-upload"></i>
+                                            </div>
+                                            <span>Attachments</span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa-solid fa-address-book"></i>
+                                            </div>
+                                            <span>Curriculum Vitae</span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            <span>Declaration</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5 mx-5">
+                    <div class="col-md-12">
+                        <div class="alert bg-color-list font-if" role="alert" ng-show="accDetails.Contacts[0].MailingCountry == 'India'">
+                            <i class="fa-solid fa-circle-info text-success me-2"></i>
+                            Indian awardee -
+                            <ul>
+                                <li class="ps-4">
+                                    <i class="fa-solid fa-circle text-success me-3"></i>Travel (including visa fee and insurance) approximately ₹ 1 lakh.</li>
+                                <li class="ps-4">
+                                    <i class="fa-solid fa-circle text-success me-3"></i>Project cost up to ₹ 12 lakhs/year (including research staff, consumables, contingency
+                                    and per diem @ € 2300/month in Germany).</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert bg-color-list font-if" role="alert" ng-hide="accDetails.Contacts[0].MailingCountry == 'India'">
+                            <i class="fa-solid fa-circle-info text-success me-2"></i>
+                            German awardee -
+                            <ul>
+                                <li class="ps-4">
+                                    <i class="fa-solid fa-circle text-success me-3"></i>Travel (including visa fee and insurance) approximately € 1500.</li>
+                                <li class="ps-4">
+                                    <i class="fa-solid fa-circle text-success me-3"></i>Project cost up to € 14500/year (including research staff, consumables, contingency
+                                    and per diem @ € 2300/month in India).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5 mx-5">
+                    <div class="col-md-3 py-3 ms-3 box-shadow-1">
+                        <!-- <i ng-if="appli.accRec.Country_Type__c=='India'"><apex:image url="{!$Resource.indiaFlag}" styleClass="img-fluid" style="max-width:30px;" /></i>
+                        <i ng-if="appli.accRec.Country_Type__c=='Germany'"><apex:image url="{!$Resource.germanyFlag}" styleClass="img-fluid" style="max-width:30px;" /></i> -->
+                        <h4 class="pb-3 color-theme w-75 float-end" style="font-weight:800">{{accDetails.Name}}</h4>
+                    </div>
+                </div>
+
+                <div class="row mt-5 mx-5" ng-repeat="expence in expenseList">
+                    <div class="accordion" stle="background-color: white !important" id="accordionPanelsStayOpenExample{{$index}}">
+                        <div class="accordion-item" style="border: none;">
+                            <div class="col-md-12 box-shadow-1 accordion-header" id="panelsStayOpen-heading{{$index}}" style="padding: none !important;margin-bottom: 1%;">
+                                <button class="accordion-button" style="background-color: white !important; box-shadow: none !important;" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpencollapse{{$index}}" aria-expanded="true" aria-controls="panelsStayOpencollapse{{$index}}">
+                                    <h4 class="pb-3 color-theme" style="font-weight:600;">{{expence.Name}}</h4>
+                                </button>
+                            </div>
+
+                            <div id="panelsStayOpencollapse{{$index}}" ng-clock="true" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-heading{{$index}}">
+                                <table class="table basic">
+                                    <thead>
+                                        <tr>
+                                            <th class="pb-3 color-theme" style="width:5%;">S.No.</th>
+                                            <th class="pb-3 color-theme" style="width:35%;">Description
+                                                <span class="required-asterisk" style="color:red;">*</span>
+                                            </th>
+                                            <th class="pb-3 color-theme" style="width:20%;">Year-1</th>
+                                            <th class="pb-3 color-theme" style="width:20%;" ng-show="Showyear2">Year-2</th>
+                                            <th class="pb-3 color-theme" style="width:20%;" ng-show="Showyear3">Year-3</th>
+                                            <th ng-hide="proposalStage" class="text-center">
+                                                <i class="fas fa-plus-circle icon" ng-click="addRow($index)" style="width:3%; font-size: 24px;"></i>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="lineItem in expence.Expense_Line_Items__r">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                <input class="form-control" type="text" id="Man Power" ng-model="lineItem.Description__c" ng-disabled="proposalStage" />
+                                            </td>
+                                            <td>
+                                                <input class="form-control w-100" number="lineItem.Year1_Expense__c" type="text" ng-model="lineItem.Year1_Expense__c" ng-keyup="calculateOtherField()"
+                                                    ng-change="calculateOtherField()" ng-keypress="calculateOtherField()" ng-disabled="proposalStage"
+                                                />
+                                            </td>
+                                            <td ng-show="Showyear2">
+                                                <input class="form-control" number="lineItem.Year2_Expense__c" type="text" ng-model="lineItem.Year2_Expense__c" ng-keyup="calculateOtherField2()"
+                                                    ng-change="calculateOtherField2()" ng-keypress="calculateOtherField2()" ng-disabled="proposalStage"
+                                                />
+                                            </td>
+                                            <td ng-show="Showyear3">
+                                                <input class="form-control" number="lineItem.Year3_Expense__c" type="text" ng-model="lineItem.Year3_Expense__c" ng-keyup="calculateOtherField3()"
+                                                    ng-change="calculateOtherField3()" ng-keypress="calculateOtherField3()" ng-disabled="proposalStage"
+                                                />
+                                            </td>
+                                            <td ng-hide="proposalStage" class="text-center">
+                                                <i class="fas fa-times-circle icon" ng-click="deleteRow($parent.$index,$index)"></i>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5 px-2 mx-5">
+                    <table class="table basic">
+                        <thead>
+                            <tr>
+                                <th class="pb-3 color-theme" style="width:5%;"></th>
+                                <th class="pb-3 color-theme" style="width:32%;">Description</th>
+                                <th class="pb-3 color-theme" style="width:18%;">Year-1 Expense</th>
+                                <th class="pb-3 color-theme" style="width:18%;" ng-show="Showyear2">Year-2 Expense</th>
+                                <th class="pb-3 color-theme" ng-show="Showyear3">Year-3 Expense</th>
+                                <!-- <th style="width:5%;"><i style="width:3%; font-size: 24px;"></i></th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="accDetails.Contacts[0].MailingCountry == 'India'">
+                                <td>Required</td>
+                                <td>All Total Required</td>
+                                <td>Max ₹ 13 lakh</td>
+                                <td ng-show="Showyear2">Max ₹ 13 lakh</td>
+                                <td ng-show="Showyear3">Max ₹ 13 lakh</td>
+                            </tr>
+
+                            <tr ng-hide="accDetails.Contacts[0].MailingCountry == 'India'">
+                                <td>Required</td>
+                                <td>All Total Required</td>
+                                <td>Max 16000 €</td>
+                                <td ng-show="Showyear2">Max 16000 €</td>
+                                <td ng-show="Showyear3">Max 16000 €</td>
+                            </tr>
+                            <tr ng-show="accDetails.Contacts[0].MailingCountry == 'India'">
+                                <td>Total</td>
+                                <td>All total Expenses</td>
+                                <td>
+                                    <input class="form-control" ng-model="year1" ng-disabled="true" />
+                                </td>
+                                <td ng-show="Showyear2">
+                                    <input class="form-control" ng-model="year2" ng-disabled="true" />
+                                </td>
+                                <td ng-show="Showyear3">
+                                    <input class="form-control" ng-model="year3" ng-disabled="true" />
+                                </td>
+                                <!-- <td></td> -->
+                            </tr>
+                            <tr ng-hide="accDetails.Contacts[0].MailingCountry == 'India'">
+                                <td>Total</td>
+                                <td>All total Expenses</td>
+                                <td>
+                                    <input class="form-control" ng-model="year1Germany" ng-disabled="true" />
+                                </td>
+                                <td ng-show="Showyear2">
+                                    <input class="form-control" ng-model="year2Germany" ng-disabled="true" />
+                                </td>
+                                <td ng-show="Showyear3">
+                                    <input class="form-control" ng-model="year3Germany" ng-disabled="true" />
+                                </td>
+                                <!-- <td></td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="m-5" ng-if="!proposalStage">
+                    <button class="blue-btn float-end" ng-click="saveExpenceLineitems()" type="button">
+                        <i class="fa-solid fa-check me-2"></i>Save and Next</button>
+                    <button class="blue-bordered-btn float-end me-2" ng-click="redirectPageURL('WiserApplicationPage')" type="button">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Previous</button>
+                </div>
+            </div>
+
+
+            <!-- <div class="container px-4">
+                <div class="card h-100 ">
+                    <div class="card-header">   
+                        <h2 class="p-3">
+                            <b>Host Information</b> 
+                           
+                        </h2>
+                    </div>
+                <div class="row px-5">
+                    <div class="col-md-12">
+
+            <div >
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item" ng-repeat="expence in expenseList">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <h4>{{expence.Name}}</h4>
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <div class="row ms-3 me-3">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th class="p-2">Details</th>
+                                                <th class="p-2">Description</th>
+                                                <th class="p-2">Year1</th>
+                                                <th class="p-2">Year2</th>
+                                                <th class="p-2">Year3</th>
+                                                <th nowrap="true" width="15%" class="p-2">
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="lineItem in expence.expenseLineItem">
+                                                <td class="p-4">
+                                                    <label>{{$index + 1}}</label>
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        <input class="form-control" id="Man Power" ng-model="lineItem.Description__c"  />
+                                                    </label>
+                                                    <br/>
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        <input class="form-control" ng-model="lineItem.Year1_Expense__c"  />
+                                                    </label>
+                                                    <br/>
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        <input class="form-control" ng-model="lineItem.Year2_Expense__c" />
+                                                    </label>
+                                                    <br/>
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        <input class="form-control" ng-model="lineItem.Year3_Expense__c" />
+                                                    </label>
+                                                    <br/>
+                                                </td>
+                                             
+                                                <td class="text-center">
+                                                    
+                                                    <a type="button" ng-click="addRow($parent.$index,$index)">
+                                                        <i class="fa-solid fa-circle-plus fa-2x text-success"></i>
+                                                    </a>
+                                                    <a type="button" ng-click="deleteRow($parent.$index,$index)">
+                                                        <i class="fa-solid fa-circle-xmark fa-2x text-danger"></i>
+                                                    </a>
+                                                </td>
+                                              
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer mt-3">
+                <div class="col-md-12">
+                    <button type="button" class="blue-btn float-end ms-3" ng-click="saveExpenceLineitems()">Save and Next</button>
+                    <button type="button" class="blue-bordered-btn float-end" ng-click="redirectPageURL('HostInfoApplicationPage')">Previous</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div> -->
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        </body>
+    </div>
+
+    </html>
+</apex:page>

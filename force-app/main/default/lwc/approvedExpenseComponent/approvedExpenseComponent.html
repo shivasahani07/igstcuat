@@ -1,0 +1,71 @@
+<template>
+    <template if:true={accounts}>
+        <template for:each={accounts} for:item="acc">
+            <section key={acc.accountId} class="accordion-item">
+                <header class="accordion-header" onclick={toggleAccordion} data-id={acc.accountId} style="cursor:pointer;">
+                    <div class="header-left">
+                        <template if:true={acc.flagUrl}>
+                            <img src={acc.flagUrl} alt="Country Flag" class="flag-icon" />
+                        </template>
+                        <h3 class="slds-text-heading_medium slds-m-left_medium">
+                            {acc.contactName} - {acc.accountName}
+                        </h3>
+                    </div>
+                    <lightning-icon icon-name={acc.iconName} size="small"></lightning-icon>
+                </header>
+
+                <template if:true={acc.isOpen}>
+                    <div class="slds-p-around_small table-scroll">
+                        <template if:true={acc.expenses.length}>
+                            <table class="enhanced-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Approved Category</th>
+                                        <th>Total Expense(Year1)</th>
+                                        <th>Approved Expense(Year1)</th>
+                                        <th>Total Expense(Year2)</th>
+                                        <th>Approved Expense(Year2)</th>
+                                        <th>Total Expense(Year3)</th>
+                                        <th>Approved Expense(Year3)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={acc.expenses} for:item="exp">
+                                        <tr key={exp.Id} class={exp.rowClass}>
+                                            <td>{exp.Name}</td>
+                                            <td class="aligncenter">
+                                                <lightning-input type="checkbox" checked={exp.Approved_Category__c} data-id={exp.Id} data-field="Approved_Category__c" onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="aligncenter">{exp.Total_Expense_Year1__c}</td>
+                                            <td>
+                                                <lightning-input type="number" value={exp.approvedExpenseYear1Value} data-id={exp.Id} data-field="Approved_Expense_Year1__c" onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="aligncenter">{exp.Total_Expense_Year2__c}</td>
+                                            <td>
+                                                <lightning-input type="number" value={exp.approvedExpenseYear2Value} data-id={exp.Id} data-field="Approved_Expense_Year2__c" onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="aligncenter">{exp.Total_Expense_Year3__c}</td>
+                                            <td>
+                                                <lightning-input type="number" value={exp.approvedExpenseYear3Value} data-id={exp.Id} data-field="Approved_Expense_Year3__c" onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <div class="slds-text-align_center slds-m-top_small">
+                                <lightning-button variant="brand" label="Save" data-id={acc.accountId} onclick={handleSave}></lightning-button>
+                            </div>
+                        </template>
+                        <template if:false={acc.expenses.length}>
+                            <p>No Expense Category exists under this account!!</p>
+                        </template>
+                    </div>
+                </template>
+            </section>
+        </template>
+    </template>
+    <template if:false={accounts}>
+        <p>No Accounts exist under this proposal!!</p>
+    </template>
+</template>

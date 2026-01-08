@@ -1,0 +1,237 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" lightningStylesheets="false" docType="html-5.0">
+  <html>
+    <head>
+      <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+      <meta http-equiv="Pragma" content="no-cache" />
+      <meta http-equiv="Expires" content="0" />
+      <c:Libraries />
+      <c:Controllers />
+      <style>
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          font-family: 'Segoe UI', sans-serif;
+          background-color: #f6f6fb;
+          height: 100vh;
+          display: flex;
+          overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+          width: 240px;
+          background-color: #fff;
+          border-right: 1px solid #e0e0e0;
+          display: flex;
+          flex-direction: column;
+          padding-top: 20px;
+        }
+
+        .sidebar .logo {
+          text-align: center;
+          font-size: 22px;
+          font-weight: bold;
+          color: #4b0082;
+          margin-bottom: 30px;
+        }
+
+        .nav-item {
+          padding: 15px 25px;
+          font-size: 15px;
+          color: #444;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: background-color 0.3s;
+        }
+
+        .nav-item i {
+          margin-right: 12px;
+          font-size: 16px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+          background-color: #4b0082;
+          color: #fff;
+        }
+
+        .bottom-nav {
+          margin-top: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+          flex: 1;
+          padding: 30px;
+          overflow-y: auto;
+        }
+
+        .header {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .header span {
+          font-weight: 500;
+          color: #333;
+        }
+
+        h2 {
+          color: #4b0082;
+          margin-top: 20px;
+          font-size: 22px;
+        }
+
+        .card-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-top: 10px;
+        }
+
+        .program-card {
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          width: calc(33.33% - 13.33px);
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .program-icon {
+          font-size: 20px;
+          color: white;
+          background-color: #4b0082;
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        .program-title {
+          font-weight: 600;
+          color: #333;
+          font-size: 16px;
+          margin-bottom: 5px;
+        }
+
+        .program-deadline {
+          font-size: 13px;
+          color: #d32f2f;
+          margin-bottom: 10px;
+        }
+
+        .program-desc {
+          font-size: 14px;
+          color: #555;
+          margin-bottom: 15px;
+        }
+
+        .btn-container {
+          margin-top: auto;
+          display: flex;
+          gap: 10px;
+        }
+
+        .btn {
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 13px;
+          cursor: pointer;
+          border: 1px solid #4b0082;
+          background-color: white;
+          color: #4b0082;
+          transition: 0.3s;
+        }
+
+        .btn:hover {
+          background-color: #4b0082;
+          color: white;
+        }
+
+        /* Responsive */
+        @media(max-width: 1024px) {
+          .program-card {
+            width: calc(50% - 10px);
+          }
+        }
+
+        @media(max-width: 768px) {
+          .program-card {
+            width: 100%;
+          }
+
+          .sidebar {
+            width: 200px;
+          }
+        }
+      </style>
+    </head>
+    <body ng-app="cp_app" ng-controller="ap_dashboard_ctrl">
+      <div class="sidebar">
+        <div class="logo">IGSTC</div>
+        <div class="nav-item" ng-class="{active: selectedMenu === 'Dashboard'}" ng-click="showSection('Dashboard')">
+          <i class="fa-solid fa-home"></i> Dashboard
+        </div>
+        <div class="nav-item" ng-class="{active: selectedMenu === 'Programs'}" ng-click="showSection('Programs')">
+          <i class="fa-solid fa-list"></i> Programs
+        </div>
+        <div class="nav-item" ng-class="{active: selectedMenu === 'Help'}" ng-click="showSection('Help')">
+          <i class="fa-solid fa-circle-question"></i> Get Help
+        </div>
+        <div class="nav-item" ng-class="{active: selectedMenu === 'FAQ'}" ng-click="showSection('FAQ')">
+          <i class="fa-solid fa-question"></i> FAQ’s
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" ng-class="{active: selectedMenu === 'Profile'}" ng-click="showSection('Profile')">
+            <i class="fa-solid fa-user"></i> Profile
+          </div>
+          <div class="nav-item" ng-class="{active: selectedMenu === 'Logout'}" ng-click="showSection('Logout')">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="header">
+          <span><i class="fa-solid fa-bell"></i>&nbsp;&nbsp;Dr. Narendra Kumar</span>
+        </div>
+        <div ng-if="selectedMenu === 'Programs'">
+          <h2>Ongoing Programs</h2>
+          <div class="card-grid">
+            <div class="program-card" ng-repeat="p in ongoingPrograms">
+              <div class="program-icon">
+                <i class="{{p.icon}}"></i>
+              </div>
+              <div class="program-title">{{p.name}}</div>
+              <div class="program-deadline">Application Deadline: {{p.deadline}}</div>
+              <div class="program-desc">{{p.desc}}</div>
+              <div class="btn-container">
+                <div class="btn">Apply</div>
+                <div class="btn">Know More</div>
+              </div>
+            </div>
+          </div>
+          <h2>Under Grant</h2>
+          <div class="card-grid">
+            <div class="program-card" ng-repeat="g in underGrant">
+              <div class="program-icon">
+                <i class="{{g.icon}}"></i>
+              </div>
+              <div class="program-title">{{g.name}}</div>
+              <div class="program-desc">{{g.details}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>
+</apex:page>

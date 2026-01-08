@@ -1,0 +1,20 @@
+<template>
+    <div class="pagination-container">
+        <button onclick={handlePrevious} disabled={isPrevDisabled}>&lt;</button>
+
+        <template for:each={pagesList} for:item="page">
+            <span key={page.pageNumber}>
+                <button
+                    data-page={page.pageNumber}
+                    onclick={handlePageChange}
+                    class={page.isClass}>
+                    {page.pageNumber}
+                </button>
+            </span>
+        </template>
+
+        <button onclick={handleNext} disabled={isNextDisabled}>&gt;</button>
+    </div>
+
+   
+</template>

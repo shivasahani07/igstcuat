@@ -1,0 +1,20 @@
+.search-input {
+    max-width: 400px;
+}
+
+.account-table {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+}
+
+.slds-text-heading_small strong {
+    color: #0176d3;
+}
+
+.slds-align_absolute-center {
+    text-align: center;
+}
+
+.slds-text-color_weak {
+    margin-top: 0.5rem;
+}
