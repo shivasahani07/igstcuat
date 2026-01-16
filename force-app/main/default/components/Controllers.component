@@ -202,8 +202,9 @@
 
         // File Upload and render
 
-
-        angular.module('cp_app', ['ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'textAngular', 'ng.ckeditor', 'dropdown-multiselect', 'ngSanitize', 'number', 'ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'text', 'textarea', 'decimal', 'specialChar']); 
+     angular.module('cp_app', ['ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'textAngular', 'ng.ckeditor', 'ngSanitize', 'number', 'ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'text', 'textarea', 'decimal', 'specialChar']); 
+    
+    // angular.module('cp_app', ['ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'textAngular', 'ng.ckeditor', 'dropdown-multiselect', 'ngSanitize', 'number', 'ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'text', 'textarea', 'decimal', 'specialChar']); 
     </script>
     
     <script src="{!$Resource.Home}" /> 

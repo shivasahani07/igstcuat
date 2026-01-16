@@ -277,7 +277,8 @@
 
 
                         <div class="col-md-6">
-                            <label class="font-if">Recommendation letter from Mentor at parent organisation.</label>
+                            <label class="font-if">Recommendation letter from Mentor/Expert from the same field.</label>
+                             <!--<label class="font-if">Recommendation letter from Mentor at parent organisation.</label>-->
                             <div class="col-md-9 mt-5" style="padding-left: 0px !important; padding-right: 0px !important">
                                 <div class="input-group input-group-lg">
                                     <input type="file" accept=".pdf" ng-disabled="proposalStage" id="{{recommendation.userDocument.Name}}" class="form-control "

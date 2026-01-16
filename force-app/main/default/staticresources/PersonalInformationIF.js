@@ -708,7 +708,7 @@ debugger
         $scope.objContact.MailingStreet=$scope.MailingLine1;
       }
       if($scope.MailingLine2!=undefined){
-        $scope.objContact.MailingStreet=$scope.objContact.MailingStreet+','+$scope.MailingLine2;
+        $scope.objContact.MailingStreet=$scope.objContact.MailingStreet+';'+$scope.MailingLine2;
       }
       if($scope.MailingLine1==null && $scope.MailingLine2==null){
         $scope.objContact.MailingStreet=null;

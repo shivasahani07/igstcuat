@@ -176,10 +176,15 @@ public static String saveApplicantPortalSingh(String loginHashCode,Contact con,A
         IndustrialFellowshipHelper instanceIFH = new IndustrialFellowshipHelper();
         return instanceIFH.saveAccountContactEduOtherDetList(ProposalId,accountId,con,ed,edu,flag);
     }
-    @RemoteAction 
+    /* @RemoteAction 
     public static String saveWorkPackageDet(List<IndustrialFellowshipHelper.WrapperWorkpackageDet> wrapper,String ProposalId){
         IndustrialFellowshipHelper instanceIFH = new IndustrialFellowshipHelper();
         return instanceIFH.saveWorkPackageDet(wrapper,ProposalId);
+    } */
+    @RemoteAction 
+    public static String saveWorkPackageDet(List<IndustrialFellowshipHelper.WrapperWorkpackageDet> wrapper, String ProposalId, String proposalStage){
+        IndustrialFellowshipHelper instanceIFH = new IndustrialFellowshipHelper();
+        return instanceIFH.saveWorkPackageDet(wrapper, ProposalId, proposalStage);
     }
     @RemoteAction
     public static string deleteWorkPackageDetails(string workPackageId){

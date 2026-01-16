@@ -72,6 +72,8 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function($scope,$rootSco
                 if(result.Title_Of_Project__c != undefined || result.Title_Of_Project__c != ""){
                     result.Title_Of_Project__c = result.Title_Of_Project__c ? result.Title_Of_Project__c.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('lt;','<').replaceAll('&gt;','>').replaceAll('gt;','>').replaceAll('&amp;','&').replaceAll('amp;','&').replaceAll('&quot;','\'') : result.Title_Of_Project__c;
                 }
+                
+                
                 if(result.Planned_research_activities_of_the_visit__c != undefined || result.Planned_research_activities_of_the_visit__c != ""){
                     result.Planned_research_activities_of_the_visit__c = result.Planned_research_activities_of_the_visit__c ? result.Planned_research_activities_of_the_visit__c.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('lt;','<').replaceAll('&gt;','>').replaceAll('gt;','>').replaceAll('&amp;','&').replaceAll('amp;','&').replaceAll('&quot;','\'') : result.Planned_research_activities_of_the_visit__c;
                 }
