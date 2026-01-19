@@ -216,8 +216,8 @@ $scope.saveandNext = function(){
             }
         }else if($scope.allDocs[i].userDocument.Name == 'Invitation letter from Host Organization'){
             if($scope.allDocs[i].userDocument.Status__c != 'Uploaded'){
-                swal('info','Please upload Invitation letter from the host organization.','info');
-                return;
+                // swal('info','Please upload Invitation letter from the host organization.','info');
+                // return;
             }  
         }else if($scope.allDocs[i].userDocument.Name == 'No Objection Certificate'){
             if($scope.allDocs[i].userDocument.Status__c != 'Uploaded'){

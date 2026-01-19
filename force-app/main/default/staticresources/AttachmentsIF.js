@@ -20,7 +20,7 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
     $scope.baseUrl = window.location.origin;
     $scope.baseUrl = $scope.baseUrl + '/servlet/servlet.FileDownload?file=';
 
-  // Fetching the proposalId from Local Storage
+    // Fetching the proposalId from Local Storage
     if (localStorage.getItem('proposalId')) {
         $rootScope.proposalId = localStorage.getItem('proposalId');
         console.log('Loaded proposalId from localStorage:', $rootScope.proposalId);
@@ -75,7 +75,7 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
         debugger;
         $scope.selectedFile = '';
         $('#file_frame').attr('src', '');
-        ApplicantPortal_Contoller.getContactUserDoc($rootScope.contactId,$rootScope.proposalId, function (result, event) {
+        ApplicantPortal_Contoller.getContactUserDoc($rootScope.contactId, $rootScope.proposalId, function (result, event) {
             debugger
             console.log('result return onload :: ');
             console.log(result);
@@ -196,26 +196,108 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
         });
     }
 
-/*
+    /*
+        $scope.uploadFile = function (type, userDocId, fileId, maxSize, minFileSize) {
+            debugger;
+            $scope.showSpinnereditProf = true;
+            var file;
+    
+            // var filee = $scope.fileInput;  // Directly access file from Angular's model
+            // console.log('fileeee : ' + filee);
+    
+            // if (!filee) {
+            //     swal('info', 'You must choose a file before trying to upload it', 'info');
+            //     $scope.showSpinnereditProf = false;
+            //     return;
+            // }
+    
+            console.log(type);
+            console.log(userDocId);
+            console.log(fileId);
+            file = document.getElementById("acceptance.userDocument.Name").file[0];
+    
+    
+            fileName = file.name;
+            var typeOfFile = fileName.split(".");
+            lengthOfType = typeOfFile.length;
+            if (typeOfFile[lengthOfType - 1] != "pdf") {
+                swal('info', 'Please choose pdf file only.', 'info');
+                return;
+            }
+            console.log(file);
+            maxFileSize = maxSize;
+            if (file != undefined) {
+                if (file.size <= maxFileSize) {
+    
+                    attachmentName = file.name;
+                    const myArr = attachmentName.split(".");
+                    var fileReader = new FileReader();
+                    var maxStringSize = 6000000;
+                    fileReader.onloadend = function (e) {
+                        attachment = window.btoa(this.result);  //Base 64 encode the file before sending it
+                        positionIndex = 0;
+                        fileSize = attachment.length;
+                        $scope.showSpinnereditProf = false;
+                        console.log("Total Attachment Length: " + fileSize);
+                        doneUploading = false;
+                        debugger;
+                        if (fileSize < maxStringSize) {
+                            $scope.uploadAttachment(type, userDocId, null);
+                        } else {
+                            swal('info', 'Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".', 'info');
+                            return;
+                        }
+    
+                    }
+                    fileReader.onerror = function (e) {
+                        swal('info', 'There was an error reading the file.  Please try again.', 'info');
+                        return;
+                    }
+                    fileReader.onabort = function (e) {
+                        swal('info', 'There was an error reading the file.  Please try again.', 'info');
+                        return;
+                    }
+    
+                    fileReader.readAsBinaryString(file);  //Read the body of the file
+    
+                } else {
+                    swal('info', 'Your file is too large.  Please try again.', 'info');
+                    return;
+                    $scope.showSpinnereditProf = false;
+                }
+            } else {
+                swal('info', 'You must choose a file before trying to upload it', 'info');
+                return;
+                $scope.showSpinnereditProf = false;
+            }
+        }
+    
+    */
+
+    // New Upload file added by Rukasar...
+
     $scope.uploadFile = function (type, userDocId, fileId, maxSize, minFileSize) {
         debugger;
         $scope.showSpinnereditProf = true;
         var file;
 
-        // var filee = $scope.fileInput;  // Directly access file from Angular's model
-        // console.log('fileeee : ' + filee);
+        file = document.getElementById(type).files[0];
 
-        // if (!filee) {
-        //     swal('info', 'You must choose a file before trying to upload it', 'info');
-        //     $scope.showSpinnereditProf = false;
-        //     return;
-        // }
+        // ADD THIS ERROR HANDLING ↓
+        if (!file) {
+            swal('Info', 'Please select a file to upload!', 'info');
+            $scope.showSpinnereditProf = false;
+            return;
+        }
 
-        console.log(type);
-        console.log(userDocId);
-        console.log(fileId);
-        file = document.getElementById("acceptance.userDocument.Name").file[0];
+        // ADD FILE SIZE VALIDATION FOR 1 MB ↓
+        var maxFileSize = 6000000; // 1 MB in bytes
 
+        if (file.size > maxFileSize) {
+            swal('Info', 'File size must be less than 1 MB. Your file is ' + (file.size / 1024 / 1024).toFixed(2) + ' MB', 'info');
+            $scope.showSpinnereditProf = false;
+            return;
+        }
 
         fileName = file.name;
         var typeOfFile = fileName.split(".");
@@ -224,131 +306,49 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
             swal('info', 'Please choose pdf file only.', 'info');
             return;
         }
+
         console.log(file);
-        maxFileSize = maxSize;
+
         if (file != undefined) {
-            if (file.size <= maxFileSize) {
+            attachmentName = file.name;
+            const myArr = attachmentName.split(".");
+            var fileReader = new FileReader();
 
-                attachmentName = file.name;
-                const myArr = attachmentName.split(".");
-                var fileReader = new FileReader();
-                var maxStringSize = 6000000;
-                fileReader.onloadend = function (e) {
-                    attachment = window.btoa(this.result);  //Base 64 encode the file before sending it
-                    positionIndex = 0;
-                    fileSize = attachment.length;
-                    $scope.showSpinnereditProf = false;
-                    console.log("Total Attachment Length: " + fileSize);
-                    doneUploading = false;
-                    debugger;
-                    if (fileSize < maxStringSize) {
-                        $scope.uploadAttachment(type, userDocId, null);
-                    } else {
-                        swal('info', 'Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".', 'info');
-                        return;
-                    }
-
-                }
-                fileReader.onerror = function (e) {
-                    swal('info', 'There was an error reading the file.  Please try again.', 'info');
-                    return;
-                }
-                fileReader.onabort = function (e) {
-                    swal('info', 'There was an error reading the file.  Please try again.', 'info');
-                    return;
-                }
-
-                fileReader.readAsBinaryString(file);  //Read the body of the file
-
-            } else {
-                swal('info', 'Your file is too large.  Please try again.', 'info');
-                return;
+            fileReader.onloadend = function (e) {
+                attachment = window.btoa(this.result);
+                positionIndex = 0;
+                fileSize = attachment.length;
                 $scope.showSpinnereditProf = false;
+                console.log("Total Attachment Length: " + fileSize);
+                doneUploading = false;
+                debugger;
+
+                if (fileSize < maxStringSize) {
+                    $scope.uploadAttachment(type, userDocId, null);
+                } else {
+                    swal('info', 'Base 64 Encoded file is too large.', 'info');
+                    return;
+                }
             }
+
+            fileReader.onerror = function (e) {
+                swal('info', 'There was an error reading the file. Please try again.', 'info');
+                return;
+            }
+
+            fileReader.onabort = function (e) {
+                swal('info', 'There was an error reading the file. Please try again.', 'info');
+                return;
+            }
+
+            fileReader.readAsBinaryString(file);
         } else {
             swal('info', 'You must choose a file before trying to upload it', 'info');
-            return;
             $scope.showSpinnereditProf = false;
-        }
-    }
-
-*/
-
-  // New Upload file added by Rukasar...
-
-  $scope.uploadFile = function (type, userDocId, fileId, maxSize, minFileSize) {
-    debugger;
-    $scope.showSpinnereditProf = true;
-    var file;
-
-    file = document.getElementById(type).files[0];
-    
-    // ADD THIS ERROR HANDLING ↓
-    if (!file) {
-        swal('Info', 'Please select a file to upload!', 'info');
-        $scope.showSpinnereditProf = false;
-        return;
-    }
-
-    // ADD FILE SIZE VALIDATION FOR 1 MB ↓
-    var maxFileSize = 6000000; // 1 MB in bytes
-    
-    if (file.size > maxFileSize) {
-        swal('Info', 'File size must be less than 1 MB. Your file is ' + (file.size / 1024 / 1024).toFixed(2) + ' MB', 'info');
-        $scope.showSpinnereditProf = false;
-        return;
-    }
-
-    fileName = file.name;
-    var typeOfFile = fileName.split(".");
-    lengthOfType = typeOfFile.length;
-    if(typeOfFile[lengthOfType-1] != "pdf"){
-        swal('info','Please choose pdf file only.','info');
-        return;
-    }
-    
-    console.log(file);
-    
-    if (file != undefined) {
-        attachmentName = file.name;
-        const myArr = attachmentName.split(".");
-        var fileReader = new FileReader();
-        
-        fileReader.onloadend = function (e) {
-            attachment = window.btoa(this.result);
-            positionIndex = 0;
-            fileSize = attachment.length;
-            $scope.showSpinnereditProf = false;
-            console.log("Total Attachment Length: " + fileSize);
-            doneUploading = false;
-            debugger;
-            
-            if (fileSize < maxStringSize) {
-                $scope.uploadAttachment(type, userDocId, null);
-            } else {
-                swal('info','Base 64 Encoded file is too large.','info');
-                return;
-            }
-        }
-        
-        fileReader.onerror = function (e) {
-            swal('info','There was an error reading the file. Please try again.','info');
             return;
         }
-        
-        fileReader.onabort = function (e) {
-            swal('info','There was an error reading the file. Please try again.','info');
-            return;
-        }
-
-        fileReader.readAsBinaryString(file);
-    } else {
-        swal('info','You must choose a file before trying to upload it','info');
-        $scope.showSpinnereditProf = false;
-        return;
     }
-}
- 
+
 
     $scope.uploadAttachment = function (type, userDocId, fileId) {
         debugger;
@@ -438,6 +438,14 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
             }
         }
 
+        Swal.fire(
+            'Success',
+            'Your Attachments have been saved successfully.',
+            'success'
+        );
+
         $scope.redirectPageURL('ReviewAndSubmitIF');
     }
+
+
 });

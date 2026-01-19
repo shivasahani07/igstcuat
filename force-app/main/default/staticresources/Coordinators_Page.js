@@ -14,6 +14,7 @@ angular.module('cp_app').controller('coordinators_ctrl', function ($scope, $root
     $rootScope.campaignId;
     $rootScope.yearlyCallId;
 
+    
     // Get proposalId from LocalStorage
     if (localStorage.getItem('proposalId')) {
         $rootScope.proposalId = localStorage.getItem('proposalId');

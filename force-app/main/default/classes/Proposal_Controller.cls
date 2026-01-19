@@ -3479,6 +3479,8 @@ return e.getMessage() + e.getLineNumber();
                                                              }
                                                          }
     
+    
+    
     //expense head logic - single - commented this code for year expense issue
     /*
 public static string createExpenseDeclarationDetails(List<Expense_Line_Item__c> expenseLineItem,String proposalId,String accId){
@@ -3641,6 +3643,9 @@ upsert expenseLineItemTobeInsert;
 return 'success';
 }
 */
+    
+    
+    
     
     public static edWrapper getExpenseDetails(String ProposalId, String ContactId) {
         edWrapper wrap = new edWrapper();
@@ -5165,7 +5170,7 @@ public class insertPairingWrapperinWiser {
         try{
             List<Employment_Details__c> empList = [Select Id,Name,Start_Date__c,End_Date__c,Position__c,Organization_Name__c,Nature_of_Job__c,Contact__c,current_employement__c,
                                                    Contact__r.Previous_industrial_internship__c,Contact__r.Availing_Fellowship__c,Contact__r.Fellowship_Details__c,Contact__r.Associated_with_IGSTC__c,Contact__r.Associated_Details__c,
-                                                   Contact__r.Abstract_of_Ongoing_Work__c From Employment_Details__c Where Contact__r.Login_Hash_Code__c =: hashcode and Applicant_Proposal_Association__c=:apaId ];
+                                                   Contact__r.Abstract_of_Ongoing_Work__c From Employment_Details__c Where  Applicant_Proposal_Association__c=:apaId ];
             return empList;
         }catch(Exception e){
             return null;
@@ -5261,7 +5266,7 @@ public class insertPairingWrapperinWiser {
     
     public static Achievement__c getAchievements(string hashcode,string apaId){
         try{
-            List<Achievement__c> achieveRecord = [SELECT id,contact__c,Awards_Honours__c,List_of_Publications__c,List_of_Patents_filed__c,Book_Chapters__c,Any_other_achievements__c FROM Achievement__c where contact__r.Login_Hash_Code__c=:hashcode AND Applicant_Proposal_Association__c=:apaId];
+            List<Achievement__c> achieveRecord = [SELECT id,contact__c,Awards_Honours__c,List_of_Publications__c,List_of_Patents_filed__c,Book_Chapters__c,Any_other_achievements__c FROM Achievement__c where  Applicant_Proposal_Association__c=:apaId];
             if(achieveRecord.size() > 0){
                 return achieveRecord[0];
             }
@@ -6706,19 +6711,28 @@ return null;
 //     system.debug('proposalRecord----'+proposalRecord);     
 }*/
     
-    public static Contact getFellowshipDetails(string applicantHashCode){
-        
-        try{
+    public static Contact getFellowshipDetails(string applicantHashCode, string proposalId){
+       
+    try{
+        // If proposalId is provided, filter by it; otherwise use the original behavior
+        if(String.isNotBlank(proposalId)){
             Contact conRec = [SELECT Id,Planned_research_activities_of_the_visit__c,Expected_outcomes__c,Basis_for_choosing_your_paired_member__c,Tentative_plans__c,Tentative_Start_Date__c,Tentative_End_Date__c, Title_Of_Project__c,
-                              Availing_Fellowship__c,Associated_with_IGSTC__c,Give_Fellowship_Details__c,Give_Associated_Details__c,(SELECT Id,Proposals__r.Id,Proposals__r.yearly_Call__r.Result_Announcement_Date__c,Proposals__r.yearly_Call__r.Pecfar_Information_Text__c
-                                                                                                                                     FROM Applicant_Proposal_Associations__r WHERE Proposals__r.RecordType_Name__c='PECFAR' LIMIT 1) FROM Contact WHERE Login_Hash_Code__c =: applicantHashCode];
-            
+                              Availing_Fellowship__c,Associated_with_IGSTC__c,Give_Fellowship_Details__c,Give_Associated_Details__c,
+                              (SELECT Id,Proposals__r.Id,Proposals__r.KeyWords__c,Proposals__r.yearly_Call__r.Result_Announcement_Date__c,Proposals__r.yearly_Call__r.Pecfar_Information_Text__c
+                               FROM Applicant_Proposal_Associations__r WHERE Proposals__r.Id =: proposalId AND Proposals__r.RecordType_Name__c='PECFAR' LIMIT 1)
+                              FROM Contact WHERE Login_Hash_Code__c =: applicantHashCode];
             return conRec;
-        }
-        catch(Exception e){
+        } else {
+            // Fall back to original behavior if proposalId is not provided
+            // return getFellowshipDetails(applicantHashCode);
             return null;
         }
     }
+    catch(Exception e){
+        system.debug('getFellowshipDetails exception: ' + e.getLineNumber() + ' - ' + e.getMessage());
+        return null;
+    }
+}
     
     
     
@@ -6819,6 +6833,16 @@ return null;
                                  FROM Contact WHERE Login_Hash_Code__c=: hashcode ];
         return ContactRecord;
     }
+    
+    
+public static List<Application_Thematic_Area__c> getApplicationThematicAreas(String proposalId){
+    try{
+        return [SELECT Id, Thematic_Area__c, Thematic_Area_Name__c FROM Application_Thematic_Area__c WHERE Application__c = :proposalId];
+    }catch(Exception e){
+        system.debug('getApplicationThematicAreas exception: ' + e.getLineNumber() + ' - ' + e.getMessage());
+        return new List<Application_Thematic_Area__c>();
+    }
+}
 
     // RE-USING OLD METHOD
     public static List<Contact> getCoordCVDetails(String hashCode, String apaId, String proposalId){
@@ -7089,6 +7113,79 @@ return null;
         }
     }
     
+    public static String insertFellowship_DetailsWithTheme(Contact proposalDetails, String proposalId, List<String> selectedTheme, String keyword, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear, String conId, String recordType){
+    try{
+        system.debug('startday ::'+startday);
+        system.debug('startmonth ::'+startmonth);
+        system.debug('startyear ::'+startyear);
+        system.debug('endday ::'+endday);
+        system.debug('endmonth ::'+endmonth);
+        system.debug('endyear ::'+endyear);
+        system.debug('proposalDetails ::'+proposalDetails);
+        system.debug('proposalId ::'+proposalId);
+        system.debug('selectedTheme ::'+selectedTheme);
+        system.debug('keyword ::'+keyword);
+        
+        if(startday==0 && startmonth==0 && startyear==0){
+            // Do nothing
+        }else{
+            proposalDetails.Tentative_Start_Date__c = Date.newInstance(startyear,startmonth,startday);
+        }
+        
+        if(endday==0 && endmonth==0 && endyear==0){
+            // Do nothing
+        }else{
+            proposalDetails.Tentative_End_Date__c = Date.newInstance(endyear,endmonth,endday);
+        }
+        
+        upsert proposalDetails;
+        
+        Contact con = new Contact(Id=conId);
+        update con;
+        
+        Contact conRec = [SELECT Id, AccountId FROM Contact WHERE Id = :con.Id];
+        if(!String.isBlank(conRec.AccountId)){
+            Account acc = new Account();
+            acc.Id = conRec.AccountId;
+            update acc;
+        }
+        
+        // Update Proposal with keywords
+        if(!String.isBlank(proposalId) && !String.isBlank(keyword)){
+            Application_Proposal__c proposal = new Application_Proposal__c(Id = proposalId);
+            proposal.KeyWords__c = keyword;
+            update proposal;
+        }
+        
+        // Handle Application_Thematic_Area__c records
+        if(!String.isBlank(proposalId) && selectedTheme != null && !selectedTheme.isEmpty()){
+            // Delete existing thematic areas for this proposal
+            List<Application_Thematic_Area__c> existingAreas = [SELECT Id FROM Application_Thematic_Area__c WHERE Application__c = :proposalId];
+            if(!existingAreas.isEmpty()){
+                delete existingAreas;
+            }
+            
+            // Create new thematic areas
+            List<Application_Thematic_Area__c> newAreas = new List<Application_Thematic_Area__c>();
+            for(String themeId : selectedTheme){
+                Application_Thematic_Area__c area = new Application_Thematic_Area__c();
+                area.Application__c = proposalId;
+                area.Thematic_Area__c = themeId;
+                newAreas.add(area);
+            }
+            if(!newAreas.isEmpty()){
+                insert newAreas;
+            }
+        }
+        
+        return proposalDetails.Id;
+    }catch(Exception e){
+        system.debug('exception ----'+e.getLineNumber()+'-----'+e.getMessage());
+        return e.getLineNumber()+'-----'+e.getMessage();
+    }
+}
+    
+    
     public static List<Contact> getAllContacts(){
         try{
             List<Contact> conRec = [SELECT Id,Name,Email FROM Contact];
@@ -7097,6 +7194,8 @@ return null;
             return null;
         }
     }
+    
+    
     
     public static List<References__c> checkReferenceEmail(List<string> email, List<Id> ids){
         try{

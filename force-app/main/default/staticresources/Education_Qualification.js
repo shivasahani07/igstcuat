@@ -438,7 +438,7 @@ angular.module('cp_app').controller('educQual_ctrl', function($scope,$rootScope)
     $scope.clickPreviousEduQualification=function(){
         var link=document.createElement("a");
         link.id = 'someLink'; //give it an ID!
-        link.href="#/Personal_Information";
+        link.href="#/ParentOrganization";
         link.click();
     }
     $scope.getEduQualification();

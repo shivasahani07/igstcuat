@@ -518,9 +518,14 @@ public without sharing class WorkshopController {
     
     //************************************** WORK PACKAGE **********************************************************
     
-    @RemoteAction
+   /* @RemoteAction
     public static List<Work_Package__c> getWPDetails(string applicantHashCode){
         return Proposal_Controller.getWPDetails(applicantHashCode);
+    }*/
+    
+    @RemoteAction
+    public static List<Work_Package__c> getWPDetails(String proposalId, String proposalStage){
+        return Proposal_Controller.getWPDetails(proposalId, proposalStage);
     }
     @RemoteAction
     public static List<Account> getProposalAccounts(String ProposalId){
@@ -553,15 +558,25 @@ public without sharing class WorkshopController {
     
     //************************************** Grant Application **********************************************************
     
-    @RemoteAction
+    /*@RemoteAction
     public static  List<Account> getApplicantDetailsForGrant(string applicantHashCode){
         return Proposal_Controller.getApplicantDetailsForGrant(applicantHashCode);
+    }*/
+    
+        @RemoteAction
+    public static List<Account> getApplicantDetailsForGrant(String apaId, String proposalId){
+        return Proposal_Controller.getApplicantDetailsForGrant(apaId, proposalId);
     }
     
-    @RemoteAction
+    /*@RemoteAction
     public static String insertExistingGrants(List<Proposal_Controller.ExistingGrantsWrapper> grantList){
         system.debug('grantList ---> '+grantList);
         return Proposal_Controller.insertExistingGrants(grantList);
+    }*/
+     @RemoteAction
+    public static String insertExistingGrants(List<Proposal_Controller.ExistingGrantsWrapper> grantList, String apaId){
+        system.debug('grantList ---> '+grantList);
+        return Proposal_Controller.insertExistingGrants(grantList, apaId);
     }
     
     @RemoteAction

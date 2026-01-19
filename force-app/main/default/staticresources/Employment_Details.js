@@ -119,7 +119,7 @@ $scope.insertEmploymentDetails = function(){
                         icon: "success",
                         button: "ok!",
                     }).then((value) => {
-                        $scope.redirectPageURL('ParentOrganization');
+                        $scope.redirectPageURL('Fellowship_Details');
                         });
                 $scope.$apply();                    
                        

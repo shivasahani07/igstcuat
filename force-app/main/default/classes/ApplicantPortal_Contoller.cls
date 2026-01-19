@@ -1,4 +1,5 @@
 public without sharing class ApplicantPortal_Contoller {
+ 
     public string tabValues  {get;set;}
     public string thematicAreaList {get;set;}
     public string countrytype  {get;set;}
@@ -1075,7 +1076,21 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
                                                             Applicant_Proposal_Association__c updatedApa){
         return Proposal_Controller.createExpenseDeclarationDetails(accId, manPowerRecords, consumables, Equipment, travel, overhead, contingency, outsourcing, updatedApa);
     }
-    
+   /* 
+    // NEW METHOD: Create expense with Expense_Head__c and Expense_Line_Item__c
+    @RemoteAction
+    public static String createExpenseWithHeadAndLineItems(List<Expense_Line_Item__c> expenseLineItems, String apaId, Applicant_Proposal_Association__c updatedApa) {
+        return Proposal_Controller.createExpenseWithHeadAndLineItems(expenseLineItems, apaId, updatedApa);
+    }
+/
+   
+    /*
+    // NEW METHOD: Get expense records from Expense_Head__c and Expense_Line_Item__c
+    @RemoteAction
+    public static Proposal_Controller.ExpenseHeadLineItemWrapper getExpenseHeadLineItems(String apaId) {
+        return Proposal_Controller.getExpenseHeadLineItems(apaId);
+    }
+    */
     // @RemoteAction
     // public static List<Expense_Detail__c> getExpenseRecords(String ProposalId){
     //     return Proposal_Controller.getExpenseRecords(ProposalId);
@@ -1134,8 +1149,14 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     }
     
     @RemoteAction
-    public static String insertFellowship_Details(Contact applicantDetails, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear,String conId, String recordType){
+    public static String insertFellowship_DetailsOld(Contact applicantDetails, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear,String conId, String recordType){
         return Proposal_Controller.insertFellowship_Details(applicantDetails, startday, startmonth, startyear, endday, endmonth, endyear, conId, recordType);
+    }
+    
+    // New overloaded method with proposalId, selectedTheme, and keyword parameters
+    @RemoteAction
+    public static String insertFellowship_Details(Contact applicantDetails, String proposalId, List<String> selectedTheme, String keyword, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear, String conId, String recordType){
+        return Proposal_Controller.insertFellowship_DetailsWithTheme(applicantDetails, proposalId, selectedTheme, keyword, startday, startmonth, startyear, endday, endmonth, endyear, conId, recordType);
     }
     
     @RemoteAction
@@ -1529,8 +1550,13 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
         return 'success';
     }
     @RemoteAction
-    public static Contact getFellowshipDetails(string applicantHashCode){
-        return Proposal_Controller.getFellowshipDetails(applicantHashCode);
+    public static Contact getFellowshipDetails(string applicantHashCode, string proposalId){
+        return Proposal_Controller.getFellowshipDetails(applicantHashCode, proposalId);
+    }
+    
+    @RemoteAction
+    public static List<Application_Thematic_Area__c> getApplicationThematicAreas(String proposalId){
+        return Proposal_Controller.getApplicationThematicAreas(proposalId);
     }
     // @RemoteAction
     // public static String doCUploadAttachmentReviewer(String attachmentBody, String attachmentName, string cvId, String udId) {
@@ -2219,18 +2245,56 @@ public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
         return Proposal_Controller.checkReferenceEmail(email,ids);
     }
     
+    // @RemoteAction
+    // public static List<Account> getApplicantDetailsForGrantWISER(string applicantHashCode){
+    //     contact conRec = [select name,id,Proposals__c,AccountId,Account.Name from contact where Id =:applicantHashCode limit 1];
+    //     System.debug('conRec-----'+conRec);
+    //     list<Account> applicantList = New list<Account>();
+    //     if(conRec.AccountId != null){
+    //         system.debug('applicantList-----'+applicantList);
+    //         applicantList = [select Id,Name,Proposals__c,(SELECT Id,Title__c,Funding_Agency__c,Budget__c,Starting_Date__c,End_Date__c,Role_in_the_Project__c,Account__c,Application__c,Currency__c FROM Existing_Grants__r),(Select Id,Login_Hash_Code__c From Contacts) from Account where Id =:conRec.AccountId];
+    //         return applicantList;
+    //     }
+    //     return null;
+    // }
+
     @RemoteAction
-    public static List<Account> getApplicantDetailsForGrantWISER(string applicantHashCode){
-        contact conRec = [select name,id,Proposals__c,AccountId,Account.Name from contact where Id =:applicantHashCode limit 1];
-        System.debug('conRec-----'+conRec);
-        list<Account> applicantList = New list<Account>();
-        if(conRec.AccountId != null){
-            system.debug('applicantList-----'+applicantList);
-            applicantList = [select Id,Name,Proposals__c,(SELECT Id,Title__c,Funding_Agency__c,Budget__c,Starting_Date__c,End_Date__c,Role_in_the_Project__c,Account__c,Application__c,Currency__c FROM Existing_Grants__r),(Select Id,Login_Hash_Code__c From Contacts) from Account where Id =:conRec.AccountId];
-            return applicantList;
+    public static List<Existing_Grants__c> getExistingGrantsRecords(String apaId) {
+        try {
+            if (String.isNotBlank(apaId)) {
+                return [
+                    SELECT Id,
+                        Title__c,
+                        Funding_Agency__c,
+                        Budget__c,
+                        Starting_Date__c,
+                        End_Date__c,
+                        Role_in_the_Project__c,
+                        Account__c,
+                        Application__c,
+                        Currency__c,
+                        Applicant_Proposal_Association__c,
+                      //  Applicant_Proposal_Association__r.Grants_Handled__c,
+                        Applicant_Proposal_Association__r.Contact__c,
+                        Applicant_Proposal_Association__r.Contact__r.AccountId,
+                        Applicant_Proposal_Association__r.Contact__r.Account.Name
+                    FROM Existing_Grants__c
+                    WHERE Applicant_Proposal_Association__c = :apaId
+                ];
+            }
+            return new List<Existing_Grants__c>(); 
+        } catch (Exception e) {
+            System.debug(
+                'Error Message : ' + e.getMessage() +
+                ' Error Line Number : ' + e.getLineNumber()
+            );
+            throw new AuraHandledException(
+                'Error Message : ' + e.getMessage() +
+                ' Error Line Number : ' + e.getLineNumber()
+            );
         }
-        return null;
     }
+
     
     @RemoteAction
     public static String insertExistingGrantsWISER(List<ExistingGrantsWrapper> grantList){
@@ -2246,6 +2310,7 @@ public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
                 grantsRec.Funding_Agency__c = wrap.fundingagency;
                 grantsRec.Account__c = wrap.Account;
                 grantsRec.Application__c = wrap.Application;
+                grantsRec.Applicant_Proposal_Association__c = wrap.apaId;
                 grantsRec.Budget__c = wrap.budget;
                 grantsRec.Currency__c = wrap.currencyPick;
                 grantsRec.Role_in_the_Project__c = wrap.role;
@@ -2288,6 +2353,7 @@ public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
         String startDate;
         String endDate;
         String role;
+        String apaId;
         // Integer startingday;
         // Integer startingmonth;
         // Integer startingyear;

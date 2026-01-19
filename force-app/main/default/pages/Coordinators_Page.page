@@ -1,5 +1,6 @@
 <apex:page sidebar="false" showHeader="false" standardStylesheets="false" controller="WorkshopController">
     <html>
+        
     <div ng-controller="coordinators_ctrl">
 
         <head>

@@ -124,7 +124,8 @@ angular.module('cp_app').controller('EmploymentDetails_Ctrl', function($scope,$r
   }
   $scope.clickEmploymentDetails=function(){
     if($rootScope.proposalStage){
-      $scope.redirectPageURL('ProjectDetailIF');
+       // $scope.redirectPageURL('ProjectDetailIF'); Commented By Karthik
+      $scope.redirectPageURL('AchievementsIF');
       return;
     }
   debugger;
@@ -162,7 +163,8 @@ angular.module('cp_app').controller('EmploymentDetails_Ctrl', function($scope,$r
                 icon: "success",
                 button: "ok!",
               }).then((value) => {
-                $scope.redirectPageURL('ProjectDetailIF');
+                // $scope.redirectPageURL('ProjectDetailIF'); Commented By Karthik
+      				$scope.redirectPageURL('AchievementsIF');
                   });
             }
             else
