@@ -560,6 +560,7 @@ return 'exception: ' + e.getMessage() + ' line no. ' + e.getLineNumber();
             system.debug('education detail :: '+instanceEduDet);
             Id eduId = Schema.SObjectType.Education_Details__c.getRecordTypeInfosByName().get('Education').getRecordTypeId();
             Id thesisId = Schema.SObjectType.Education_Details__c.getRecordTypeInfosByName().get('Thesis').getRecordTypeId();
+            Application_Proposal__c prop = [SELECT Id,contact__c FROM Application_Proposal__c WHERE Id = :apaId LIMIT 1];
             Date newMtStartDate;
             Date newMtEndDate;
             Date newPhDStartDate;
@@ -596,6 +597,7 @@ return 'exception: ' + e.getMessage() + ' line no. ' + e.getLineNumber();
                 if(lineItem.Degree__c!=null){
                     lineItem.RecordTypeId=eduId;
                     lineItem.Applicant_Proposal_Association__c=apaId;
+                    lineItem.Contact__c=prop.contact__c;
                 }
                 else{
                     lineItem.RecordTypeId=thesisId;

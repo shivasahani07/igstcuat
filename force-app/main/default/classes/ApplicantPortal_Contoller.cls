@@ -1514,7 +1514,7 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
             cdl.Name = 'PublicShare';
             cdl.RelatedRecordId = udId;
             insert cdl;
-            system.debug('ContentDistribution----'+cdl);
+            system.debug('ContentDistribution----'+cdl);;76y
             Id conDoc = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer.Id].ContentDocumentId;
             ContentDocumentLink conDocLink = New ContentDocumentLink();
             conDocLink.LinkedEntityId = udId;
