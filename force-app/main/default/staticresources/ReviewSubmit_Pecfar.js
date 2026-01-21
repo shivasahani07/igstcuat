@@ -41,12 +41,13 @@ angular.module('cp_app').controller('revSubmit_ctrl', function($scope,$sce,$root
                 $scope.projectData=result.Lcon;
                 $scope.objAchievments=result.achievements;
                 $scope.proposalDetails=result.proposal;
-                /*for(var i=0;i<$scope.projectData.length;i++){
+                for(var i=0;i<$scope.projectData.length;i++){
                     if(i==0)
                     $scope.getProjectdetils($scope.projectData[i].Id,'a');
+                    
                     else
                     $scope.getProjectdetils($scope.projectData[i].Id,'b');
-                } */
+                } 
             }
         });
     }

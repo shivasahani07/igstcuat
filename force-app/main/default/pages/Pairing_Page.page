@@ -300,7 +300,7 @@
                                     <div class="col-md-12 mt-5">
                                         <label class="font-if">
                                             Email<span class="required-asterisk" style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" ng-model="pairingDetails.Email" ng-focus="removeClass('txtIndEmail')" id="txtIndEmail" ng-disabled="proposalStage || primary" ng-change="checkEmail(pairingDetails.Email,pairingDetails.Id)" />
+                                        <input type="text" class="form-control" ng-model="pairingDetails.Email" ng-focus="removeClass('txtIndEmail')" id="txtIndEmail" ng-disabled="proposalStage || primary || pairingDetails.Email" ng-change="checkEmail(pairingDetails.Email,pairingDetails.Id)" />
                                     </div>
                                     <div class="col-md-12 mt-5">
                                         <label class="font-if">

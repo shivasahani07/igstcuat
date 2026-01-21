@@ -585,10 +585,11 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
 
                 // Applied programs 
                 $scope.appliedPrograms = $scope.appliedCampaigns ? $scope.appliedCampaigns.map(item => ({
+                    
                     name: item?.Proposals__r?.Campaign__r?.Name ?? "",
                     PropName: item?.Proposals__r?.Name ?? "",
                     //titleOfProject: item?.Contact__r?.Title_Of_Project__c ?? "",
-                    titleOfProject: item?.Proposals__r?.Title_Of__c ?? "",
+                    titleOfProject: item?.Proposals__r?.Title_Of__c ?? item?.Proposals__r?.project_title__c,
                     desc: item?.Proposals__r?.Campaign__r?.Description ?? "",
                     deadline: item.Proposals__r?.yearly_Call__r?.Campaign_End_Date__c ?
                         new Date(item.Proposals__r?.yearly_Call__r?.Campaign_End_Date__c).toLocaleDateString('en-GB', {
@@ -603,7 +604,8 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
                     apaId: item?.Id ?? "",
                     yearlyCallId: item?.Proposals__r?.yearly_Call__c ?? "",
                     proposalStage: item?.Proposals__r?.Proposal_Stages__c ?? "",
-                    category: 'applied'
+                    category: 'applied',
+                    id:item?.Proposals__r?.Id ?? "",
                 })) : [];
 
                 // Simple helper for YearlyCall__c → Campaign data              
@@ -762,6 +764,19 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
             baseUrl += window.location.search;
         }
         window.location.href = baseUrl;
+    };
+
+    $scope.downloadApplicationPdf = function (id) {
+        debugger;
+        ApplicantPortal_Contoller.downloadApplicationPdf(id, function (result, event) {
+            debugger;
+            if (event.status && result != null) {
+                window.open('/servlet/servlet.FileDownload?file='+result, '_blank');
+            } else {
+                console.error('Error downloading application pdf:', event.message);
+            }
+        });
+        
     };
 
     $scope.logout = function () {

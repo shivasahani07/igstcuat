@@ -1514,7 +1514,7 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
             cdl.Name = 'PublicShare';
             cdl.RelatedRecordId = udId;
             insert cdl;
-            system.debug('ContentDistribution----'+cdl);;76y
+            system.debug('ContentDistribution----'+cdl);
             Id conDoc = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer.Id].ContentDocumentId;
             ContentDocumentLink conDocLink = New ContentDocumentLink();
             conDocLink.LinkedEntityId = udId;
@@ -2158,6 +2158,7 @@ userDocc.Id = udId;
 public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
     // Step 1: Get contact IDs through junction
     List<Id> contactIds = new List<Id>();
+    set<id> apaIds = new set<id>();
     for(Applicant_Proposal_Association__c assoc : [
         SELECT Contact__c 
         FROM Applicant_Proposal_Association__c 
@@ -2165,6 +2166,7 @@ public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
     ]) {
         if(assoc.Contact__c != null) {
             contactIds.add(assoc.Contact__c);
+            apaIds.add(assoc.Id);
         }
     }
     if(contactIds.isEmpty()) {
@@ -2192,7 +2194,7 @@ public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
                        Institution_Name__c, Area_of_specialization__c,
                        Percentage__c, Percentage_cgpa__c, Thesis_Supervisor__c,
                        Thesis_Type__c, Recordtype.Name, RecordTypeId, Title_Thesis__c 
-                FROM Education_Details__r) 
+                FROM Education_Details__r where Applicant_Proposal_Association__c IN :apaIds) 
         FROM Contact 
         WHERE Id IN :contactIds
     ];
@@ -2244,7 +2246,23 @@ public static WrapperProposalDet getPECFARProposalDetails(string proposalId){
     public static List<References__c> checkReferenceEmail(List<string> email, List<Id> ids){
         return Proposal_Controller.checkReferenceEmail(email,ids);
     }
-    
+
+    @RemoteAction
+    public static string downloadApplicationPdf(String id){
+        try{
+            if(String.isBlank(id)){
+                return null;
+            }
+            Attachment attachment = [SELECT Id, Name, Body FROM Attachment WHERE parentId = :id AND ContentType = 'application/pdf' ORDER BY CreatedDate DESC LIMIT 1 ];     
+            return attachment.Id; 
+        }catch(Exception e){
+            System.debug('Error Message : ' + e.getMessage() +
+                ' Error Line Number : ' + e.getLineNumber()
+            );   
+            return null;
+        }   
+    }
+
     // @RemoteAction
     // public static List<Account> getApplicantDetailsForGrantWISER(string applicantHashCode){
     //     contact conRec = [select name,id,Proposals__c,AccountId,Account.Name from contact where Id =:applicantHashCode limit 1];

@@ -165,32 +165,32 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
     //     return;
     // }
     if($scope.applicantDetails.Name == undefined || $scope.applicantDetails.Name == ""){
-        swal("Personal Info", "Please Enter Full Name.");
+        swal("Personal Info", "Please enter Full Name.");
         $("#txtFirstName").addClass('border-theme');
           return;
     }
     if($scope.birthdate == undefined || $scope.birthdate == ""){
-        swal("Personal Info", "Please Enter BirthDate.");
+        swal("Personal Info", "Please enter BirthDate.");
         $("#txtDOB").addClass('border-theme');
             return;
     }
     if($scope.applicantDetails.Gender__c == undefined || $scope.applicantDetails.Gender__c == ""){
-        swal("Personal Info", "Please Enter your Gender.");
+        swal("Personal Info", "Please enter your Gender.");
         $("#txtGender").addClass('border-theme');
             return;
     }
     if($scope.applicantDetails.Nationality__c == undefined || $scope.applicantDetails.Nationality__c == ""){
-        swal("Personal Info", "Please Enter your Nationality.");
+        swal("Personal Info", "Please enter your Nationality.");
         $("#selectNatinality").addClass('border-theme');
             return;
     }
     if($scope.applicantDetails.Email == undefined || $scope.applicantDetails.Email == ""){
-        swal("Personal Info", "Please Enter Email.");
+        swal("Personal Info", "Please enter Email.");
         $("#txtEmail").addClass('border-theme');
             return;
     }
     if($scope.applicantDetails.MobilePhone == undefined || $scope.applicantDetails.MobilePhone == ""){
-        swal("Personal Info", "Please Enter Mobile No.");
+        swal("Personal Info", "Please enter Mobile No.");
         $("#txtPhone").addClass('border-theme');
             return;
     }
@@ -208,12 +208,12 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
     }
 
     if($scope.applicantDetails.Account.Name == undefined || $scope.applicantDetails.Account.Name == ""){
-        swal("Personal Info", "Please Enter Institution Name.");
+        swal("Personal Info", "Please enter Institution Name.");
         $("#txtOrg").addClass('border-theme');
             return;
     }
     if($scope.applicantDetails.Designation__c == undefined || $scope.applicantDetails.Designation__c == ""){
-        swal("Personal Info", "Please Enter your Designation.");
+        swal("Personal Info", "Please enter your Designation.");
         $("#txtDesignation").addClass('border-theme');
             return;
     }
@@ -223,9 +223,27 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
             return;
     }
     if ($scope.MailingStreet1 == undefined || $scope.MailingStreet1 == "") {
-        swal("info", "Please Enter Line 1.","info");
+        swal("info", "Please enter Line 1.","info");
         $("#txtMailingL1").addClass('border-theme');
         return; 
+    }
+
+    if($scope.applicantDetails.MailingCity == undefined || $scope.applicantDetails.MailingCity == ""){
+        swal("Personal Info", "Please enter City.");
+        $("#txtMailingCity").addClass('border-theme');
+        return;
+    }
+
+    if($scope.applicantDetails.MailingState == undefined || $scope.applicantDetails.MailingState == ""){
+        swal("Personal Info", "Please enter State.");
+        $("#txtMailingState").addClass('border-theme');
+        return;
+    }
+
+    if($scope.applicantDetails.MailingPostalCode == undefined || $scope.applicantDetails.MailingPostalCode == ""){
+        swal("Personal Info", "Please enter PinCode.");
+        $("#txtMailingPincode").addClass('border-theme');
+        return;
     }
 
     if($scope.applicantDetails.MailingCountry != undefined && $scope.applicantDetails.MailingCountry == "India"){

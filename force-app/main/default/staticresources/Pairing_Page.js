@@ -255,27 +255,27 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
  
                         if($scope.pairingDetails != undefined){
                         if($scope.pairingDetails.FirstName == undefined || $scope.pairingDetails.FirstName == ""){
-                            swal("info", "Please Enter First Name.");
+                            swal("Info", "Please Enter First Name.");
                             $("#txtIndFN").addClass('border-theme');
                               return;
                         }
            
                         if($scope.pairingDetails.LastName == undefined || $scope.pairingDetails.LastName == ""){
-                            swal("info", "Please Enter Last Name.");
+                            swal("Info", "Please Enter Last Name.");
                             $("#txtIndLN").addClass('border-theme');
                               return;
                         }
            
                         if($scope.pairingDetails.Email == undefined || $scope.pairingDetails.Email == ""){
-                            swal("info", "Please Enter Email.");
+                            swal("Info", "Please Enter Email.");
                             $("#txtIndEmail").addClass('border-theme');
                               return;
                         }else{
                             if($scope.valid($scope.pairingDetails.Email)){
                                 swal(
-                                    'info',
+                                    'Info',
                                     'Check Your Registered Email.',
-                                    'info'
+                                    'Info'
                                 )
                                 $("#txtIndEmail").addClass('border-theme');
                                 return;
@@ -283,21 +283,21 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                         }
            
                             if($scope.pairingDetails.Account == undefined || $scope.pairingDetails.Account == ""){
-                                      swal("info", "Please Enter Institution / Organization Name.");
+                                      swal("Info", "Please Enter Institution / Organization Name.");
                                       $("#txtIndOrg").addClass('border-theme');
                                         return;
                             }
                            
                             if($scope.pairingDetails.Account != undefined){
                                 if($scope.pairingDetails.Account.Name == undefined){
-                                    swal("info", "Please Enter Institution / Organization Name.");
+                                    swal("Info", "Please Enter Institution / Organization Name.");
                                     $("#txtIndOrg").addClass('border-theme');
                                       return;
                                 }
                       }
            
                         if($scope.pairingDetails.Birthdate == undefined || $scope.pairingDetails.Birthdate == ""){
-                            swal("info", "Please Enter BirthDate.");
+                            swal("Info", "Please Enter BirthDate.");
                             $("#txtIndBD").addClass('border-theme');
                               return;
                         }
@@ -305,7 +305,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                            
  
                         if($scope.emailCheck == true){
-                            swal('info','Email already exists.','info');
+                            swal('Info','Email already exists.','Info');
                             $("#txtIndEmail").addClass('border-theme');
                                 return;
                         }
@@ -317,27 +317,27 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
  
                         if($scope.pairList != undefined){
                             if($scope.pairList.FirstName == undefined || $scope.pairList.FirstName == ""){
-                                swal("info", "Please Enter First Name.");
+                                swal("Info", "Please Enter First Name.");
                                 $("#txtGerFN").addClass('border-theme');
                                   return;
                             }
                
                             if($scope.pairList.LastName == undefined || $scope.pairList.LastName == ""){
-                                swal("info", "Please Enter Last Name.");
+                                swal("Info", "Please Enter Last Name.");
                                 $("#txtGerLn").addClass('border-theme');
                                   return;
                             }
                
                             if($scope.pairList.Email == undefined || $scope.pairList.Email == ""){
-                                swal("info", "Please Enter Email.");
+                                swal("Info", "Please Enter Email.");
                                 $("#txtGerEmail").addClass('border-theme');
                                   return;
                             }else{
                                 if($scope.valid($scope.pairList.Email)){
                                     swal(
-                                        'info',
+                                        'Info',
                                         'Check Your Registered Email.',
-                                        'info'
+                                        'Info'
                                     )
                                     $("#txtGerEmail").addClass('border-theme');
                                     return;
@@ -345,27 +345,27 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                             }
                
                                 if($scope.pairList.Account == undefined || $scope.pairList.Account == ""){
-                                          swal("info", "Please Enter Institution / Organization Name.");
+                                          swal("Info", "Please Enter Institution / Organization Name.");
                                           $("#txtGerOrg").addClass('border-theme');
                                             return;
                                 }
                                
                                 if($scope.pairList.Account != undefined){
                                     if($scope.pairList.Account.Name == undefined){
-                                        swal("info", "Please Enter Institution / Organization Name.");
+                                        swal("Info", "Please Enter Institution / Organization Name.");
                                         $("#txtGerOrg").addClass('border-theme');
                                           return;
                                     }
                           }
                
                             if($scope.pairList.Birthdate == undefined || $scope.pairList.Birthdate == ""){
-                                swal("info", "Please Enter BirthDate.");
+                                swal("Info", "Please Enter BirthDate.");
                                 $("#txtGerBD").addClass('border-theme');
                                   return;
                             }
    
                             if($scope.emailCheck == true){
-                                swal('info','Email already exists.','info');
+                                swal('Info','Email already exists.','Info');
                                 $("#txtGerEmail").addClass('border-theme');
                                     return;
                             }
@@ -376,13 +376,13 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
             // }
        
                 // if($scope.detailedList.length==2 && IndianCount>1){
-                //     swal("info", "Indian partner should be only one", "info");
+                //     swal("Info", "Indian partner should be only one", "Info");
                 //     $("#txtPincode").addClass('border-theme');
                 //         return;
                 //     }
        
                 // if($scope.detailedList.length==2 && GermanyCount>1){
-                //     swal("info", "German partner should be only 1", "info");
+                //     swal("Info", "German partner should be only 1", "Info");
                 //     $("#txtPincode").addClass('border-theme');
                 //         return;
                 //     }

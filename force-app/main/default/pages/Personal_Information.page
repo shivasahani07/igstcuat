@@ -318,7 +318,7 @@
 
                                         <div class="col-md-6 mt-3">
                                             <label class="font-if">Email<span class="text-danger me-2">*</span></label>
-                                            <input class="form-control" ng-disabled="proposalStage" ng-model="applicantDetails.Email" type="email" id="txtEmail" ng-focus="removeClass('txtEmail')" ng-change="checkEmail(applicantDetails.Email,applicantDetails.Id)"/>
+                                            <input class="form-control" ng-disabled="proposalStage || applicantDetails.Email" ng-model="applicantDetails.Email" type="email" id="txtEmail" ng-focus="removeClass('txtEmail')" ng-change="checkEmail(applicantDetails.Email,applicantDetails.Id)"/>
                                         </div> 
                                         
                                         <div class="col md-6 mt-3 mx-3" ng-show="applicantDetails.MailingCountry == 'India'">
@@ -392,7 +392,7 @@
 
                             <div class="row mt-4 mx-5">
                                 <div class="col-md-6 mt-3">
-                                    <label class="font-if">City</label>
+                                    <label class="font-if">City<span class="text-danger me-2">*</span></label>
                                     <input type="text" ng-disabled="proposalStage" id="txtMailingCity" ng-focus="removeClass('txtMailingCity')" ng-model="applicantDetails.MailingCity" class="form-control" />
                                 </div>
 
@@ -406,17 +406,17 @@
 
                             <div class="row mt-4 mx-5">
                                 <div class="col-md-6 mt-3">
-                                    <label class="font-if">State</label>
+                                    <label class="font-if">State<span class="text-danger me-2">*</span></label>
                                     <select class="form-control" aria-label="Default select example" ng-model="applicantDetails.MailingState" id="txtMailingState" ng-focus="removeClass('txtMailingState')" ng-disabled="proposalStage">
                                         <option ng-repeat="staff in applicantDetails.stateList">{{staff}}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mt-3" ng-show="applicantDetails.MailingCountry == 'India'">
-                                    <label class="font-if">PinCode</label>
+                                    <label class="font-if">PinCode<span class="text-danger me-2">*</span></label>
                                     <input type="text" ng-disabled="proposalStage" number="applicantDetails.MailingPostalCode" id="txtMailingPincode" ng-focus="removeClass('txtMailingPincode')" ng-model="applicantDetails.MailingPostalCode" class="form-control" ng-change="checkPinCode()" />
                                 </div>
                                 <div class="col-md-6 mt-3" ng-show="applicantDetails.MailingCountry == 'Germany'">
-                                    <label class="font-if">PinCode</label>
+                                    <label class="font-if">PinCode<span class="text-danger me-2">*</span></label>
                                     <input type="text" ng-disabled="proposalStage" id="txtMailingPincode" ng-focus="removeClass('txtMailingPincode')" ng-model="applicantDetails.MailingPostalCode" class="form-control" />
                                 </div>
                             </div>

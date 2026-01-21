@@ -5180,9 +5180,11 @@ public class insertPairingWrapperinWiser {
     public static string insertEmploymentDetailsPECFAR(List<Employment_Details__c> empDetails,string apaId){
      
     try{
+        Applicant_Proposal_Association__c apa = [SELECT Id,Contact__c FROM Applicant_Proposal_Association__c WHERE Id = :apaId LIMIT 1];
         if(empDetails != null && !empDetails.isEmpty()){
             for(Employment_Details__c emp : empDetails){
-                emp.Applicant_Proposal_Association__c = apaId;
+                emp.Applicant_Proposal_Association__c = apa.Id;
+                emp.Contact__c = apa.Contact__c;
             }
             upsert empDetails;
         }

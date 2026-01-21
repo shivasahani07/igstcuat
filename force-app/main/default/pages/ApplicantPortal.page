@@ -187,6 +187,11 @@
             color: #4b0082;
             margin-bottom: 30px;
         }
+        .sidebar-appPortal .igstc-logo {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+        }
 
         .nav-item {
             padding: 15px 25px;
@@ -730,7 +735,7 @@
     <apex:includeScript value="{!$Resource.CustomJs}" /> -->
     <!-- Global Header - Visible on all pages -->
     <div ng-if="!isLoading" class="global-header">
-        <i class="fa-solid fa-bell"></i>
+        <!-- <i class="fa-solid fa-bell"></i> -->
         <span>{{contactName || 'Loading...'}}</span>
         <button class="global-header-btn" ng-click="navigateToHome()" title="Home">
             <i class="fa-solid fa-home"></i>
@@ -744,6 +749,10 @@
     
     <div ng-else="isLoading" class="main-div" ng-if="!$root.isRoutedView">
         <div class="sidebar-appPortal">
+            <div class="igstc-logo">
+                <img src="{!URLFOR($Resource.Logo)}" alt="IGSTC Logo"/>
+                <!-- <apex:image url="{!$Resource.Logo}" alt="IGSTC" styleClass="igstc-logo"/> -->
+            </div>
             <div class="logo">IGSTC</div>
             <div class="nav-item" ng-class="{active: selectedMenu === 'Dashboard'}" ng-click="showSection('Dashboard')">
                 <i class="fa-solid fa-home"></i> Dashboard
@@ -795,6 +804,11 @@
                         <div class="program-deadline">Application Deadline: {{p.deadline}}</div>  
                         <div class="program-proposal"><i class="fa fa-id-card" aria-hidden="true"></i><span class="program-proposal-text">Proposal No: </span>{{p.PropName}}</div>
                         <!--<div class="program-desc"><i class="fa fa-file-text" aria-hidden="true"></i><span class="program-desc-text"> Title: </span>{{p.desc}}</div>-->
+                        <div class="program-desc"
+                                 ng-if="p.proposalStage !== 'Draft'"
+                                 >
+                               Application Submitted
+                            </div>
                         <div class="program-desc"><i class="fa fa-file-text" aria-hidden="true"></i><span class="program-desc-text"> Title of Project: </span>{{p.titleOfProject}}</div>
                         <div class="btn-container">
                             
@@ -810,10 +824,17 @@
                                  ng-click="redirectToForm(p, true)">
                                 View
                             </div>
+
+                            <div class="btn"
+                                 ng-if="p.proposalStage !== 'Draft'"
+                                 ng-click="downloadApplicationPdf(p.id)">
+                                Download Application pdf
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
-                <h2 ng-if="allPrograms.length > 0">Programs Offered By IGSTC in year</h2>
+                <h2 ng-if="allPrograms.length > 0">Programs Offered by IGSTC</h2>
                 <!-- Added By Karthik -->
                 <!-- <div ng-if="yearList.length > 0" style="margin-bottom: 10px;">
                     <label style="margin-right: 8px;">Year:</label>
@@ -848,7 +869,7 @@
                                 ng-disabled="p.isExpired">
                                 Apply
                             </div>
-                            <div class="btn know-btn">Know More</div>
+                            <div class="btn know-btn"><a href="https://www.igstc.org/home/projects_call_text" target="_blank">Know More</a></div>
                         </div>
 
 

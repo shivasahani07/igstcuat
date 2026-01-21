@@ -324,7 +324,7 @@
                     <div class="row mt-5 mx-5">
                         <div class="col-md-12 mt-3">
                             <!--<label class="label-rtf"><b>Planned research activities of the visit(Abstract/objectives/work plan in max 1500 characters without space):</b></label>-->
-                            <label class="label-rtf"><b>Work plan for the visit duration(max 1500 characters without space):</b></label>
+                            <label class="label-rtf"><b>Work plan for the visit duration (max 1500 characters without space):</b></label>
                             <span class="required-asterisk" style="color:red;">*</span><br />
                             <small class="label-rtf"><b>To use the below RTF box more efficiently, make sure you write
                                     your content in word document first and then copy paste here</b></small>
@@ -374,7 +374,7 @@
                     <div class="row mt-3 mx-5">
                         <div class="col-md-12 mt-3">
                             <label class="label-rtf"><b>Plans for networking visits to different institutions during the
-                                    fellowship ,if any (Max 500 characters without space)::</b></label><br />
+                                    fellowship,if any (Max 500 characters without space):</b></label><br />
                             <small class="label-rtf"><b>To use the below RTF box more efficiently, make sure you write
                                     your content in word document first and then copy paste here</b></small>
                             <ng-ckeditor ng-focus="removeClass2('plansNetworking')" id="plansNetworking"

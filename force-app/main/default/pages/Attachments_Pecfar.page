@@ -279,6 +279,9 @@
                                               <button class="btn btn-success" ng-click="uploadFile(doc.userDocument.Name,doc.userDocument.Id,'','1048576','1048576')" type="button">Upload</button>
                                             </span>
                                           </div>
+                                          <div ng-show="doc.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
+                                          </div>
                                     </div>
 
                                       <div class="col-md-3" ng-show="doc.userDocument.Status__c=='Uploaded'">
@@ -296,6 +299,9 @@
                                             <span class="input-group-btn" ng-hide="proposalStage">
                                               <button class="btn btn-success" ng-click="uploadFile(educational.userDocument.Name,educational.userDocument.Id,'','1048576','1048576')" type="button">Upload</button>
                                             </span>
+                                          </div>
+                                          <div ng-show="educational.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
                                           </div>
                                     </div>
 
@@ -335,6 +341,9 @@
                                               <button class="btn btn-success" ng-click="uploadFile(noObjection.userDocument.Name,noObjection.userDocument.Id,'','1048576','1048576')" type="button">Upload</button>
                                             </span>
                                           </div>
+                                          <div ng-show="noObjection.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
+                                          </div>
                                     </div>
 
                                     <div class="col-md-3" ng-show="noObjection.userDocument.Status__c=='Uploaded'">
@@ -347,13 +356,16 @@
 
                             <div class="row mt-5 mb-5" style="margin-left: -1px">
                                 <div class="col-md-6">
-                                    <label class="font-if mb-2">Proof of employment/experience certificate.<span class="text-danger me-2">*</span></label>
+                                    <label class="font-if mb-2">Proof of Employment/Experience certificate.<span class="text-danger me-2">*</span></label>
                                     <div class="col-md-9 mt-4" style="padding-left: 0px !important; padding-right: 0px !important">
                                         <div class="input-group input-group-lg">
                                             <input type="file" ng-disabled="proposalStage" accept=".pdf" id="{{proof.userDocument.Name}}" class="form-control "/>
                                             <span class="input-group-btn" ng-hide="proposalStage">
                                               <button class="btn btn-success" ng-click="uploadFile(proof.userDocument.Name,proof.userDocument.Id,'','1048576','1048576')" type="button">Upload</button>
                                             </span>
+                                          </div>
+                                          <div ng-show="proof.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
                                           </div>
                                     </div>
 
