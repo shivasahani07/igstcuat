@@ -144,7 +144,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
     if (typeOfFile[lengthOfType - 1] == "jpg" || typeOfFile[lengthOfType - 1] == "jpeg") {
 
     } else {
-      swal('info', 'Please choose jpg/jpeg file only.', 'info');
+      swal('Info', 'Please choose jpg/jpeg file only.', 'info');
       return;
     }
     console.log(file);
@@ -171,19 +171,19 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
           if (fileSize < maxStringSize) {
             $scope.uploadAttachment(type, userDocId, fileId);
           } else {
-            swal("info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".", "info");
+            swal("Info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".", "info");
             return;
             // alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
           }
 
         }
         fileReader.onerror = function (e) {
-          swal("info", "There was an error reading the file.  Please try again.", "info");
+          swal("Info", "There was an error reading the file.  Please try again.", "info");
           return;
           // alert("There was an error reading the file.  Please try again.");
         }
         fileReader.onabort = function (e) {
-          swal("info", "There was an error reading the file.  Please try again.", "info");
+          swal("Info", "There was an error reading the file.  Please try again.", "info");
           return;
           // alert("There was an error reading the file.  Please try again.");
         }
@@ -191,11 +191,11 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
         fileReader.readAsBinaryString(file);  //Read the body of the file
 
       } else {
-        swal("info", "File must be under 1 Mb in size.  Your file is too large.  Please try again.", "info");
+        swal("Info", "File must be under 1 Mb in size.  Your file is too large.  Please try again.", "info");
         return;
       }
     } else {
-      swal("info", "You must choose a file before trying to upload it", "info");
+      swal("Info", "You must choose a file before trying to upload it", "info");
       return;
       // alert("You must choose a file before trying to upload it");
       // $scope.showSpinnereditProf = false;
@@ -394,12 +394,12 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
     console.log('clickFellowshipDetails function called====>');
 
     if ($scope.objProposal.Proposed_area__c == undefined || $scope.objProposal.Proposed_area__c == null || $scope.objProposal.Proposed_area__c == '') {
-      swal('info', 'Please enter proposed area of work', 'info');
+      swal('Info', 'Please enter proposed area of work', 'info');
       $("#proposedArea").addClass('border-theme');
       return;
     }
     if ($scope.objProposal.Title_Of__c == undefined || $scope.objProposal.Title_Of__c == null || $scope.objProposal.Title_Of__c == '') {
-      swal('info', 'Please enter title of the proposed work', 'info');
+      swal('Info', 'Please enter title of the proposed work', 'info');
       $("#title").addClass('border-theme');
       return;
     }
@@ -421,7 +421,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
 
     if ($scope.objIndFell.Industrial_Fellowship_Type__c == 'PIEF') {
       if ($scope.objProposal.Duration_In_Months_Max_36__c < 3) {
-        swal('info', 'For PIEF, duration should be minimum 3 months.', 'info');
+        swal('Info', 'For PIEF, duration should be minimum 3 months.', 'info');
         $("#duration").addClass('border-theme');
         return;
       }
@@ -429,19 +429,19 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
 
     if ($scope.objIndFell.Industrial_Fellowship_Type__c == 'PDIF') {
       if ($scope.objProposal.Duration_In_Months_Max_36__c < 6) {
-        swal('info', 'For PDIF, duration should be minimum 6 months.', 'info');
+        swal('Info', 'For PDIF, duration should be minimum 6 months.', 'info');
         $("#duration").addClass('border-theme');
         return;
       }
     }
 
     if ($scope.objProposal.Duration_In_Months_Max_36__c <= 0) {
-      swal('info', 'Duration of the fellowship can not be zero', 'info');
+      swal('Info', 'Duration of the fellowship can not be zero', 'info');
       $("#duration").addClass('border-theme');
       return;
     }
     if ($scope.objProposal.Brief_Statement_of_Purpose__c == undefined || $scope.objProposal.Brief_Statement_of_Purpose__c == null || $scope.objProposal.Brief_Statement_of_Purpose__c == '') {
-      swal('info', 'Please enter brief statement of purpose', 'info');
+      swal('Info', 'Please enter brief statement of purpose', 'info');
       return;
     }
 
@@ -451,7 +451,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
       // let brief = div.innerText.replace(/(\r\n\t|\t|\n|\r)/gm, "");
       // brief = brief.replaceAll(' ','');
       if ($scope.objRtf[0].charCount > 1200) {
-        swal('info', 'Max character limit for Brief Statement of Purpose is 1200 only', 'info');
+        swal('Info', 'Max character limit for Brief Statement of Purpose is 1200 only', 'info');
         return;
       }
     }
@@ -468,7 +468,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
     }
     
     if (keyword == undefined || keyword == null || keyword == '') {
-      swal('info', 'Please enter objective of the work', 'info');
+      swal('Info', 'Please enter objective of the work', 'info');
       return;
     }
     $scope.objProposal.Research_Approach_Objectives__c = keyword;
@@ -494,7 +494,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
     }*/
 
     if ($scope.objProposal.Work_plan__c == undefined || $scope.objProposal.Work_plan__c == null || $scope.objProposal.Work_plan__c == '') {
-      swal('info', 'Please enter work plan', 'info');
+      swal('Info', 'Please enter work plan', 'info');
       return;
     }
 
@@ -504,7 +504,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
       // let workplan = div.innerText.replace(/(\r\n\t|\t|\n|\r)/gm, "");
       // workplan = workplan.replaceAll(' ','');
       if ($scope.objRtf[2].charCount > 2000) {
-        swal('info', 'Max character limit for Work plan is 2000 only', 'info');
+        swal('Info', 'Max character limit for Work plan is 2000 only', 'info');
         return;
       }
     }
@@ -521,7 +521,7 @@ angular.module('cp_app').controller('ProjectDetailIF_Ctrl', function ($scope, $s
     }
     
     if (keyword1 == undefined || keyword1 == null || keyword1 == '') {
-      swal('info', 'Please enter Expected outcomes', 'info');
+      swal('Info', 'Please enter Expected outcomes', 'info');
       return;
     }
     $scope.objProposal.Expected_Deliverables__c = keyword1;

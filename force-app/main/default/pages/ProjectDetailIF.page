@@ -573,21 +573,24 @@
                                 
                                 <div class="row mt-5 mx-3">
                                         <label class="font-if color-theme pt-2">Attach referred Image/Diagram/Chart/ Graph for Work plan in jpg/jpeg, if any(Max. 1Mb)</label>
-                                        <div class="input-group input-group-lg col-md-6">
+                                    <div class="input-group input-group-lg col-md-6">
                                         <input type="file" accept=".jpg,.jpeg" ng-disabled="proposalStage" id="{{doc.userDocument.Name}}" class="form-control "/>
                                             <span class="input-group-btn" ng-hide="proposalStage">
                                             <button class="btn btn-success" ng-click="uploadFile(doc.userDocument.Name,doc.userDocument.Id,'',1048576)" type="button">Upload</button>
                                             </span>
                                     </div>
-
+                                    <div ng-show="doc.ContentDistribution.PreferencesAllowPDFDownload" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
+                                    </div>                                 
                                         
-                                    <!-- <div class="col-md-1" ng-show="doc.userDocument.Status__c=='Uploaded'" style="margin-left: 10px">
-                                        <a class="blue-btn float-end py-3"  ng-click="filePreviewHandler(doc)">View</a>
-                                    </div> -->
+                                    
                                     <div class="col-md-1" ng-show="doc.ContentDistribution.PreferencesAllowPDFDownload" style="margin-left: 10px">
                                         <a class="blue-btn float-end py-3"  ng-click="filePreviewHandler(doc)">View</a>
                                     </div>
                                 </div>
+                                <!-- <div class="col-md-1" ng-show="doc.ContentDistribution.PreferencesAllowPDFDownload" style="margin-left: 10px">
+                                        <a class="blue-btn float-end py-3"  ng-click="filePreviewHandler(doc)">View</a>
+                                </div> -->
                             </div>
                         </div>
                             <div class="row m-5" ng-if="!proposalStage">

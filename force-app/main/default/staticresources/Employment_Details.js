@@ -81,31 +81,31 @@ $scope.insertEmploymentDetails = function(){
 
         for(var i=0;i<$scope.empDetails.length;i++){
             if($scope.empDetails[i].Start_Date__c == undefined || $scope.empDetails[i].Start_Date__c == ""){
-                swal('info','Please enter Start date','info');
+                swal('Info','Please enter Start date','Info');
                 $("#txtSD"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].End_Date__c == undefined || $scope.empDetails[i].End_Date__c == ""){
-                swal('info','Please enter End date','info');
+                swal('Info','Please enter End date','Info');
                 $("#txtED1"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].Position__c == undefined || $scope.empDetails[i].Position__c == ""){
-                swal('info','Please enter Position','info');
+                swal('Info','Please enter Position','Info');
                 $("#txtPos"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].Organization_Name__c == undefined || $scope.empDetails[i].Organization_Name__c == ""){
-                swal('info','Please enter Organization/Institute name','info');
+                swal('Info','Please enter Organization/Institute name','Info');
                 $("#txtOrg"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].Nature_of_Job__c == undefined || $scope.empDetails[i].Nature_of_Job__c == ""){
-                swal('info','Please enter Nature of work','info');
+                swal('Info','Please enter Nature of work','Info');
                 $("#txtNature"+i+"").addClass('border-theme');
                 return;
             }
@@ -119,7 +119,7 @@ $scope.insertEmploymentDetails = function(){
                         icon: "success",
                         button: "ok!",
                     }).then((value) => {
-                        $scope.redirectPageURL('Fellowship_Details');
+                        $scope.redirectPageURL('Achievements_Pecfar');
                         });
                 $scope.$apply();                    
                        
@@ -139,17 +139,17 @@ $scope.insertEmploymentDetails = function(){
 
     //     for(var i=0;i<$scope.empDetails.length;i++){
     //         if($scope.empDetails[i].Start_Date__c==undefined || $scope.empDetails[i].Start_Date__c==""){
-    //             swal('info','Please enter Start Date','info');
+    //             swal('Info','Please enter Start Date','Info');
     //             $("#txtSD"+i+"").addClass('border-theme');
     //             return;
     //         }
     //         if($scope.empDetails[i].Position__c==undefined || $scope.empDetails[i].Position__c==""){
-    //             swal('info','Please enter Position','info');
+    //             swal('Info','Please enter Position','Info');
     //             $("#txtPos"+i+"").addClass('border-theme');
     //             return;
     //         }
     //         if($scope.empDetails[i].End_Date__c==undefined && $scope.empDetails[i].current_employement__c==false){
-    //             swal('info','Please enter Employment End Date/Is it your Current Employment','info');
+    //             swal('Info','Please enter Employment End Date/Is it your Current Employment','Info');
     //             $("#txtED1"+i+"").addClass('border-theme');
     //             $("#txtCE"+i+"").addClass('border-theme');
     //             return;
@@ -159,12 +159,12 @@ $scope.insertEmploymentDetails = function(){
 
     //         }
     //         if($scope.empDetails[i].Organization_Name__c==undefined || $scope.empDetails[i].Organization_Name__c==""){
-    //             swal('info','Please enter Organization Name','info');
+    //             swal('Info','Please enter Organization Name','Info');
     //             $("#txtOrg"+i+"").addClass('border-theme');
     //             return;
     //         }
     //         if($scope.empDetails[i].Nature_of_Job__c==undefined || $scope.empDetails[i].Nature_of_Job__c==""){
-    //             swal('info','Please enter Nature of Work','info');
+    //             swal('Info','Please enter Nature of Work','Info');
     //             $("#txtNature"+i+"").addClass('border-theme');
     //             return;
     //         }
@@ -204,7 +204,7 @@ $scope.insertEmploymentDetails = function(){
     //         if(mjStartDate!=null && mjEndDate!=null){
     //             var mjDiff=mjEndDate.diff(mjStartDate, 'days');
     //             if(mjDiff<0){
-    //                 swal('info','Start date can not be greater than end date','info')
+    //                 swal('Info','Start date can not be greater than end date','Info')
     //                 $("#txtSD"+i+"").addClass('border-theme');
     //                 $("#txtED"+i+"").addClass('border-theme');
     //                 return;
@@ -214,7 +214,7 @@ $scope.insertEmploymentDetails = function(){
     //     mjEndDate=null;
     //       if($scope.empDetails[i].Start_Date__c != undefined && $scope.empDetails[i].Start_Date__c != ""){
     //         if($scope.empDetails[i].Start_Date__c.getDate() > dd && $scope.empDetails[i].Start_Date__c.getUTCMonth()+1 >= mm && $scope.empDetails[i].Start_Date__c.getUTCFullYear() >= yyyy){
-    //           swal("info", "Start Date should not be future date.","info");
+    //           swal("Info", "Start Date should not be future date.","Info");
     //           $("#txtSD"+i+"").addClass('border-theme');
     //                   return;
     //         }
@@ -222,7 +222,7 @@ $scope.insertEmploymentDetails = function(){
 
     //       if(($scope.empDetails[i].Start_Date__c != undefined && $scope.empDetails[i].Start_Date__c != "") && ($scope.empDetails[i].End_Date__c != undefined && $scope.empDetails[i].End_Date__c != "")){
     //         if($scope.empDetails[i].Start_Date__c > $scope.empDetails[i].End_Date__c){
-    //             swal("info", "End Date should not be be previous to Start Date.","info");
+    //             swal("Info", "End Date should not be be previous to Start Date.","Info");
     //             $("#txtSD"+i+"").addClass('border-theme');
     //             $("#txtED"+i+"").addClass('border-theme');
     //                     return; 

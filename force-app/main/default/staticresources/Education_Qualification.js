@@ -223,11 +223,11 @@ angular.module('cp_app').controller('educQual_ctrl', function($scope,$rootScope)
                     return; 
                 }
                 
-                if($scope.eduList[i].Percentage__c==0){
-                    swal('info','Please enter Percentage more than 0.','info');
-                    $("#txtPer"+i+"").addClass('border-theme');
-                    return;  
-                }
+                // if($scope.eduList[i].Percentage__c==0){
+                //     swal('info','Please enter Percentage more than 0.','info');
+                //     $("#txtPer"+i+"").addClass('border-theme');
+                //     return;  
+                // }
                 
             }
             if($scope.eduList[i].Percentage_cgpa__c == "CGPA"){

@@ -4754,9 +4754,9 @@ return conList;
         }
     }
         */
-public static insertPairingWrapper insertPairingDetails(List<wrapperPairing> contactList, String campaignId, String yearlyCall) {
+public static insertPairingWrapper insertPairingDetails(List<wrapperPairing> contactList, String campaignId, String yearlyCall,String hascodeId,String projectId) {
     insertPairingWrapper dataWrapper = new insertPairingWrapper();
-    
+    Contact contactRec = [SELECT Id, Name, Email, AccountId FROM Contact WHERE Login_Hash_Code__c = :hascodeId or id = :hascodeId LIMIT 1];
     try {
         system.debug('size ---> ' + contactList.size());
         
@@ -4831,28 +4831,26 @@ public static insertPairingWrapper insertPairingDetails(List<wrapperPairing> con
         // Step 3: Handle Proposal (PEC FAR logic)
         Id pecfarRtId = Utility.getProposalRecordType('PECFAR');
         Application_Proposal__c singleProposal;
+        Boolean proposalFound = false;
         
-        List<Application_Proposal__c> existingProposalsViaJunction = new List<Application_Proposal__c>();
-        if(!contactIds.isEmpty()) {
-            system.debug('size contactIds---> '+contactIds);
-            existingProposalsViaJunction = [
+        // Check if projectId is provided - means Application_Proposal__c already exists
+        if(projectId != null && String.isNotBlank(projectId)) {
+            // Try to find existing proposal
+            List<Application_Proposal__c> existingProposal = [
                 SELECT Id, Campaign__c, RecordTypeId
                 FROM Application_Proposal__c
-                WHERE Id IN (
-                    SELECT Proposals__c 
-                    FROM Applicant_Proposal_Association__c 
-                    WHERE Contact__c IN :contactIds
-                )
-                AND Campaign__c = :campaignId
-                AND RecordTypeId = :pecfarRtId
+                WHERE Id = :projectId
                 LIMIT 1
             ];
+            if(!existingProposal.isEmpty()) {
+                singleProposal = existingProposal[0];
+                proposalFound = true;
+                system.debug('Using existing proposal from projectId: ' + singleProposal.Id);
+            }
         }
         
-        if(!existingProposalsViaJunction.isEmpty()) {
-            singleProposal = existingProposalsViaJunction[0];
-            system.debug('Found existing proposal via junction: ' + singleProposal.Id);
-        } else {
+        // If proposal not found with projectId, create new proposal
+        if(!proposalFound) {
             singleProposal = new Application_Proposal__c();
             singleProposal.RecordTypeId = pecfarRtId;
             singleProposal.Campaign__c = campaignId;
@@ -4862,75 +4860,70 @@ public static insertPairingWrapper insertPairingDetails(List<wrapperPairing> con
             system.debug('Created new proposal: ' + singleProposal.Id);
         }
         
-        // Step 4: Handle Applicant_Proposal_Association__c - create if doesn't exist (SINGLE record like reference)
-        
-    /*    Applicant_Proposal_Association__c association;
-        // Pick first contact for association (like reference uses single conId)
-        Id firstContactId = contactIds.isEmpty() ? null : new List<Id>(contactIds)[0];
-        
-        if(firstContactId != null) {
-            List<Applicant_Proposal_Association__c> existingAppPropAssoc = [
-                SELECT Id, Contact__c, Proposals__c 
-                FROM Applicant_Proposal_Association__c 
-                WHERE Contact__c = :firstContactId 
-                AND Proposals__c = :singleProposal.Id 
-                LIMIT 1
-            ];
-            
-            if (existingAppPropAssoc.isEmpty()) {
-                association = new Applicant_Proposal_Association__c(
-                    Contact__c = firstContactId,
-                    Proposals__c = singleProposal.Id
-                );
-                insert association;
-                system.debug('Created association: ' + association.Id);
+        // Step 4: Handle Applicant_Proposal_Association__c - create associations for all contacts
+        Applicant_Proposal_Association__c association;
+        List<Applicant_Proposal_Association__c> assocToInsert = new List<Applicant_Proposal_Association__c>();
+
+        if (!contactIds.isEmpty()) {
+            // Fetch existing associations for all contacts for this proposal
+            Map<Id, Applicant_Proposal_Association__c> existingAssocMap = new Map<Id, Applicant_Proposal_Association__c>();
+
+            for (Applicant_Proposal_Association__c apa : [
+                SELECT Id, Contact__c, Proposals__c
+                FROM Applicant_Proposal_Association__c
+                WHERE Contact__c IN :contactIds
+                AND Proposals__c = :singleProposal.Id
+            ]) {
+                existingAssocMap.put(apa.Contact__c, apa);
+            }
+
+            // Create associations for all contacts that don't have one yet
+            for (Id conId : contactIds) {
+                if (!existingAssocMap.containsKey(conId)) {
+                    assocToInsert.add(new Applicant_Proposal_Association__c(
+                        Contact__c = conId,
+                        Proposals__c = singleProposal.Id
+                    ));
+                }
+            }
+
+            // Insert missing associations
+            if (!assocToInsert.isEmpty()) {
+                insert assocToInsert;
+                System.debug('Created associations count: ' + assocToInsert.size());
+            }
+
+            // Return only the apa for the hascodeId contact (logged-in contact)
+            Id hascodeContactId = contactRec.Id;
+            if (existingAssocMap.containsKey(hascodeContactId)) {
+                association = existingAssocMap.get(hascodeContactId);
+                system.debug('Found existing association for hascodeId contact: ' + association.Id);
             } else {
-                association = existingAppPropAssoc[0];
-                system.debug('Found existing association: ' + association.Id);
+                // Find the newly created association for hascodeId contact
+                for (Applicant_Proposal_Association__c apa : assocToInsert) {
+                    if (apa.Contact__c == hascodeContactId) {
+                        association = apa;
+                        system.debug('Using newly created association for hascodeId contact: ' + association.Id);
+                        break;
+                    }
+                }
             }
         }
-        */
         
-        Applicant_Proposal_Association__c association;
-List<Applicant_Proposal_Association__c> assocToInsert = new List<Applicant_Proposal_Association__c>();
-
-if (!contactIds.isEmpty()) {
-
-    // Fetch existing associations for all contacts for this proposal
-    Map<Id, Applicant_Proposal_Association__c> existingAssocMap = new Map<Id, Applicant_Proposal_Association__c>();
-
-    for (Applicant_Proposal_Association__c apa : [
-        SELECT Id, Contact__c, Proposals__c
-        FROM Applicant_Proposal_Association__c
-        WHERE Contact__c IN :contactIds
-        AND Proposals__c = :singleProposal.Id
-    ]) {
-        existingAssocMap.put(apa.Contact__c, apa);
-    }
-
-    // Create associations only if not already present
-    for (Id conId : contactIds) {
-        if (!existingAssocMap.containsKey(conId)) {
-            assocToInsert.add(new Applicant_Proposal_Association__c(
-                Contact__c = conId,
-                Proposals__c = singleProposal.Id
-            ));
+        // If association not found yet (hascodeId contact not in contactList), query for existing association
+        if (association == null && contactRec.Id != null) {
+            List<Applicant_Proposal_Association__c> hascodeAssoc = [
+                SELECT Id, Contact__c, Proposals__c
+                FROM Applicant_Proposal_Association__c
+                WHERE Contact__c = :contactRec.Id
+                AND Proposals__c = :singleProposal.Id
+                LIMIT 1
+            ];
+            if (!hascodeAssoc.isEmpty()) {
+                association = hascodeAssoc[0];
+                system.debug('Found existing association for hascodeId contact (not in contactList): ' + association.Id);
+            }
         }
-    }
-
-    // Insert missing associations
-    if (!assocToInsert.isEmpty()) {
-        insert assocToInsert;
-        System.debug('Created associations count: ' + assocToInsert.size());
-    }
-
-    // Maintain reference-style single association (first available)
-    if (!existingAssocMap.isEmpty()) {
-        association = existingAssocMap.values()[0];
-    } else if (!assocToInsert.isEmpty()) {
-        association = assocToInsert[0];
-    }
-}
         
         // Populate wrapper with results (EXACT reference pattern)
         dataWrapper.proposalId = singleProposal.Id;

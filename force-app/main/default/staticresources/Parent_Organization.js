@@ -118,17 +118,27 @@ angular.module('cp_app').controller('POrg_ctrl', function($scope,$rootScope) {
         $scope.accountDetails['Shipping_State__c'] = $scope.accountDetails['BillingState'];
 
         if($scope.accDetails.Account.Name==undefined || $scope.accDetails.Account.Name==""){
-          swal('info','Please enter Organization Name','info');
+          swal('Info','Please enter Organization Name','info');
           $("#name").addClass('border-theme');
           return;
       }
       if($scope.accDetails.Account.BillingCountry==undefined || $scope.accDetails.Account.BillingCountry==""){
-          swal('info','Please enter Country','info');
+          swal('Info','Please enter Country','info');
           $("#country").addClass('border-theme');
           return;
       }
+      if($scope.accDetails.Account.BillingState==undefined || $scope.accDetails.Account.BillingState==""){
+          swal('Info','Please enter State','info');
+          $("#State").addClass('border-theme');
+          return;
+      }
+      if($scope.accDetails.Account.BillingCity==undefined || $scope.accDetails.Account.BillingCity==""){
+          swal('Info','Please enter City','info');
+          $("#City").addClass('border-theme');
+          return;
+      }
       if($scope.accDetails.Account.BillingPostalCode==undefined || $scope.accDetails.Account.BillingPostalCode==""){
-          swal('info','Please enter Pin Code','info');
+          swal('Info','Please enter Pin Code','info');
           $("#pincode").addClass('border-theme');
           return;
       }
@@ -142,17 +152,17 @@ angular.module('cp_app').controller('POrg_ctrl', function($scope,$rootScope) {
     //     }
     //   }
       if($scope.accDetails.Account.Name_of_Mentor__c==undefined || $scope.accDetails.Account.Name_of_Mentor__c==""){
-          swal('info','Please enter Name of Mentor','info');
+          swal('Info','Please enter Name of Mentor','info');
           $("#mentor").addClass('border-theme');
           return;
       }
       if($scope.accDetails.Account.Designation_Position_of_the_Mentor__c==undefined || $scope.accDetails.Account.Designation_Position_of_the_Mentor__c==""){
-          swal('info','Please enter Designation/Position of Mentor','info');
+          swal('Info','Please enter Designation/Position of Mentor','info');
           $("#designation").addClass('border-theme');
           return;
       }
       if($scope.accDetails.Account.Mentor_contact_number__c==undefined || $scope.accDetails.Account.Mentor_contact_number__c==""){
-          swal('info','Please enter Mentor contact number','info');
+          swal('Info','Please enter Mentor contact number','info');
           $("#number").addClass('border-theme');
           return;
       }
@@ -168,7 +178,7 @@ angular.module('cp_app').controller('POrg_ctrl', function($scope,$rootScope) {
     //     }
     // }
       if($scope.accDetails.Account.Mentor_E_mail_Id__c==undefined || $scope.accDetails.Account.Mentor_E_mail_Id__c==""){
-          swal('info','Please enter Mentor email-id','info');
+          swal('Info','Please enter Mentor email-id','info');
           $("#email").addClass('border-theme');
           return;
       }
@@ -184,7 +194,7 @@ angular.module('cp_app').controller('POrg_ctrl', function($scope,$rootScope) {
     //     }
     // }
       if($scope.accDetails.Account.Organisation_Posrt__c==undefined || $scope.accDetails.Account.Organisation_Posrt__c==""){
-          swal('info','Please enter Organization portfolio','info');
+          swal('Info','Please enter Organization portfolio','info');
           return;
       }else{
             //   var div = document.createElement("div");
@@ -192,7 +202,7 @@ angular.module('cp_app').controller('POrg_ctrl', function($scope,$rootScope) {
             //   let abstractText = div.innerText.replace(/(\r\n\t|\t|\n|\r)/gm, "");
             //   abstractText = abstractText.replaceAll(' ','');
         if($scope.objRtf[0].charCount > 250){
-          swal('info','Max character limit for Brief Portfolio of the organisation is 250 only','info');
+          swal('Info','Max character limit for Brief Portfolio of the organisation is 250 only','info');
           return;
         }
       }
@@ -258,7 +268,7 @@ angular.module('cp_app').controller('POrg_ctrl', function($scope,$rootScope) {
         debugger;
         if($scope.accDetails.Account.BillingCountry == "India"){
           if($scope.accDetails.Account.BillingPostalCode.length > 6){
-            swal('info','For India, pin code should be 6 digit.','info');
+            swal('Info','For India, pin code should be 6 digit.','info');
             $("#pincode").addClass('border-theme');
           return;
           }

@@ -298,7 +298,7 @@ angular.module('cp_app').controller('ReviewAndSubmitIF_Ctrl', function ($scope, 
         if (typeOfFile[lengthOfType - 1] == "jpg" || typeOfFile[lengthOfType - 1] == "jpeg") {
 
         } else {
-            swal('info', 'Please choose jpg/jpeg file only.', 'info');
+            swal('Info', 'Please choose jpg/jpeg file only.', 'info');
             return;
         }
         console.log(file);
@@ -324,19 +324,19 @@ angular.module('cp_app').controller('ReviewAndSubmitIF_Ctrl', function ($scope, 
                     if (fileSize < maxStringSize) {
                         $scope.uploadAttachment(type, userDocId, fileId);
                     } else {
-                        swal("info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".", "info");
+                        swal("Info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".", "info");
                         return;
                         // alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
                     }
 
                 }
                 fileReader.onerror = function (e) {
-                    swal("info", "There was an error reading the file.  Please try again.", "info");
+                    swal("Info", "There was an error reading the file.  Please try again.", "info");
                     return;
                     // alert("There was an error reading the file.  Please try again.");
                 }
                 fileReader.onabort = function (e) {
-                    swal("info", "There was an error reading the file.  Please try again.", "info");
+                    swal("Info", "There was an error reading the file.  Please try again.", "info");
                     return;
                     // alert("There was an error reading the file.  Please try again.");
                 }
@@ -344,11 +344,11 @@ angular.module('cp_app').controller('ReviewAndSubmitIF_Ctrl', function ($scope, 
                 fileReader.readAsBinaryString(file);  //Read the body of the file
 
             } else {
-                swal("info", "File must be under 1 Mb in size.  Your file is too large.  Please try again.", "info");
+                swal("Info", "File must be under 1 Mb in size.  Your file is too large.  Please try again.", "info");
                 return;
             }
         } else {
-            swal("info", "You must choose a file before trying to upload it", "info");
+            swal("Info", "You must choose a file before trying to upload it", "info");
             return;
             // alert("You must choose a file before trying to upload it");
             // $scope.showSpinnereditProf = false;

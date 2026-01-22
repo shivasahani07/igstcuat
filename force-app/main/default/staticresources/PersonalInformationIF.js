@@ -416,7 +416,7 @@ $scope.uploadFile = function (type, userDocId, fileId,fileSizeFun,fileSizeMin) {
               if (fileSize < maxStringSize) {
                   $scope.uploadAttachment(type , userDocId, fileId);
               } else {
-                swal("info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".","info");
+                swal("Info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".","info");
                 $scope.setLostValues();
                 return;
                   // alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
@@ -424,13 +424,13 @@ $scope.uploadFile = function (type, userDocId, fileId,fileSizeFun,fileSizeMin) {
   
           }
           fileReader.onerror = function (e) {
-            swal("info", "There was an error reading the file.  Please try again.","info");
+            swal("Info", "There was an error reading the file.  Please try again.","info");
             $scope.setLostValues();
                 return;
               // alert("There was an error reading the file.  Please try again.");
           }
           fileReader.onabort = function (e) {
-            swal("info", "There was an error reading the file.  Please try again.","info");
+            swal("Info", "There was an error reading the file.  Please try again.","info");
             $scope.setLostValues();
                 return;
               // alert("There was an error reading the file.  Please try again.");
@@ -439,7 +439,7 @@ $scope.uploadFile = function (type, userDocId, fileId,fileSizeFun,fileSizeMin) {
           fileReader.readAsBinaryString(file);  //Read the body of the file
   
       } else {
-        swal("info", "File must be under 500 kb in size.  Your file is too large.  Please try again.","info");
+        swal("Info", "File must be under 500 kb in size.  Your file is too large.  Please try again.","info");
         $scope.setLostValues();
        // $scope.getContactWiser();
                 return;
@@ -447,7 +447,7 @@ $scope.uploadFile = function (type, userDocId, fileId,fileSizeFun,fileSizeMin) {
           $scope.showSpinnereditProf = false;
       }
   } else {
-    swal("info", "You must choose a file before trying to upload it","info");
+    swal("Info", "You must choose a file before trying to upload it","info");
     $scope.setLostValues();
       return;
       // alert("You must choose a file before trying to upload it");
@@ -531,43 +531,43 @@ debugger
     var birthDay=0;
     // $scope.objContact.Country_Code__c = code[0];
     if($scope.objContact.Title==undefined || $scope.objContact.Title==''||$scope.objContact.Title==' '){
-      swal('info','Please enter Salutation','info');
+      swal('Info','Please enter Salutation','info');
       $("#txtSalutation").addClass('border-theme');
       return;
     }
     if($scope.objContact.FirstName==undefined || $scope.objContact.FirstName==''||$scope.objContact.FirstName==' '){
-      swal('info','Please enter first name','info');
+      swal('Info','Please enter first name','info');
       $("#txtFirstName").addClass('border-theme');
       return;
     }
     if($scope.objContact.LastName==undefined || $scope.objContact.LastName==''||$scope.objContact.LastName==' '){
-      swal('info','Please enter last name','info');
+      swal('Info','Please enter last name','info');
       $("#txtLastName").addClass('border-theme');
       return;
     }
     if($scope.Birthdate==undefined || $scope.Birthdate==''||$scope.Birthdate==' '){
-      swal('info','Please enter birth date','info');
+      swal('Info','Please enter birth date','info');
       $("#txtDOB").addClass('border-theme');
       return;
     }
     if($scope.objContact.Nationality__c==undefined || $scope.objContact.Nationality__c==''||$scope.objContact.Nationality__c==' '){
-      swal('info','Please select nationality','info');
+      swal('Info','Please select nationality','info');
       $("#selectNatinality").addClass('border-theme');
       return;
     }
     if($scope.objContact.Gender__c==undefined || $scope.objContact.Gender__c==''||$scope.objContact.Gender__c==' '){
-      swal('info','Please select Gender','info');
+      swal('Info','Please select Gender','info');
       $("#gender").addClass('border-theme');
       return;
     }
     if($scope.objContact.Email==undefined || $scope.objContact.Email==''||$scope.objContact.Email==' '){
-      swal('info','Please enter Email','info');
+      swal('Info','Please enter Email','info');
       $("#txtEmail").addClass('border-theme');
       return;
     }else{
       if($scope.valid($scope.objContact.Email)){
           swal(
-              'info',
+              'Info',
               'Check Your Registered Email!',
               'info'
           );
@@ -577,13 +577,13 @@ debugger
   }
 
     if($scope.emailCheck == true){
-      swal('info','Email already exists.','info');
+      swal('Info','Email already exists.','info');
       $("#txtEmail").addClass('border-theme');
           return;
     }
 
     if($scope.objContact.MobilePhone==undefined || $scope.objContact.MobilePhone==''||$scope.objContact.MobilePhone==' '){
-      swal('info','Please enter Mobile No.','info');
+      swal('Info','Please enter Mobile No.','info');
       $("#mobile").addClass('border-theme');
       return;
     }
@@ -591,7 +591,7 @@ debugger
     if($scope.objContact.MobilePhone != undefined && $scope.objContact.MobilePhone != ""){
       if($scope.objContact.MobilePhone.length < 10){
           swal(
-              'info',
+              'Info',
               'Mobile No. should be 10 digit.',
               'info'
           )
@@ -603,7 +603,7 @@ debugger
   if($scope.objContact.OtherPhone != undefined && $scope.objContact.OtherPhone != ""){
     if($scope.objContact.OtherPhone.length < 10){
         swal(
-            'info',
+            'Info',
             'Contact No. should be 10 digit.',
             'info'
         )
@@ -613,38 +613,38 @@ debugger
 }
 
     if($scope.MailingLine1 == undefined || $scope.MailingLine1 == ""){
-      swal('info','Please enter Line 1.','info');
+      swal('Info','Please enter Line 1.','info');
       $("#line1").addClass('border-theme');
       return;
     }
 
     if($scope.objContact.MailingCity == undefined || $scope.objContact.MailingCity == ""){
-      swal('info','Please enter District.','info');
+      swal('Info','Please enter District.','info');
       $("#district").addClass('border-theme');
       return;
     }
 
     if($scope.objContact.MailingCountry == undefined || $scope.objContact.MailingCountry == ""){
-      swal('info','Please enter country.','info');
+      swal('Info','Please enter country.','info');
       $("#country").addClass('border-theme');
       return;
     }
 
     if($scope.objContact.MailingState == undefined || $scope.objContact.MailingState == ""){
-      swal('info','Please enter State.','info');
+      swal('Info','Please enter State.','info');
       $("#state").addClass('border-theme');
       return;
     }
 
     if($scope.objContact.MailingPostalCode == undefined || $scope.objContact.MailingPostalCode == ""){
-      swal('info','Please enter pin code.','info');
+      swal('Info','Please enter pin code.','info');
       $("#pin").addClass('border-theme');
       return;
     }
 
     if($scope.objContact.MailingCountry == "India"){
       if($scope.objContact.MailingPostalCode.length != 6){
-        swal('info','For India, pin code should be 6 digit.','info');
+        swal('Info','For India, pin code should be 6 digit.','info');
         $("#pin").addClass('border-theme');
       return;
       }
@@ -652,31 +652,31 @@ debugger
 
     if($scope.objContact.Addess_same_as__c == false){
       if($scope.OtherLine1 == undefined || $scope.OtherLine1 == ""){
-        swal('info','Please enter Line 1.','info');
+        swal('Info','Please enter Line 1.','info');
         $("#line11").addClass('border-theme');
         return;
       }
 
       if($scope.objContact.OtherCity == undefined || $scope.objContact.OtherCity == ""){
-        swal('info','Please enter District.','info');
+        swal('Info','Please enter District.','info');
         $("#district2").addClass('border-theme');
         return;
       }
 
       if($scope.objContact.OtherCountry == undefined || $scope.objContact.OtherCountry == ""){
-        swal('info','Please enter country.','info');
+        swal('Info','Please enter country.','info');
         $("#country2").addClass('border-theme');
         return;
       }
 
       if($scope.objContact.OtherState == undefined || $scope.objContact.OtherState == ""){
-        swal('info','Please enter State.','info');
+        swal('Info','Please enter State.','info');
         $("#state2").addClass('border-theme');
         return;
       }
 
       if($scope.objContact.OtherPostalCode == undefined || $scope.objContact.OtherPostalCode == ""){
-        swal('info','Please enter pin code.','info');
+        swal('Info','Please enter pin code.','info');
         $("#pin2").addClass('border-theme');
         return;
       }
@@ -684,7 +684,7 @@ debugger
 
     if($scope.objContact.OtherCountry == "India"){
       if($scope.objContact.OtherPostalCode.length != 6){
-        swal('info','For India, pin code should be 6 digit.','info');
+        swal('Info','For India, pin code should be 6 digit.','info');
         $("#pin2").addClass('border-theme');
       return;
       }
@@ -818,7 +818,7 @@ $scope.valid = function(value){
       debugger;
       if($scope.objContact.MailingCountry == "India"){
         if($scope.objContact.MailingPostalCode.length > 6){
-          swal('info','For India, pin code should be 6 digit.','info');
+          swal('Info','For India, pin code should be 6 digit.','info');
           $("#pin").addClass('border-theme');
         return;
         }
@@ -829,7 +829,7 @@ $scope.valid = function(value){
       debugger;
       if($scope.objContact.OtherCountry == "India"){
         if($scope.objContact.OtherPostalCode.length != 6){
-          swal('info','For India, pin code should be 6 digit.','info');
+          swal('Info','For India, pin code should be 6 digit.','info');
           $("#pin2").addClass('border-theme');
         return;
         }

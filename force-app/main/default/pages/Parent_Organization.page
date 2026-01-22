@@ -447,6 +447,7 @@
                                 <div class="col-md-6">
                                     <label class="font-if">City
                                     </label>
+                                    <span class="required-asterisk" style="color:red;">*</span>
                                     <input name="city" class="form-control" type="text" ng-focus="removeClass2('city')" id="city" ng-model="accDetails.Account.BillingCity" ng-disabled="proposalStage" />
                                 </div>
         
@@ -463,6 +464,7 @@
                             <div class="row mt-5 mx-1">
                                 <div class="col-md-6">
                                     <label class="font-if">State</label>
+                                    <span class="required-asterisk" style="color:red;">*</span>
                                     <input type="text" ng-disabled="proposalStage" ng-focus="removeClass2('state')" id="state" ng-model="accDetails.Account.BillingState" class="form-control" />
                                     <!-- <select class="form-control" aria-label="Default select example" ng-focus="removeClass2('state')" id="state" ng-model="accDetails.Account.BillingState" ng-disabled="proposalStage">
                                         <option ng-repeat="staff in accDetails.Account.stateList">{{staff}}</option>

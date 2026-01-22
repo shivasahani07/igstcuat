@@ -461,9 +461,11 @@
                                     <span class="input-group-btn" ng-hide="proposalStage">
                                      <button class="btn btn-success" ng-click="uploadFile(acceptance.userDocument.Name,acceptance.userDocument.Id,'','1048576','1048576')"
                                             type="button">Upload</button>
-
                             
                                     </span>
+                                </div>
+                                <div ng-show="acceptance.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
                                 </div>
                             </div>
 
@@ -489,6 +491,9 @@
                                         <button class="btn btn-success" ng-click="uploadFile(recommendation.userDocument.Name,recommendation.userDocument.Id,'','1048576','1048576')"
                                             type="button">Upload</button>
                                     </span>
+                                </div>
+                                <div ng-show="recommendation.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
                                 </div>
                             </div>
 
@@ -518,6 +523,9 @@
                                             type="button">Upload</button>
                                     </span>
                                 </div>
+                                <div ng-show="permission.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
+                                </div>
                             </div>
 
                             <div class="col-md-3" ng-show="permission.userDocument.Status__c=='Uploaded'">
@@ -537,6 +545,9 @@
                                         <button class="btn btn-success" ng-click="uploadFile(reference.userDocument.Name,reference.userDocument.Id,'','1048576','1048576')"
                                             type="button">Upload</button>
                                     </span>
+                                </div>
+                                <div ng-show="reference.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
                                 </div>
                             </div>
 
@@ -561,6 +572,9 @@
                                             type="button">Upload</button>
                                     </span>
                                 </div>
+                                <div ng-show="proof.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
+                                </div>
                             </div>
 
                             <div class="col-md-3" ng-show="proof.userDocument.Status__c=='Uploaded'">
@@ -583,6 +597,9 @@
                                         <button class="btn btn-success" ng-click="uploadFile(currentPassport.userDocument.Name,currentPassport.userDocument.Id,'','1048576','1048576')"
                                             type="button">Upload</button>
                                     </span>
+                                </div>
+                                <div ng-show="currentPassport.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                            <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
                                 </div>
                             </div>
 

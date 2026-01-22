@@ -187,9 +187,9 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
  
                 if (result == null || result.length == 0) {
                     $scope.pairingDetails.push({
-                        "FirstName": " ",
-                        "LastName": " ",
-                        "Email": " ",
+                        "FirstName": "",
+                        "LastName": "",
+                        "Email": "",
                         "Birthdate":"",
                         "MailingCountry":"",
                         "Campaign__c":$scope.campaigntype
@@ -237,8 +237,21 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
         var GermanyCount = 0;
         $scope.detailedList = [];
         $scope.conList = [];
+        
+        // Trim email fields to remove whitespace
+        if($scope.pairingDetails && $scope.pairingDetails.Email){
+            $scope.pairingDetails.Email = $scope.pairingDetails.Email.trim();
+        }
+        if($scope.pairList && $scope.pairList.Email){
+            $scope.pairList.Email = $scope.pairList.Email.trim();
+        }
+        
+        // Debug: Log email values before pushing to detailedList
+        console.log('pairingDetails.Email:', $scope.pairingDetails ? $scope.pairingDetails.Email : 'pairingDetails is undefined');
+        console.log('pairList.Email:', $scope.pairList ? $scope.pairList.Email : 'pairList is undefined');
+        
         $scope.detailedList.push($scope.pairingDetails,$scope.pairList);
-        console.log('detailedList :: '+$scope.detailedList);
+        console.log('detailedList :: '+JSON.stringify($scope.detailedList));
                
      /*  
     $scope.Pecfar_age_limit = $scope.pairingDetails.Proposals__r.yearly_Call__r.Pecfar_age_limit__c;
@@ -266,11 +279,13 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                               return;
                         }
            
-                        if($scope.pairingDetails.Email == undefined || $scope.pairingDetails.Email == ""){
+                        if($scope.pairingDetails.Email == undefined || $scope.pairingDetails.Email == "" || ($scope.pairingDetails.Email && $scope.pairingDetails.Email.trim() == "")){
                             swal("Info", "Please Enter Email.");
                             $("#txtIndEmail").addClass('border-theme');
                               return;
                         }else{
+                            // Trim email before validation
+                            $scope.pairingDetails.Email = $scope.pairingDetails.Email.trim();
                             if($scope.valid($scope.pairingDetails.Email)){
                                 swal(
                                     'Info',
@@ -328,11 +343,13 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                                   return;
                             }
                
-                            if($scope.pairList.Email == undefined || $scope.pairList.Email == ""){
+                            if($scope.pairList.Email == undefined || $scope.pairList.Email == "" || ($scope.pairList.Email && $scope.pairList.Email.trim() == "")){
                                 swal("Info", "Please Enter Email.");
                                 $("#txtGerEmail").addClass('border-theme');
                                   return;
                             }else{
+                                // Trim email before validation
+                                $scope.pairList.Email = $scope.pairList.Email.trim();
                                 if($scope.valid($scope.pairList.Email)){
                                     swal(
                                         'Info',
@@ -389,8 +406,10 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
  
             for(let i=0; i<$scope.detailedList.length; i++){
                     delete ($scope.detailedList[i]['$$hashKey']);
+                    // Ensure email is trimmed and not null
+                    var emailValue = $scope.detailedList[i].Email ? $scope.detailedList[i].Email.trim() : '';
                     var pairingObj = {"companyNmae":$scope.detailedList[i].Account.Name,"proposal":$rootScope.projectId,"accId":$scope.detailedList[i].AccountId,"birthyear":0,"birthmonth":0,"birthday":0,cont:{
-                        "FirstName":$scope.detailedList[i].FirstName,"LastName":$scope.detailedList[i].LastName,"Id":$scope.detailedList[i].Id,"Email":$scope.detailedList[i].Email,"Campaign__c":$scope.campaigntype,"MailingCountry":$scope.detailedList[i].MailingCountry,AccountId:$scope.detailedList[i].AccountId,"Proposals__c":$rootScope.projectId
+                        "FirstName":$scope.detailedList[i].FirstName,"LastName":$scope.detailedList[i].LastName,"Id":$scope.detailedList[i].Id,"Email":emailValue,"Campaign__c":$scope.campaigntype,"MailingCountry":$scope.detailedList[i].MailingCountry,AccountId:$scope.detailedList[i].AccountId,"Proposals__c":$rootScope.projectId
                     }};
                     pairingObj.companyNmae = $scope.detailedList[i].Account.Name;
  
@@ -445,7 +464,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                 }
  
                 for(var i=0;i<$scope.detailedList.length;i++){
-                    delete ($scope.detailedList[i].Birthdate);
+                    // delete ($scope.detailedList[i].Birthdate);
                 }
  
         // for(let i=0; i<$scope.pairingDetails.length; i++){
@@ -543,12 +562,15 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
         // }
  
         ApplicantPortal_Contoller.insertPairingDetails
-        ($scope.conList,$rootScope.campaignId,$rootScope.yearlyCallId, function(result, event){
+        ($scope.conList,$rootScope.campaignId,$rootScope.yearlyCallId,$rootScope.contactId,$rootScope.proposalId, function(result, event){
             if(event.status){
              debugger;
                 // Saving the ProposalId in Local Storage
                 localStorage.setItem('proposalId', result.proposalId);
-                localStorage.setItem('apaId', result.apa.Id);
+                // Only save apaId if apa is not null
+                if(result.apa && result.apa.Id) {
+                    localStorage.setItem('apaId', result.apa.Id);
+                }
              swal({
                 title: "Pairing Details",
                 text: 'Pairing details have been successfully saved.',

@@ -152,14 +152,6 @@
                                     <div class="progress-success w-100"></div>
                                 </div>  
                                 <ul>
-                                    <li class="active pb-cursor">
-                                        <a ng-click="redirectPageURL('Fellowship_Details')">
-                                            <div class="icon-circle">
-                                                <i class="fa fa-home"></i>
-                                            </div>
-                                            <span>Fellowship Details</span>
-                                        </a>
-                                    </li>
                                     
                                       <li class="active pb-cursor">
                                         <a ng-click="redirectPageURL('Achievements_Pecfar')">
@@ -169,7 +161,14 @@
                                             <span>Achievements</span>
                                         </a>
                                     </li>
-                                   
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('Fellowship_Details')">
+                                            <div class="icon-circle">
+                                                <i class="fa fa-home"></i>
+                                            </div>
+                                            <span>Fellowship Details</span>
+                                        </a>
+                                    </li>
 
                                     <li class="active pb-cursor">
                                         <a ng-click="redirectPageURL('Attachments_Pecfar')">
@@ -202,14 +201,7 @@
                                     <div class="progress-success wp-0"></div>
                                 </div>
                                 <ul>
-                                    <li>
-                                        <a>
-                                            <div class="icon-circle">
-                                                <i class="fa fa-home"></i>
-                                            </div>
-                                            <span>Fellowship Details</span>
-                                        </a>
-                                    </li>
+                                    
                                     <li>
                                         <a>
                                             <div class="icon-circle">
@@ -218,7 +210,14 @@
                                             <span>Achievements</span>
                                         </a>
                                     </li>
-                                   
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa fa-home"></i>
+                                            </div>
+                                            <span>Fellowship Details</span>
+                                        </a>
+                                    </li>
                                     
                                     
                                     <li>
@@ -320,7 +319,7 @@
                                         <label class="font-if">Date of Birth
                                             <span class="required-asterisk" style="color:red;">*</span></label>
                                         <!-- <md-datepicker ng-disabled="proposalStage" ng-model="pairingDetails.Birthdate" ng-focus="removeClass('txtIndBD')" id="txtIndBD" md-placeholder="Birthdate" class="form-control" md-current-view="year"></md-datepicker> -->
-                                        <input type="date" class="form-control" ng-focus="removeClass('txtIndBD')" id="txtIndBD" ng-model="pairingDetails.Birthdate" ng-disabled="proposalStage || primary" />
+                                        <input type="date" class="form-control" ng-focus="removeClass('txtIndBD')" id="txtIndBD" ng-model="pairingDetails.Birthdate" ng-disabled="proposalStage || primary || pairingDetails.Birthdate" />
                                     </div>
                                 </div>
                                 

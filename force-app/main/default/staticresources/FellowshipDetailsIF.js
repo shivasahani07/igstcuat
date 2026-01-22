@@ -162,17 +162,27 @@ $scope.callRTF=function(){
       $scope.accDetails['Shipping_State__c'] = $scope.accDetails['BillingState'];
 
       if($scope.accDetails.Name==undefined || $scope.accDetails.Name==""){
-        swal('info','Please enter Organization Name','info');
+        swal('Info','Please enter Organization Name','info');
         $("#name").addClass('border-theme');
         return;
     }
     if($scope.accDetails.BillingCountry==undefined || $scope.accDetails.BillingCountry==""){
-        swal('info','Please enter Country','info');
+        swal('Info','Please enter Country','info');
         $("#country").addClass('border-theme');
         return;
     }
+     if($scope.accDetails.BillingState==undefined || $scope.accDetails.BillingState==""){
+        swal('Info','Please enter State','info');
+        $("#state").addClass('border-theme');
+        return;
+    }
+     if($scope.accDetails.BillingCity==undefined || $scope.accDetails.BillingCity==""){
+        swal('Info','Please enter City','info');
+        $("#city").addClass('border-theme');
+        return;
+    }
     if($scope.accDetails.BillingPostalCode==undefined || $scope.accDetails.BillingPostalCode==""){
-        swal('info','Please enter Pin Code','info');
+        swal('Info','Please enter Pin Code','info');
         $("#pincode").addClass('border-theme');
         return;
     }else{
@@ -185,17 +195,17 @@ $scope.callRTF=function(){
     // }
     }
     if($scope.accDetails.Name_of_Mentor__c==undefined || $scope.accDetails.Name_of_Mentor__c==""){
-        swal('info','Please enter Name of Mentor','info');
+        swal('Info','Please enter Name of Mentor','info');
         $("#mentor").addClass('border-theme');
         return;
     }
     if($scope.accDetails.Designation_Position_of_the_Mentor__c==undefined || $scope.accDetails.Designation_Position_of_the_Mentor__c==""){
-        swal('info','Please enter Designation/Position of Mentor','info');
+        swal('Info','Please enter Designation/Position of Mentor','info');
         $("#designation").addClass('border-theme');
         return;
     }
     if($scope.accDetails.Mentor_contact_number__c==undefined || $scope.accDetails.Mentor_contact_number__c==""){
-        swal('info','Please enter Mentor contact number','info');
+        swal('Info','Please enter Mentor contact number','info');
         $("#number").addClass('border-theme');
         return;
     }
@@ -211,13 +221,13 @@ $scope.callRTF=function(){
   //     }
   // }
     if($scope.accDetails.Mentor_E_mail_Id__c==undefined || $scope.accDetails.Mentor_E_mail_Id__c==""){
-        swal('info','Please enter Mentor email-id','info');
+        swal('Info','Please enter Mentor email-id','info');
         $("#email").addClass('border-theme');
         return;
     }else{
       if($scope.valid($scope.accDetails.Mentor_E_mail_Id__c)){
           swal(
-              'info',
+              'Info',
               'Check Your Registered Email!',
               'info'
           );
@@ -231,7 +241,7 @@ $scope.callRTF=function(){
   //         return;
   // }
     if($scope.accDetails.Organisation_Posrt__c==undefined || $scope.accDetails.Organisation_Posrt__c==""){
-        swal('info','Please enter Organization portfolio','info');
+        swal('Info','Please enter Organization portfolio','info');
         return;
     }else{
       // var div = document.createElement("div");
@@ -239,7 +249,7 @@ $scope.callRTF=function(){
       //         let abstractText = div.innerText.replace(/(\r\n\t|\t|\n|\r)/gm, "");
       //         abstractText = abstractText.replaceAll(' ','');
         if($scope.objRtf[0].charCount > 250){
-          swal('info','Max character limit for Brief Portfolio of the organisation is 250 only','info');
+          swal('Info','Max character limit for Brief Portfolio of the organisation is 250 only','info');
           return;
         }
       }
@@ -302,7 +312,7 @@ $scope.checkPinCode = function(){
   debugger;
   if($scope.accDetails.BillingCountry == "India"){
     if($scope.accDetails.BillingPostalCode.length > 6){
-      swal('info','For India, pin code should be 6 digit.','info');
+      swal('Info','For India, pin code should be 6 digit.','info');
       $("#pincode").addClass('border-theme');
     return;
     }

@@ -161,13 +161,13 @@
 
         body {
             margin: 0;
+            padding: 0;
             /* font-family: 'Segoe UI', sans-serif; */
             font-family: "Nunito Sans", sans-serif;
             background-color: #f6f6fb;
             height: 100vh;
             display: flex;
             overflow: hidden;
-            padding-top: 60px;
         }
 
         /* Sidebar */
@@ -177,19 +177,21 @@
             border-right: 1px solid #e0e0e0;
             display: flex;
             flex-direction: column;
-            padding-top: 20px;
+            padding-top: 0;
         }
 
         .sidebar-appPortal .logo {
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: #4b0082;
-            margin-bottom: 30px;
+            display: none;
         }
         .sidebar-appPortal .igstc-logo {
+            padding: 15px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar-appPortal .igstc-logo img {
             width: 100%;
-            height: 100px;
+            max-width: 180px;
+            height: auto;
             object-fit: contain;
         }
 
@@ -221,6 +223,7 @@
         .main-content {
             flex: 1;
             padding: 30px;
+            padding-top: 10px;
             overflow-y: auto;
             scrollbar-width: none;
             background-color: #F9F9FB;
@@ -524,15 +527,190 @@
             }
         }
 
+        /* FAQ Section Styles */
+        .faq-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            width: calc(33.33% - 13.33px);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .faq-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            color: white;
+        }
+
+        .faq-icon.blue {
+            background-color: #155DFC;
+        }
+
+        .faq-icon.purple {
+            background-color: #9747FF;
+        }
+
+        .faq-icon.orange {
+            background-color: #FB8A2E;
+        }
+
+        .faq-icon.red {
+            background-color: #d32f2f;
+        }
+
+        .faq-icon.blue-purple {
+            background-color: #6B46C1;
+        }
+
+        .faq-icon.brown {
+            background-color: #8B4513;
+        }
+
+        .faq-title {
+            font-weight: 700;
+            color: #000;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .faq-desc {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            flex: 1;
+        }
+
+        .faq-know-more {
+            color: #4b0082;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .faq-know-more:hover {
+            color: #6e40aa;
+        }
+
+        /* FAQ Detail Page Styles */
+        .faq-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        } 
+
+        .faq-back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #4b0082;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .faq-back-button:hover {
+            color: #6e40aa;
+        }
+
+        .faq-detail-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 40px;
+            margin-top: 10px;
+        }
+
+        .faq-detail-title {
+            color: #4F1BA3;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .faq-detail-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .faq-detail-content ol {
+            padding-left: 20px;
+        }
+
+        .faq-detail-content li {
+            margin-bottom: 15px;
+        }
+
+        .faq-detail-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .faq-detail-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: 2px solid #4b0082;
+            border-radius: 8px;
+            background-color: white;
+            color: #4b0082;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .faq-detail-btn:hover {
+            background-color: #4b0082;
+            color: white;
+        }
+
+        .faq-detail-btn i {
+            font-size: 16px;
+        }
+
+        .faq-email-link {
+            color: #4b0082;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .faq-email-link:hover {
+            text-decoration: underline;
+        }
+
         /* Responsive */
         @media(max-width: 1024px) {
-            .program-card {
+            .program-card,
+            .faq-card {
                 width: calc(50% - 10px);
             }
         }
 
         @media(max-width: 768px) {
-            .program-card {
+            .program-card,
+            .faq-card {
                 width: 100%;
             }
 
@@ -733,27 +911,53 @@
             </div> -->
             <!-- <apex:includeScript value="{!$Resource.SlickJs}" />
     <apex:includeScript value="{!$Resource.CustomJs}" /> -->
-    <!-- Global Header - Visible on all pages -->
-    <div ng-if="!isLoading" class="global-header">
-        <!-- <i class="fa-solid fa-bell"></i> -->
-        <span>{{contactName || 'Loading...'}}</span>
-        <button class="global-header-btn" ng-click="navigateToHome()" title="Home">
-            <i class="fa-solid fa-home"></i>
-            <span style="color:whitesmoke">Home</span>
-        </button>
-        <button class="global-header-btn logout-btn" ng-click="logout()" title="Logout">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span style="color:whitesmoke">Logout</span>
-        </button>
+    <!-- Top Bar - Full Width Header -->
+    <div ng-if="!isLoading" class="top-bar">
+        <div class="top-bar-left">
+            <div class="top-bar-logo">
+                <img src="{!URLFOR($Resource.Logo)}" alt="IGSTC Logo"/>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <i class="fa-solid fa-bell notification-icon"></i>
+            <span class="user-name">{{contactName || 'Loading...'}}</span>
+            <div class="user-profile-dropdown" ng-class="{'dropdown-open': showUserDropdown}">
+                <div class="user-profile-trigger" ng-click="toggleUserDropdown()">
+                    <img ng-if="userProfilePicId" class="user-avatar" src="{{profilePicUrl}}" alt="Profile Picture"/>
+                    <div ng-if="!userProfilePicId" class="user-avatar-placeholder">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="user-status-indicator"></div>
+                    <i class="fa-solid fa-chevron-up dropdown-arrow" ng-class="{'rotated': showUserDropdown}"></i>
+                </div>
+                <div class="user-dropdown-menu" ng-show="showUserDropdown">
+                    <div class="dropdown-user-info">
+                        <img ng-if="userProfilePicId" class="dropdown-avatar" src="{{profilePicUrl}}" alt="Profile Picture"/>
+                        <div ng-if="!userProfilePicId" class="dropdown-avatar-placeholder">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="dropdown-user-details">
+                            <div class="dropdown-user-name">{{contactName || 'Loading...'}}</div>
+                            <div class="dropdown-user-email">{{userEmail || applicantEmail || ''}}</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" ng-click="navigateToResetPassword(); showUserDropdown = false;">
+                        <i class="fa-solid fa-key"></i> Reset Password
+                    </a>
+                    <a href="#" class="dropdown-item" ng-click="logout(); showUserDropdown = false;">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <div ng-else="isLoading" class="main-div" ng-if="!$root.isRoutedView">
+        <div ng-else="isLoading" class="main-div" ng-if="!$root.isRoutedView">
         <div class="sidebar-appPortal">
             <div class="igstc-logo">
                 <img src="{!URLFOR($Resource.Logo)}" alt="IGSTC Logo"/>
-                <!-- <apex:image url="{!$Resource.Logo}" alt="IGSTC" styleClass="igstc-logo"/> -->
             </div>
-            <div class="logo">IGSTC</div>
             <div class="nav-item" ng-class="{active: selectedMenu === 'Dashboard'}" ng-click="showSection('Dashboard')">
                 <i class="fa-solid fa-home"></i> Dashboard
             </div>
@@ -798,7 +1002,7 @@
                             <div class="program-icon">
                                <i class="{{p.icon}}"></i>
                            </div>
-                            <div class="program-title">{{p.name}}</div>
+                            <div class="program-title">{{p.name}}</div> 
                         </div>
 
                         <div class="program-deadline">Application Deadline: {{p.deadline}}</div>  
@@ -807,7 +1011,7 @@
                         <div class="program-desc"
                                  ng-if="p.proposalStage !== 'Draft'"
                                  >
-                               Application Submitted
+                            Status: Application Submitted
                             </div>
                         <div class="program-desc"><i class="fa fa-file-text" aria-hidden="true"></i><span class="program-desc-text"> Title of Project: </span>{{p.titleOfProject}}</div>
                         <div class="btn-container">
@@ -874,6 +1078,178 @@
 
 
                     </div>
+                </div>
+            </div>
+            
+            <!-- FAQ Section -->
+            <div ng-if="selectedMenu === 'FAQ'">
+                <!-- FAQ List View -->
+                <div ng-if="!selectedFAQ">
+                    <h2>FAQ's</h2>
+                    <div class="card-grid">
+                        <!-- 2+2 CALL -->
+                        <div class="faq-card">
+                            <div class="faq-icon blue">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="faq-title">2+2 CALL</div>
+                            <div class="faq-desc">
+                                A flagship funding scheme supporting joint R&amp;D projects with two partners each from India and Germany.
+                            </div>
+                            <a href="#" class="faq-know-more" ng-click="showFAQDetail('2+2 CALL')">Know More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <!-- PECFAR -->
+                        <div class="faq-card">
+                            <div class="faq-icon purple">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+                            <div class="faq-title">PECFAR</div>
+                            <div class="faq-desc">
+                                Facilitates exchange of young Indian and German researchers and clinicians in the medical field.
+                            </div>
+                            <a href="#" class="faq-know-more" ng-click="showFAQDetail('PECFAR')">Know More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <!-- WISER -->
+                        <div class="faq-card">
+                            <div class="faq-icon orange">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <div class="faq-title">WISER</div>
+                            <div class="faq-desc">
+                                Empowers Indian women scientists through international exposure and Indo-German research partnerships.
+                            </div>
+                            <a href="#" class="faq-know-more" ng-click="showFAQDetail('WISER')">Know More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <!-- SING -->
+                        <div class="faq-card">
+                            <div class="faq-icon red">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <div class="faq-title">SING</div>
+                            <div class="faq-desc">
+                                Supports the creation of Indo-German research network centres in strategic areas.
+                            </div>
+                            <a href="#" class="faq-know-more" ng-click="showFAQDetail('SING')">Know More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <!-- WORKSHOPS -->
+                        <div class="faq-card">
+                            <div class="faq-icon blue-purple">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                            </div>
+                            <div class="faq-title">WORKSHOPS</div>
+                            <div class="faq-desc">
+                                Funds thematic workshops and exploratory meetings to initiate Indo-German collaboration.
+                            </div>
+                            <a href="#" class="faq-know-more" ng-click="showFAQDetail('WORKSHOPS')">Know More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <!-- IF -->
+                        <div class="faq-card">
+                            <div class="faq-icon brown">
+                                <i class="fa-solid fa-atom"></i>
+                            </div>
+                            <div class="faq-title">IF</div>
+                            <div class="faq-desc">
+                                This programme is aimed at encouraging PhD students/researchers in S&amp;T with an appreciable track record.
+                            </div>
+                            <a href="#" class="faq-know-more" ng-click="showFAQDetail('IF')">Know More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Detail View -->
+                <div ng-if="selectedFAQ" class="faq-detail-container">
+                    <div class="faq-back-button" ng-click="backToFAQ()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </div>
+                    <h2 style="text-align: center; margin-bottom: 20px;">FAQ's</h2>
+                    <div class="faq-detail-card">
+                        <div class="faq-detail-title">{{selectedFAQ.name}}</div>
+                        <div class="faq-detail-content">
+                            <ol>
+                                <!-- Call Text, Basic Guidelines, FAQs -->
+                                <li ng-if="selectedFAQ.hasCallText && selectedFAQ.hasBasicGuidelines && selectedFAQ.hasFAQs">
+                                    Kindly read the Call Text, Basic Guidelines and FAQs carefully before applying. The link for same is below:
+                                    <div class="faq-detail-buttons">
+                                        <a href="{{selectedFAQ.callTextUrl}}" target="_blank" class="faq-detail-btn" ng-if="selectedFAQ.callTextUrl">
+                                            <i class="fa-solid fa-phone"></i> Call Text
+                                        </a>
+                                        <a href="{{selectedFAQ.basicGuidelinesUrl}}" target="_blank" class="faq-detail-btn" ng-if="selectedFAQ.basicGuidelinesUrl">
+                                            <i class="fa-solid fa-book-open"></i> Basic Guidelines
+                                        </a>
+                                        <a href="{{selectedFAQ.faqUrl}}" target="_blank" class="faq-detail-btn" ng-if="selectedFAQ.faqUrl">
+                                            <i class="fa-solid fa-file-lines"></i> FAQs
+                                        </a>
+                                    </div>
+                                </li>
+                                <li ng-if="selectedFAQ.hasCallText && !selectedFAQ.hasBasicGuidelines && !selectedFAQ.hasFAQs">
+                                    Kindly read the Call Text carefully before applying. The link for same is below:
+                                    <div class="faq-detail-buttons">
+                                        <a href="{{selectedFAQ.callTextUrl}}" target="_blank" class="faq-detail-btn" ng-if="selectedFAQ.callTextUrl">
+                                            <i class="fa-solid fa-phone"></i> Call Text
+                                        </a>
+                                    </div>
+                                </li>
+                                
+                                <!-- Project Details Format -->
+                                <li ng-if="selectedFAQ.hasProjectDetailsFormat">
+                                    Download the First Stage "Project Details" upload format from here.
+                                </li>
+                                
+                                <!-- Standing Instructions -->
+                                <li ng-if="selectedFAQ.hasStandingInstructions">
+                                    Download the Standing Instructions and User Manual for First Stage proposal Submission from here.
+                                </li>
+                                
+                                <!-- Eligibility -->
+                                <li>Please ensure your eligibility before filling the application.</li>
+                                
+                                <!-- Documents Required -->
+                                <li ng-if="selectedFAQ.hasDocumentsRequired && selectedFAQ.documentsRequired.length > 0">
+                                    Documents required for application submission:
+                                    <ul style="margin-top: 10px; padding-left: 20px;">
+                                        <li ng-repeat="doc in selectedFAQ.documentsRequired" style="margin-bottom: 8px;">{{doc}}</li>
+                                    </ul>
+                                </li>
+                                
+                                <!-- Email -->
+                                <li>Queries, if any, should be addressed to <a href="mailto:{{selectedFAQ.email}}" class="faq-email-link">{{selectedFAQ.email}}</a></li>
+                                
+                                <!-- Deadline -->
+                                <li>{{selectedFAQ.deadline}}</li>
+                                
+                                <!-- Disqualification Note -->
+                                <li>You may note that any false information given in the application can lead to disqualification of your candidature at any stage of the process.</li>
+                                
+                                <!-- Refresh Note -->
+                                <li ng-if="selectedFAQ.hasRefreshNote">Please refresh the page with Ctrl+Shift+R and clear cache in case you face a lag or recurring error in the portal.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="selectedMenu === 'Help'">
+                <h2>Help</h2>
+                <div class="card-grid">
+                    
+                </div>
+            </div>
+            <div ng-if="selectedMenu === 'Profile'">
+                <h2>Profile</h2>
+                <div class="card-grid">
+                <!-- <apex:include pageName="contactprofile">
+                    <apex:param name="id" value="{!contactId}"/>
+                </apex:include> -->
+                <iframe
+                    src="/apex/contactprofile?id={!contactId}"
+                    width="1000px"
+                    height="1000px"
+                    frameborder="0">
+                </iframe>
                 </div>
             </div>
         </div>

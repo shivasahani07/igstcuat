@@ -620,6 +620,9 @@
                                                         <button class="btn btn-success" ng-click="uploadFile(doc.userDocument.Name,doc.userDocument.Id,'')" type="button">Upload</button>
                                                         </span>
                                                 </div>
+                                                <div ng-show="doc.userDocument.Status__c=='Uploaded'" class="mt-2">
+                                                    <span class="text-success" style="font-weight: bold;"><i class="fa-solid fa-check-circle me-2"></i>Uploaded</span>
+                                                </div>
                                         </div>
 
                                         <!-- <div class="col-md-3 mt-4" ng-show="doc.userDocument.Status__c=='Uploaded'">

@@ -303,7 +303,7 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
         var typeOfFile = fileName.split(".");
         lengthOfType = typeOfFile.length;
         if (typeOfFile[lengthOfType - 1] != "pdf") {
-            swal('info', 'Please choose pdf file only.', 'info');
+            swal('Info', 'Please choose pdf file only.', 'info');
             return;
         }
 
@@ -326,24 +326,24 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
                 if (fileSize < maxStringSize) {
                     $scope.uploadAttachment(type, userDocId, null);
                 } else {
-                    swal('info', 'Base 64 Encoded file is too large.', 'info');
+                    swal('Info', 'Base 64 Encoded file is too large.', 'info');
                     return;
                 }
             }
 
             fileReader.onerror = function (e) {
-                swal('info', 'There was an error reading the file. Please try again.', 'info');
+                swal('Info', 'There was an error reading the file. Please try again.', 'info');
                 return;
             }
 
             fileReader.onabort = function (e) {
-                swal('info', 'There was an error reading the file. Please try again.', 'info');
+                swal('Info', 'There was an error reading the file. Please try again.', 'info');
                 return;
             }
 
             fileReader.readAsBinaryString(file);
         } else {
-            swal('info', 'You must choose a file before trying to upload it', 'info');
+            swal('Info', 'You must choose a file before trying to upload it', 'info');
             $scope.showSpinnereditProf = false;
             return;
         }
@@ -402,7 +402,7 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
         for (var i = 0; i < $scope.allDocs.length; i++) {
             if ($scope.allDocs[i].userDocument.Name == 'Acceptance Letter') {
                 if ($scope.allDocs[i].userDocument.Status__c != 'Uploaded') {
-                    swal('info', 'Please upload Endorsement / acceptance letter from the host organisation on official letter head with signature and seal.', 'info');
+                    swal('Info', 'Please upload Endorsement / acceptance letter from the host organisation on official letter head with signature and seal.', 'info');
                     return;
                 }
             }
@@ -432,7 +432,7 @@ angular.module('cp_app').controller('AttachmentsIF_Ctrl', function ($scope, $sce
             // }
             else if ($scope.allDocs[i].userDocument.Name == 'Scan copy of the front page of current Passport / Aadhar card') {
                 if ($scope.allDocs[i].userDocument.Status__c != 'Uploaded') {
-                    swal('info', 'Please upload Scan copy of the front and back page of current Passport / Aadhar card.', 'info');
+                    swal('Info', 'Please upload Scan copy of the front and back page of current Passport / Aadhar card.', 'info');
                     return;
                 }
             }

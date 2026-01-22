@@ -589,7 +589,7 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
                     name: item?.Proposals__r?.Campaign__r?.Name ?? "",
                     PropName: item?.Proposals__r?.Name ?? "",
                     //titleOfProject: item?.Contact__r?.Title_Of_Project__c ?? "",
-                    titleOfProject: item?.Proposals__r?.Title_Of__c ?? item?.Proposals__r?.project_title__c,
+                    titleOfProject: item?.Proposals__r?.Title_Of__c ?? item?.Contact__r.Title_Of_Project__c ?? "",
                     desc: item?.Proposals__r?.Campaign__r?.Description ?? "",
                     deadline: item.Proposals__r?.yearly_Call__r?.Campaign_End_Date__c ?
                         new Date(item.Proposals__r?.yearly_Call__r?.Campaign_End_Date__c).toLocaleDateString('en-GB', {
@@ -638,7 +638,7 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
                     }));
                 } else {
                     const appliedCampaignIds = new Set(
-                        $scope.appliedPrograms.filter(a => a.campaignId).map(a => a.campaignId)
+                        // $scope.appliedPrograms.filter(a => a.campaignId).map(a => a.campaignId)
                     );
 
                     $scope.allPrograms = $scope.allCamapigns
@@ -755,6 +755,136 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
 
     $scope.showSection = function (menu) {
         $scope.selectedMenu = menu;
+        $scope.selectedFAQ = null; // Reset FAQ detail view when switching sections
+    };
+
+    // FAQ data
+    $scope.faqData = {
+        '2+2 CALL': {
+            name: 'IGSTC 2+2 Call - 2025',
+            title: '2+2 CALL',
+            description: 'A flagship funding scheme supporting joint R&D projects with two partners each from India and Germany.',
+            hasCallText: true,
+            hasBasicGuidelines: true,
+            hasFAQs: true,
+            callTextUrl: 'https://www.igstc.org/projects_call_text',
+            basicGuidelinesUrl: 'https://www.igstc.org/home/projects_basic_guideline',
+            faqUrl: 'https://www.igstc.org/home/faqs',
+            hasProjectDetailsFormat: true,
+            hasStandingInstructions: true,
+            hasDocumentsRequired: false,
+            documentsRequired: [],
+            email: 'info.igstc@igstc.org',
+            deadline: 'Application Deadline: 15th February 2026',
+            hasRefreshNote: true
+        },
+        'PECFAR': {
+            name: 'Paired Early Career Fellowship in Applied Research (PECFAR) - Call 2025',
+            title: 'PECFAR',
+            description: 'Facilitates exchange of young Indian and German researchers and clinicians in the medical field.',
+            hasCallText: true,
+            hasBasicGuidelines: true,
+            hasFAQs: true,
+            hasProjectDetailsFormat: false,
+            hasStandingInstructions: false,
+            hasDocumentsRequired: true,
+            documentsRequired: [
+                'No Objection Certificate from the Parent institution.',
+                'Invitation Letter from the host institution.',
+                'Proof of Date of Birth (Scan copy of Passport/ Aadhar Card).',
+                'Proof of Education Qualifications arranged in reverse chronological order.',
+                'Proof of Current Employment/Fellowship Award Letter.'
+            ],
+            email: 'pecfar@igstc.org',
+            deadline: 'Application Deadline: 31st March 2025',
+            hasRefreshNote: false
+        },
+        'WISER': {
+            name: 'Women Involvement in Science and Engineering Research (WISER)',
+            title: 'WISER',
+            description: 'Empowers Indian women scientists through international exposure and Indo-German research partnerships.',
+            hasCallText: true,
+            hasBasicGuidelines: true,
+            hasFAQs: true,
+            callTextUrl: 'https://www.igstc.org/home/wiser_2025',
+            basicGuidelinesUrl: 'https://www.igstc.org/home/wiser_basic_guidelines_2025',
+            faqUrl: 'https://www.igstc.org/home/wiser_faq_2025',
+            hasProjectDetailsFormat: false,
+            hasStandingInstructions: false,
+            hasDocumentsRequired: true,
+            documentsRequired: [
+                'No Objection Certificate (NOC)/Endorsement letter from the head of the institution(present organisation).',
+                'Endorsement/consent letter from the Indian/German pairing collaborator'
+            ],
+            email: 'wiser@igstc.org',
+            deadline: 'Application submission: 1 February to 31 March every year',
+            hasRefreshNote: false
+        },
+        'SING': {
+            name: 'IGSTC SING - Call 2025',
+            title: 'SING',
+            description: 'Supports the creation of Indo-German research network centres in strategic areas.',
+            hasCallText: true,
+            hasBasicGuidelines: false,
+            hasFAQs: false,
+            hasProjectDetailsFormat: false,
+            hasStandingInstructions: false,
+            hasDocumentsRequired: true,
+            documentsRequired: [
+                'Consent Letter/No Objection Certificate from the Parent Institution.',
+                'Invitation/Support Letter from the Host Institution.',
+                'Supporting documents in favour of your application, including CV.'
+            ],
+            email: 'sing@igstc.org',
+            deadline: 'Application submission: Open throughout the year',
+            hasRefreshNote: false
+        },
+        'WORKSHOPS': {
+            name: 'IGSTC Workshop - Call 2026',
+            title: 'WORKSHOPS',
+            description: 'Funds thematic workshops and exploratory meetings to initiate Indo-German collaboration.',
+            hasCallText: true,
+            hasBasicGuidelines: false,
+            hasFAQs: false,
+            hasProjectDetailsFormat: false,
+            hasStandingInstructions: false,
+            hasDocumentsRequired: false,
+            documentsRequired: [],
+            email: 'info.igstc@igstc.org',
+            deadline: 'Cut-off dates: 31st January 2026 and 31st July 2026',
+            hasRefreshNote: false
+        },
+        'IF': {
+            name: 'IGSTC Industrial Fellowships - Call 2025',
+            title: 'IF',
+            description: 'This programme is aimed at encouraging PhD students/researchers in S&T with an appreciable track record.',
+            hasCallText: true,
+            hasBasicGuidelines: true,
+            hasFAQs: true,
+            hasProjectDetailsFormat: false,
+            hasStandingInstructions: false,
+            hasDocumentsRequired: true,
+            documentsRequired: [
+                'Consent Letter from the Host Institution.',
+                'The applicant having institutional affiliation needs to submit NOC from the Head of the institution at the time of application. NOC Format',
+                'Applicants needs to submit recommendation letter from the mentor at parent organisation.',
+                'PDIF applicant not having affiliation with an institution needs to submit 2 letters of reference.',
+                'Proof of Date of Birth (Scan copy of Passport/ Aadhar Card).',
+                'Proof of Education Qualifications arranged in reverse chronological order.',
+                'Proof of Employment.'
+            ],
+            email: 'industrial.fellowship@igstc.org',
+            deadline: 'Application Deadline: 31st March 2025',
+            hasRefreshNote: false
+        }
+    };
+
+    $scope.showFAQDetail = function(faqTitle) {
+        $scope.selectedFAQ = $scope.faqData[faqTitle];
+    };
+
+    $scope.backToFAQ = function() {
+        $scope.selectedFAQ = null;
     };
 
     // Navigate to home/dashboard - removes hash but keeps query params

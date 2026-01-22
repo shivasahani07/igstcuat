@@ -1,0 +1,1245 @@
+<apex:page sidebar="false"
+           showHeader="false"
+           standardStylesheets="false"
+           docType="html-5.0"
+           controller="ContactProfileController">
+    
+    <style>
+        /* Scoped styles for contact profile component */
+        .contact-profile-container {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: transparent;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        box-sizing: border-box;
+        }
+        
+        /* Ensure proper isolation when included in other pages */
+        .contact-profile-container * {
+        box-sizing: border-box;
+        }
+        
+        /* Override any parent page styles that might interfere */
+        .contact-profile-container h1,
+        .contact-profile-container h2,
+        .contact-profile-container h3 {
+        margin: 0;
+        padding: 0;
+        }
+        
+        /* ===== Tabs ===== */
+        .contact-profile-container .tabs {
+        display: flex;
+        background: #fff;
+        border-radius: 30px;
+        padding: 6px;
+        width: fit-content;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        
+        .contact-profile-container .tab {
+        padding: 10px 22px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        }
+        
+        .contact-profile-container .tab.active {
+        background: #5b2dab;
+        color: #fff;
+        font-weight: 600;
+        }
+        
+        /* ===== Card ===== */
+        .contact-profile-container .card {
+        background: #fff;
+        margin-top: 20px;
+        padding: 24px;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        /* ===== Header ===== */
+        .contact-profile-container .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        }
+        
+        .contact-profile-container .btn-primary {
+        background: #5b2dab;
+        color: #fff;
+        border: none;
+        padding: 10px 26px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        }
+        
+        /* ===== Profile Upload ===== */
+       .contact-profile-container .profile-upload {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .contact-profile-container .file-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .contact-profile-container .upload-text {
+            font-size: 12px;
+            color: #999;
+            pointer-events: none;
+            text-align: center;
+            padding: 0 8px;
+        }
+        
+        .contact-profile-container .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+        }
+        
+        .contact-profile-container .profile-upload.has-image .upload-text {
+            display: none;
+        }
+        
+        .contact-profile-container .profile-upload.has-image .profile-image {
+            display: block;
+        }
+        
+        .contact-profile-container .profile-upload:hover {
+            border-color: #5b2dab;
+            background: #f5f5f5;
+        }
+
+        
+        /* ===== Form ===== */
+        .contact-profile-container .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px 20px;
+        margin-top: 20px;
+        }
+        
+        .contact-profile-container .form-group {
+        display: flex;
+        flex-direction: column;
+        }
+        
+        .contact-profile-container label {
+        font-size: 13px;
+        margin-bottom: 4px;
+        }
+        
+        .contact-profile-container label span {
+        color: red;
+        }
+        
+        .contact-profile-container input, 
+        .contact-profile-container select,
+        .contact-profile-container .form-control,
+        .contact-profile-container input[type="text"],
+        .contact-profile-container input[type="email"],
+        .contact-profile-container input[type="date"],
+        .contact-profile-container select,
+        .contact-profile-container textarea {
+        height: 38px;
+        padding: 0 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        }
+        
+        .contact-profile-container textarea {
+        height: auto;
+        min-height: 100px;
+        padding: 10px;
+        resize: vertical;
+        }
+        
+        /* Grid row input fields */
+        .contact-profile-container .grid-row input,
+        .contact-profile-container .grid-row select,
+        .contact-profile-container .grid-row .form-control {
+        height: 36px;
+        padding: 0 8px;
+        margin: 0;
+        }
+        
+        .contact-profile-container .full-width {
+        grid-column: span 2;
+        }
+        
+        /* ===== Radio ===== */
+        .contact-profile-container .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-top: 6px;
+        }
+        
+        /* ===== Signature ===== */
+        .contact-profile-container .signature {
+        margin-top: 20px;
+        }
+        
+        .contact-profile-container .upload-btn {
+        background: #4CAF50;
+        color: #fff;
+        padding: 8px 20px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        margin-left: 10px;
+        }
+        
+        .contact-profile-container .hint {
+        font-size: 12px;
+        color: #666;
+        margin-top: 6px;
+        }
+
+        /* ===== Tab Content ===== */
+        .contact-profile-container .tab-content {
+            display: none;
+        }
+
+        .contact-profile-container .tab-content.active {
+            display: block;
+        }
+
+        /* ===== Section Card ===== */
+        .contact-profile-container .section-card {
+            background: #fff;
+            border-radius: 14px;
+            margin-top: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        /* ===== Grid Tables ===== */
+        .contact-profile-container .grid-header, 
+        .contact-profile-container .grid-row {
+            display: grid;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .contact-profile-container .grid-header {
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .contact-profile-container .grid-row {
+            margin-top: 12px;
+        }
+        
+        .contact-profile-container .grid-row > div {
+            display: flex;
+            align-items: center;
+            padding: 4px 0;
+        }
+        
+        /* Ensure input fields in grid rows are properly styled */
+        .contact-profile-container .grid-row input,
+        .contact-profile-container .grid-row select,
+        .contact-profile-container .grid-row textarea {
+            width: 100%;
+            min-width: 0;
+            height: 36px;
+            padding: 0 8px;
+            margin: 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .contact-profile-container .grid-row textarea {
+            height: auto;
+            min-height: 100px;
+            padding: 8px;
+        }
+
+        .contact-profile-container .action-icons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .contact-profile-container .icon-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .contact-profile-container .icon-add { background: #5b2dab; }
+        .contact-profile-container .icon-delete { background: #e74c3c; }
+        .contact-profile-container .icon-edit { background: #000; }
+
+        .contact-profile-container .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+
+
+
+        /* ===== Accordion ===== */
+        .contact-profile-container .accordion-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .contact-profile-container .accordion-header {
+            background: #eaf2ff;
+            padding: 12px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .contact-profile-container .accordion-header:hover {
+            background: #d4e4ff;
+        }
+
+        .contact-profile-container .accordion-header::after {
+            content: "⌄";
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .contact-profile-container .accordion-item.active .accordion-header::after {
+            content: "⌃";
+        }
+
+        .contact-profile-container .accordion-body {
+            display: none;
+            padding: 14px;
+            background: #fff;
+        }
+
+        .contact-profile-container .accordion-item.active .accordion-body {
+            display: block;
+        }
+        
+        /* Override Salesforce default styles for input fields */
+        .contact-profile-container .form-control,
+        .contact-profile-container input,
+        .contact-profile-container select {
+            font-family: "Segoe UI", Arial, sans-serif !important;
+        }
+        
+        /* Button spacing */
+        .contact-profile-container .btn-primary {
+            margin-left: 10px;
+        }
+        
+        .contact-profile-container .btn-primary:first-child {
+            margin-left: 0;
+        }
+
+
+    </style>
+    
+    <!-- ===== Contact Profile Container ===== -->
+    <div class="contact-profile-container">
+    <!-- ===== Tabs ===== -->
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(0)">Basic Details</div>
+        <div class="tab" onclick="openTab(1)">Education Details</div>
+        <div class="tab" onclick="openTab(2)">Employment Details</div>
+        <div class="tab" onclick="openTab(3)">Achievements</div>
+        <div class="tab" onclick="openTab(4)">Publications</div>
+
+    </div>
+    
+    <div class="tab-content active">
+    <!-- ===== Card ===== -->
+    <div class="card">
+        
+        <div id="contactForm">
+        <div class="header-row">
+           
+             <div class="profile-upload" id="profileUploadDiv">
+                <!-- Display existing image if available -->
+                <img id="existingProfileImage" 
+                     alt="Profile Picture" 
+                     class="profile-image"
+                     style="display:none;"
+                     onerror="handleImageError(this);"
+                     onload="handleImageLoad(this);"/>
+                
+                <!-- Visible text (shown when no image) -->
+                <span class="upload-text" id="uploadText">Click to<br/>Upload Photo</span>
+                
+                <!-- Standard HTML file input -->
+                <input type="file" 
+                       id="profileFileInput"
+                       accept="image/png,image/jpeg,image/jpg"
+                       style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"
+                       onchange="handleFileSelect(this);"/>
+            </div>
+           
+            <button type="button" onclick="saveContactData();" class="btn-primary">Save</button>
+        </div>
+        
+        <div id="messages" style="margin-top: 10px;"></div>
+        
+        <!-- ===== Form ===== -->
+        <div class="form-grid">
+            
+            <div class="form-group">
+                <label>Salutation <span>*</span></label>
+                <select id="contactSalutation" class="form-control">
+                    <option value="">--Select--</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Prof">Prof</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>First Name <span>*</span></label>
+                <input type="text" id="contactFirstName" class="form-control" value="{!con.FirstName}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Last Name <span>*</span></label>
+                <input type="text" id="contactLastName" class="form-control" value="{!con.LastName}"/>
+            </div>
+            
+            <div class="form-group full-width">
+                <label>Current Position / Designation <span>*</span></label>
+                <input type="text" id="contactDesignation" class="form-control" value="{!con.Designation__c}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Institution / Industry</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="instType" value="Academia" id="instTypeAcademia"/> Academia
+                    </label>
+                    <label>
+                        <input type="radio" name="instType" value="Industry" id="instTypeIndustry"/> Industry
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Institution / Organisation Name</label>
+                <input type="text" id="contactInstitution" class="form-control" value="{!con.Account.Name}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Department / Division</label>
+                <input type="text" id="contactDepartment" class="form-control" value="{!con.Department}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span>*</span></label>
+                <input type="email" id="contactEmail" class="form-control" value="{!con.Email}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Phone <span>*</span></label>
+                <input type="text" id="contactPhone" class="form-control" value="{!con.MobilePhone}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Country <span>*</span></label>
+                <input type="text" id="contactCountry" class="form-control" value="{!con.MailingCountry}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Street <span>*</span></label>
+                <input type="text" id="contactStreet" class="form-control" value="{!con.MailingStreet}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>State <span>*</span></label>
+                <input type="text" id="contactState" class="form-control" value="{!con.MailingState}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>City <span>*</span></label>
+                <input type="text" id="contactCity" class="form-control" value="{!con.MailingCity}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Postal / Zip Code <span>*</span></label>
+                <input type="text" id="contactPostalCode" class="form-control" value="{!con.MailingPostalCode}"/>
+            </div>
+            
+        </div>
+        
+        <!-- ===== Signature ===== -->
+        <div class="signature">
+            <label>Signature</label><br/>
+            <input type="file" id="signatureFile"/>
+            <button type="button" class="upload-btn" onclick="uploadSignature();">Upload</button>
+            
+            <div class="hint">
+                • Signature should be done by blue/black colour pen<br/>
+                • Dimension: 200 × 230 pixels<br/>
+                • Size: 20 KB – 50 KB
+            </div>
+        </div>
+        
+        </div>
+    </div>
+    </div>
+    
+    <div class="tab-content">
+
+    <div id="educationForm">
+
+        <div class="section-card">
+            <div class="section-title">Education</div>
+
+            <!-- Header -->
+            <div class="grid-header"
+                 style="grid-template-columns: 1.2fr 1.5fr 1.5fr 1fr 1fr 60px;">
+                <div>Degree<span style="color:red">*</span></div>
+                <div>Institution<span style="color:red">*</span></div>
+                <div>Specialisation<span style="color:red">*</span></div>
+                <div>Start Date<span style="color:red">*</span></div>
+                <div>End Date<span style="color:red">*</span></div>
+                <div></div>
+            </div>
+
+            <!-- Dynamic Rows Container -->
+            <div id="educationRowsContainer">
+                <!-- Rows will be populated by JavaScript -->
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="saveEducationData();" class="btn-primary">Save Education</button>
+                <button type="button" onclick="addEducationRow();" class="btn-primary">Add Row</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+    
+    <div class="tab-content">
+
+    <div id="employmentForm">
+
+        <div class="section-card">
+            <div class="section-title">Employment</div>
+
+            <!-- Header -->
+            <div class="grid-header"
+                 style="grid-template-columns: 1.8fr 1.4fr 1fr 1fr 60px;">
+                <div>Organisation<span style="color:red">*</span></div>
+                <div>Position<span style="color:red">*</span></div>
+                <div>Start Date<span style="color:red">*</span></div>
+                <div>End Date<span style="color:red">*</span></div>
+                <div></div>
+            </div>
+
+            <!-- Dynamic Rows Container -->
+            <div id="employmentRowsContainer">
+                <!-- Rows will be populated by JavaScript -->
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="saveEmploymentData();" class="btn-primary">Save Employment</button>
+                <button type="button" onclick="addEmploymentRow();" class="btn-primary">Add Row</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= ACHIEVEMENTS TAB ================= -->
+<div class="tab-content">
+
+    <div id="achievementForm">
+        <div id="achievementMessages" style="margin-top: 10px;"></div>
+        
+        <div class="section-card">
+            <div class="section-title">Achievements</div>
+
+            <!-- Achievement Fields -->
+            <div id="achievementFields">
+                <!-- Awards & Honours -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Awards and Honours
+                    </div>
+                    <div class="accordion-body">
+                        <textarea id="achievementAwards" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Patents -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        List of Patents filed / granted
+                    </div>
+                    <div class="accordion-body">
+                        <textarea id="achievementPatents" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Book Chapters -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Book Chapters / Monographs
+                    </div>
+                    <div class="accordion-body">
+                        <textarea id="achievementBookChapters" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Other Achievements -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Any other notable achievements
+                    </div>
+                    <div class="accordion-body">
+                        <textarea id="achievementOther" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="saveAchievementData();" class="btn-primary">Save Achievements</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ================= Publication TAB ================= -->
+<div class="tab-content">
+
+    <div id="PublicationForm">
+        <div id="publicationMessages" style="margin-top: 10px;"></div>
+        
+        <div class="section-card">
+            <div class="section-title">Publication</div>
+
+            <!-- Publications Field -->
+            <div id="publicationFields">
+                <div class="accordion-item active">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        List of Publications
+                    </div>
+                    <div class="accordion-body">
+                        <textarea id="achievementPublications" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="savePublicationData();" class="btn-primary">Save Publications</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        function openTab(tabIndex) {
+            var container = document.querySelector('.contact-profile-container');
+            if (!container) return;
+            
+            var tabs = container.querySelectorAll('.tab');
+            var contents = container.querySelectorAll('.tab-content');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            if (tabs[tabIndex] && contents[tabIndex]) {
+                tabs[tabIndex].classList.add('active');
+                contents[tabIndex].classList.add('active');
+            }
+        }
+
+        
+        function toggleAccordion(header) {
+            var item = header.parentElement;
+            item.classList.toggle('active');
+        }
+        
+        // Global variables for file upload
+        var attachment = '';
+        var attachmentName = '';
+        var fileSize = 0;
+        var positionIndex = 0;
+        var doneUploading = false;
+        var maxStringSize = 6000000; // ~6MB base64 encoded
+        
+        // Handle file selection
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                var fileSizeInBytes = file.size;
+                var maxFileSize = 5242880; // 5MB
+                
+                // Validate file size
+                if (fileSizeInBytes > maxFileSize) {
+                    alert('File size must be less than 5MB. Your file is ' + (fileSizeInBytes / 1024 / 1024).toFixed(2) + 'MB');
+                    input.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                var fileName = file.name.toLowerCase();
+                if (!(fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png'))) {
+                    alert('Only JPG, JPEG, and PNG images are allowed');
+                    input.value = '';
+                    return;
+                }
+                
+                attachmentName = file.name;
+                
+                // Preview image first
+                var uploadDiv = document.getElementById('profileUploadDiv');
+                var previewReader = new FileReader();
+                
+                previewReader.onload = function(e) {
+                    var img = uploadDiv.querySelector('.profile-image');
+                    if (!img) {
+                        img = document.createElement('img');
+                        img.className = 'profile-image';
+                        img.alt = 'Profile Picture';
+                        uploadDiv.appendChild(img);
+                    }
+                    img.src = e.target.result;
+                    uploadDiv.classList.add('has-image');
+                    var uploadText = document.getElementById('uploadText');
+                    if (uploadText) {
+                        uploadText.style.display = 'none';
+                    }
+                };
+                
+                previewReader.readAsDataURL(file);
+                
+                // Read file as binary string for upload
+                var fileReader = new FileReader();
+                fileReader.onload = function(e) {
+                    attachment = btoa(e.target.result); // Convert to base64
+                    fileSize = attachment.length;
+                    
+                    if (fileSize > maxStringSize) {
+                        alert('Base64 encoded file is too large. Maximum size is ' + (maxStringSize / 1024 / 1024).toFixed(2) + 'MB. Your file is ' + (fileSize / 1024 / 1024).toFixed(2) + 'MB');
+                        input.value = '';
+                        return;
+                    }
+                    
+                    // Auto-upload the file
+                    uploadProfilePicture();
+                };
+                
+                fileReader.onerror = function(e) {
+                    alert('There was an error reading the file. Please try again.');
+                    input.value = '';
+                };
+                
+                fileReader.readAsBinaryString(file);
+            }
+        }
+        
+        // Upload profile picture in chunks
+        function uploadProfilePicture() {
+            var contactId = '{!con.Id}';
+            if (!contactId || contactId === '') {
+                alert('Please save contact details first before uploading image');
+                return;
+            }
+            
+            positionIndex = 0;
+            doneUploading = false;
+            uploadAttachmentChunk();
+        }
+        
+        function uploadAttachmentChunk() {
+            var chunkSize = 750000;
+            var attachmentBody = '';
+            var contactId = '{!con.Id}';
+            
+            if (fileSize <= positionIndex + chunkSize) {
+                attachmentBody = attachment.substring(positionIndex);
+                doneUploading = true;
+            } else {
+                attachmentBody = attachment.substring(positionIndex, positionIndex + chunkSize);
+            }
+            
+            console.log('Uploading ' + attachmentBody.length + ' chars of ' + fileSize);
+            
+            // Call RemoteAction
+            ContactProfileController.doUploadProfilePic(
+                contactId,
+                attachmentBody,
+                attachmentName,
+                function(result, event) {
+                    console.log('Upload result:', result);
+                    if (event.type === 'exception') {
+                        console.error('Exception:', event);
+                        alert('Error uploading image: ' + event.message);
+                    } else                     if (event.status) {
+                        if (doneUploading) {
+                            // Upload complete
+                            showMessage('messages', 'Profile picture uploaded successfully!', 'success');
+                            // Refresh profile image without reloading page
+                            setTimeout(function() {
+                                refreshProfileImage();
+                            }, 1000);
+                        } else {
+                            // Continue with next chunk
+                            positionIndex += chunkSize;
+                            uploadAttachmentChunk();
+                        }
+                    } else {
+                        showMessage('messages', 'Error uploading image. Please try again.', 'error');
+                    }
+                },
+                { buffer: true, escape: true, timeout: 120000 }
+            );
+        }
+        
+        // Handle image load success
+        function handleImageLoad(img) {
+            var uploadDiv = document.getElementById('profileUploadDiv');
+            if (uploadDiv) {
+                uploadDiv.classList.add('has-image');
+            }
+        }
+        
+        // Handle image load error
+        function handleImageError(img) {
+            img.style.display = 'none';
+            var uploadDiv = document.getElementById('profileUploadDiv');
+            if (uploadDiv) {
+                uploadDiv.classList.remove('has-image');
+            }
+        }
+        
+        // Check if existing image loaded successfully on page load
+        window.addEventListener('load', function() {
+            loadContactData();
+            loadEducationData();
+            loadEmploymentData();
+            loadAchievementData();
+            loadProfileImage();
+        });
+        
+        // ========== DATA LOADING FUNCTIONS ==========
+        
+        function loadContactData() {
+            // Contact data is already populated via Visualforce expressions
+            // Set Salutation dropdown
+            var salutation = '{!con.Salutation}';
+            if (salutation) {
+                document.getElementById('contactSalutation').value = salutation;
+            }
+        }
+        
+        function loadEducationData() {
+            try {
+                var educationData = JSON.parse('{!educationListJSON}');
+                var container = document.getElementById('educationRowsContainer');
+                container.innerHTML = '';
+                
+                if (educationData && educationData.length > 0) {
+                    educationData.forEach(function(edu, index) {
+                        addEducationRowHTML(edu, index);
+                    });
+                } else {
+                    addEducationRowHTML(null, 0);
+                }
+            } catch (e) {
+                console.error('Error loading education data:', e);
+                var container = document.getElementById('educationRowsContainer');
+                container.innerHTML = '';
+                addEducationRowHTML(null, 0);
+            }
+        }
+        
+        function loadEmploymentData() {
+            try {
+                var employmentData = JSON.parse('{!employmentListJSON}');
+                var container = document.getElementById('employmentRowsContainer');
+                container.innerHTML = '';
+                
+                if (employmentData && employmentData.length > 0) {
+                    employmentData.forEach(function(emp, index) {
+                        addEmploymentRowHTML(emp, index);
+                    });
+                } else {
+                    addEmploymentRowHTML(null, 0);
+                }
+            } catch (e) {
+                console.error('Error loading employment data:', e);
+                var container = document.getElementById('employmentRowsContainer');
+                container.innerHTML = '';
+                addEmploymentRowHTML(null, 0);
+            }
+        }
+        
+        function loadAchievementData() {
+            try {
+                var achievementData = JSON.parse('{!achievementListJSON}');
+                if (achievementData && achievementData.length > 0) {
+                    var ach = achievementData[0];
+                    if (ach.Awards_Honours__c) document.getElementById('achievementAwards').value = ach.Awards_Honours__c;
+                    if (ach.List_of_Patents_filed__c) document.getElementById('achievementPatents').value = ach.List_of_Patents_filed__c;
+                    if (ach.Book_Chapters__c) document.getElementById('achievementBookChapters').value = ach.Book_Chapters__c;
+                    if (ach.Any_other_achievements__c) document.getElementById('achievementOther').value = ach.Any_other_achievements__c;
+                    if (ach.List_of_Publications__c) document.getElementById('achievementPublications').value = ach.List_of_Publications__c;
+                }
+            } catch (e) {
+                console.error('Error loading achievement data:', e);
+            }
+        }
+        
+        function loadProfileImage() {
+            var contactId = '{!con.Id}';
+            var profileImageUrl = '{!profileImageUrl}';
+            
+            // First try to use the Visualforce expression value
+            if (profileImageUrl && profileImageUrl !== '' && profileImageUrl !== 'null') {
+                var img = document.getElementById('existingProfileImage');
+                if (img) {
+                    img.src = profileImageUrl;
+                    img.style.display = 'block';
+                }
+            } else if (contactId) {
+                // Fallback to RemoteAction if Visualforce value is not available
+                ContactProfileController.getProfileImageUrl(contactId, function(result, event) {
+                    if (result && result !== 'null' && result !== '') {
+                        var img = document.getElementById('existingProfileImage');
+                        if (img) {
+                            img.src = result;
+                            img.style.display = 'block';
+                            handleImageLoad(img);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // ========== ROW MANAGEMENT FUNCTIONS ==========
+        
+        function addEducationRowHTML(edu, index) {
+            var container = document.getElementById('educationRowsContainer');
+            var row = document.createElement('div');
+            row.className = 'grid-row';
+            row.style.cssText = 'grid-template-columns: 1.2fr 1.5fr 1.5fr 1fr 1fr 60px;';
+            row.id = 'eduRow_' + index;
+            
+            var degreeValue = edu ? (edu.Degree__c || '') : '';
+            var institutionValue = edu ? (edu.Institution_Name__c || '') : '';
+            var specializationValue = edu ? (edu.Area_of_specialization__c || '') : '';
+            var startDateValue = edu && edu.Start_Date__c ? edu.Start_Date__c.split('T')[0] : '';
+            var endDateValue = edu && edu.End_Date__c ? edu.End_Date__c.split('T')[0] : '';
+            var eduId = edu ? (edu.Id || '') : '';
+            
+            row.innerHTML = '<input type="hidden" class="eduId" value="' + (eduId || '') + '"/>' +
+                '<input type="text" class="eduDegree form-control" value="' + degreeValue + '" placeholder="Degree"/>' +
+                '<input type="text" class="eduInstitution form-control" value="' + institutionValue + '" placeholder="Institution"/>' +
+                '<input type="text" class="eduSpecialization form-control" value="' + specializationValue + '" placeholder="Specialization"/>' +
+                '<input type="date" class="eduStartDate form-control" value="' + startDateValue + '"/>' +
+                '<input type="date" class="eduEndDate form-control" value="' + endDateValue + '"/>' +
+                '<div class="action-icons"><button type="button" class="icon-btn icon-delete" onclick="removeEducationRow(' + index + ')">×</button></div>';
+            
+            container.appendChild(row);
+        }
+        
+        function addEducationRow() {
+            var container = document.getElementById('educationRowsContainer');
+            var index = container.children.length;
+            addEducationRowHTML(null, index);
+        }
+        
+        function removeEducationRow(index) {
+            var row = document.getElementById('eduRow_' + index);
+            if (row) {
+                row.remove();
+            }
+        }
+        
+        function addEmploymentRowHTML(emp, index) {
+            var container = document.getElementById('employmentRowsContainer');
+            var row = document.createElement('div');
+            row.className = 'grid-row';
+            row.style.cssText = 'grid-template-columns: 1.8fr 1.4fr 1fr 1fr 60px;';
+            row.id = 'empRow_' + index;
+            
+            var orgValue = emp ? (emp.Organization_Name__c || '') : '';
+            var positionValue = emp ? (emp.Position__c || '') : '';
+            var startDateValue = emp && emp.Start_Date__c ? emp.Start_Date__c.split('T')[0] : '';
+            var endDateValue = emp && emp.End_Date__c ? emp.End_Date__c.split('T')[0] : '';
+            var empId = emp ? (emp.Id || '') : '';
+            
+            row.innerHTML = '<input type="hidden" class="empId" value="' + (empId || '') + '"/>' +
+                '<input type="text" class="empOrganization form-control" value="' + orgValue + '" placeholder="Organization"/>' +
+                '<input type="text" class="empPosition form-control" value="' + positionValue + '" placeholder="Position"/>' +
+                '<input type="date" class="empStartDate form-control" value="' + startDateValue + '"/>' +
+                '<input type="date" class="empEndDate form-control" value="' + endDateValue + '"/>' +
+                '<div class="action-icons"><button type="button" class="icon-btn icon-delete" onclick="removeEmploymentRow(' + index + ')">×</button></div>';
+            
+            container.appendChild(row);
+        }
+        
+        function addEmploymentRow() {
+            var container = document.getElementById('employmentRowsContainer');
+            var index = container.children.length;
+            addEmploymentRowHTML(null, index);
+        }
+        
+        function removeEmploymentRow(index) {
+            var row = document.getElementById('empRow_' + index);
+            if (row) {
+                row.remove();
+            }
+        }
+        
+        // ========== SAVE FUNCTIONS ==========
+        
+        function saveContactData() {
+            var contactId = '{!con.Id}';
+            var contactData = {
+                Id: contactId,
+                Salutation: document.getElementById('contactSalutation').value,
+                FirstName: document.getElementById('contactFirstName').value,
+                LastName: document.getElementById('contactLastName').value,
+                Designation__c: document.getElementById('contactDesignation').value,
+                Department: document.getElementById('contactDepartment').value,
+                Email: document.getElementById('contactEmail').value,
+                MobilePhone: document.getElementById('contactPhone').value,
+                MailingCountry: document.getElementById('contactCountry').value,
+                MailingStreet: document.getElementById('contactStreet').value,
+                MailingState: document.getElementById('contactState').value,
+                MailingCity: document.getElementById('contactCity').value,
+                MailingPostalCode: document.getElementById('contactPostalCode').value
+            };
+            
+            ContactProfileController.saveContactProfile(contactData, function(result, event) {
+                if (event.status) {
+                    if (result === 'SUCCESS') {
+                        showMessage('messages', 'Profile saved successfully!', 'success');
+                    } else {
+                        showMessage('messages', result, 'error');
+                    }
+                } else {
+                    showMessage('messages', 'Error saving profile: ' + event.message, 'error');
+                }
+            });
+        }
+        
+        function saveEducationData() {
+            var contactId = '{!con.Id}';
+            var rows = document.querySelectorAll('#educationRowsContainer .grid-row');
+            var educationList = [];
+            
+            rows.forEach(function(row) {
+                var edu = {
+                    Id: row.querySelector('.eduId').value || null,
+                    Degree__c: row.querySelector('.eduDegree').value,
+                    Institution_Name__c: row.querySelector('.eduInstitution').value,
+                    Area_of_specialization__c: row.querySelector('.eduSpecialization').value,
+                    Start_Date__c: row.querySelector('.eduStartDate').value,
+                    End_Date__c: row.querySelector('.eduEndDate').value,
+                    Contact__c: contactId
+                };
+                if (edu.Degree__c || edu.Institution_Name__c) {
+                    educationList.push(edu);
+                }
+            });
+            
+            ContactProfileController.saveEducationDetails(contactId, educationList, function(result, event) {
+                if (event.status) {
+                    if (result === 'SUCCESS') {
+                        showMessage('messages', 'Education details saved successfully!', 'success');
+                    } else {
+                        showMessage('messages', result, 'error');
+                    }
+                } else {
+                    showMessage('messages', 'Error saving education: ' + event.message, 'error');
+                }
+            });
+        }
+        
+        function saveEmploymentData() {
+            var contactId = '{!con.Id}';
+            var rows = document.querySelectorAll('#employmentRowsContainer .grid-row');
+            var employmentList = [];
+            
+            rows.forEach(function(row) {
+                var emp = {
+                    Id: row.querySelector('.empId').value || null,
+                    Organization_Name__c: row.querySelector('.empOrganization').value,
+                    Position__c: row.querySelector('.empPosition').value,
+                    Start_Date__c: row.querySelector('.empStartDate').value,
+                    End_Date__c: row.querySelector('.empEndDate').value,
+                    Contact__c: contactId
+                };
+                if (emp.Organization_Name__c || emp.Position__c) {
+                    employmentList.push(emp);
+                }
+            });
+            
+            ContactProfileController.saveEmploymentDetails(contactId, employmentList, function(result, event) {
+                if (event.status) {
+                    if (result === 'SUCCESS') {
+                        showMessage('messages', 'Employment details saved successfully!', 'success');
+                    } else {
+                        showMessage('messages', result, 'error');
+                    }
+                } else {
+                    showMessage('messages', 'Error saving employment: ' + event.message, 'error');
+                }
+            });
+        }
+        
+        function saveAchievementData() {
+            var contactId = '{!con.Id}';
+            var achievementData = {
+                Contact__c: contactId,
+                Awards_Honours__c: document.getElementById('achievementAwards').value,
+                List_of_Patents_filed__c: document.getElementById('achievementPatents').value,
+                Book_Chapters__c: document.getElementById('achievementBookChapters').value,
+                Any_other_achievements__c: document.getElementById('achievementOther').value
+            };
+            
+            // Try to get existing achievement ID
+            try {
+                var achievementDataList = JSON.parse('{!achievementListJSON}');
+                if (achievementDataList && achievementDataList.length > 0) {
+                    achievementData.Id = achievementDataList[0].Id;
+                }
+            } catch (e) {
+                console.error('Error parsing achievement data:', e);
+            }
+            
+            ContactProfileController.saveAchievementDetails(contactId, achievementData, function(result, event) {
+                if (event.status) {
+                    if (result === 'SUCCESS') {
+                        showMessage('achievementMessages', 'Achievements saved successfully!', 'success');
+                    } else {
+                        showMessage('achievementMessages', result, 'error');
+                    }
+                } else {
+                    showMessage('achievementMessages', 'Error saving achievements: ' + event.message, 'error');
+                }
+            });
+        }
+        
+        function savePublicationData() {
+            var contactId = '{!con.Id}';
+            var achievementData = {
+                Contact__c: contactId,
+                List_of_Publications__c: document.getElementById('achievementPublications').value
+            };
+            
+            // Try to get existing achievement ID
+            try {
+                var achievementDataList = JSON.parse('{!achievementListJSON}');
+                if (achievementDataList && achievementDataList.length > 0) {
+                    achievementData.Id = achievementDataList[0].Id;
+                }
+            } catch (e) {
+                console.error('Error parsing achievement data:', e);
+            }
+            
+            ContactProfileController.saveAchievementDetails(contactId, achievementData, function(result, event) {
+                if (event.status) {
+                    if (result === 'SUCCESS') {
+                        showMessage('publicationMessages', 'Publications saved successfully!', 'success');
+                    } else {
+                        showMessage('publicationMessages', result, 'error');
+                    }
+                } else {
+                    showMessage('publicationMessages', 'Error saving publications: ' + event.message, 'error');
+                }
+            });
+        }
+        
+        function showMessage(containerId, message, type) {
+            var container = document.getElementById(containerId);
+            if (container) {
+                var className = type === 'success' ? 'success' : 'error';
+                container.innerHTML = '<div class="' + className + '" style="padding: 10px; margin: 10px 0; border-radius: 4px; background: ' + 
+                    (type === 'success' ? '#d4edda' : '#f8d7da') + '; color: ' + 
+                    (type === 'success' ? '#155724' : '#721c24') + ';">' + message + '</div>';
+                setTimeout(function() {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+        }
+        
+        function uploadSignature() {
+            alert('Signature upload functionality to be implemented');
+        }
+        
+        // Fix profile picture display after upload
+        function refreshProfileImage() {
+            var contactId = '{!con.Id}';
+            if (contactId) {
+                ContactProfileController.getProfileImageUrl(contactId, function(result, event) {
+                    if (result && result !== 'null') {
+                        var img = document.getElementById('existingProfileImage');
+                        if (img) {
+                            img.src = result + '?t=' + new Date().getTime(); // Add timestamp to force refresh
+                            img.style.display = 'block';
+                            handleImageLoad(img);
+                        }
+                    }
+                });
+            }
+        }
+
+        </script>
+    </div>
+    <!-- End Contact Profile Container -->
+</apex:page>

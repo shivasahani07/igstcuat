@@ -146,14 +146,7 @@
                                     <div class="progress-success w-100"></div>
                                 </div>
                                 <ul>
-                                    <li class="active pb-cursor">
-                                        <a ng-click="redirectPageURL('Fellowship_Details')">
-                                            <div class="icon-circle">
-                                                <i class="fa fa-home"></i>
-                                            </div>
-                                            <span>Fellowship Details</span>
-                                        </a>
-                                    </li>
+                                   
                                     <li class="active pb-cursor">
                                         <a ng-click="redirectPageURL('Achievements_Pecfar')">
                                             <div class="icon-circle">
@@ -162,7 +155,14 @@
                                             <span>Achievements</span>
                                         </a>
                                     </li>
-                                    
+                                    <li class="active pb-cursor">
+                                        <a ng-click="redirectPageURL('Fellowship_Details')">
+                                            <div class="icon-circle">
+                                                <i class="fa fa-home"></i>
+                                            </div>
+                                            <span>Fellowship Details</span>
+                                        </a>
+                                    </li>
                                     
                                     
                                     <li class="active pb-cursor">
@@ -196,14 +196,7 @@
                                     <div class="progress-success wp-0"></div>
                                 </div>
                                 <ul>
-                                    <li>
-                                        <a>
-                                            <div class="icon-circle">
-                                                <i class="fa fa-home"></i>
-                                            </div>
-                                            <span>Fellowship Details</span>
-                                        </a>
-                                    </li>
+                                    
                                     <li>
                                         <a>
                                             <div class="icon-circle">
@@ -213,7 +206,14 @@
                                         </a>
                                     </li>
                                     
-                                    
+                                    <li>
+                                        <a>
+                                            <div class="icon-circle">
+                                                <i class="fa fa-home"></i>
+                                            </div>
+                                            <span>Fellowship Details</span>
+                                        </a>
+                                    </li>
                                     
                                     <li>
                                         <a>

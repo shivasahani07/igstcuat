@@ -146,7 +146,7 @@ angular.module('cp_app').controller('EmploymentDetails_Ctrl', function($scope,$r
           //   let abstractText = div.innerText.replace(/(\r\n\t|\t|\n|\r)/gm, "");
           //   abstractText = abstractText.replaceAll(' ','');
       if($scope.objRtf[0].charCount > 500){
-        swal('info','Max character limit for Abstract for ongoing work is 500 only','info');
+        swal('Info','Max character limit for Abstract for ongoing work is 500 only','info');
         return;
       }
         }

@@ -369,7 +369,8 @@ public without sharing class ApplicantPortal_Contoller {
             }
             insert con;
             // return 'Successfully created new user!';
-            return 'You have successfully registered on IGSTC Portal, Please check your E-mail!';
+            //return 'You have successfully registered on IGSTC Portal, Please check your E-mail!';
+            return 'You have successfully registered on IGSTC Portal, kindly verify your E-mail before logging in!';
         }catch(Exception e) {
             System.debug('Error while craeting new contact and account ==> ' + e.getMessage() + ' at Line ===> ' + e.getLineNumber() + ' Stack Trace ===> ' + e.getStackTraceString());
             return 'Error creating new user: ' + e.getMessage();
@@ -1178,8 +1179,8 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     ////////////////////////////New Method aaded by Karthik 
     
     @RemoteAction
-    public static Proposal_Controller.insertPairingWrapper insertPairingDetails(List<Proposal_Controller.wrapperPairing> contactList,String campaignId,String yearlyCall){
-        return Proposal_Controller.insertPairingDetails(contactList,campaignId,yearlyCall);
+    public static Proposal_Controller.insertPairingWrapper insertPairingDetails(List<Proposal_Controller.wrapperPairing> contactList,String campaignId,String yearlyCall,String contactId,String projectId){
+        return Proposal_Controller.insertPairingDetails(contactList,campaignId,yearlyCall,contactId,projectId);
     }
     
     @RemoteAction

@@ -43,17 +43,17 @@ global without sharing  class DynamicCongaTempGeneration {
             )
         ];
         // Get ONLY PRIMARY contact for SIGN / FILE NAME-------------added by Mahima
-            Contact primaryCon = [
-                SELECT Id, FirstName, LastName
-                FROM Contact
-                WHERE Id IN (
-                    SELECT Contact__c
-                    FROM Applicant_Proposal_Association__c
-                    WHERE Proposals__c = :recordID
-                    AND Contact__r.Is_Primary__c = TRUE
-                )
-                LIMIT 1
-            ];
+            // Contact primaryCon = [
+            //     SELECT Id, FirstName, LastName
+            //     FROM Contact
+            //     WHERE Id IN (
+            //         SELECT Contact__c
+            //         FROM Applicant_Proposal_Association__c
+            //         WHERE Proposals__c = :recordID
+            //         AND Contact__r.Is_Primary__c = TRUE
+            //     )
+            //     LIMIT 1
+            // ];
 
         
         if(contactList.isEmpty()){

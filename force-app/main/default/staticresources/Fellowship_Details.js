@@ -100,11 +100,21 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
                     }
                     if (result.Tentative_Start_Date__c != null) {
                         $scope.startDate = true;
-                        $scope.tentitiveStartDate = new Date(result.Tentative_Start_Date__c);
+                        var startDateObj = new Date(result.Tentative_Start_Date__c);
+                        // Format date as yyyy-MM-dd for HTML date input (avoid timezone issues)
+                        var year = startDateObj.getFullYear();
+                        var month = String(startDateObj.getMonth() + 1).padStart(2, '0');
+                        var day = String(startDateObj.getDate()).padStart(2, '0');
+                        $scope.tentitiveStartDate = year + '-' + month + '-' + day;
                     }
                     if (result.Tentative_End_Date__c != null) {
-                        $scope.tentitiveEndDate = new Date(result.Tentative_End_Date__c);
-                    }
+                        var endDateObj = new Date(result.Tentative_End_Date__c);
+                        // Format date as yyyy-MM-dd for HTML date input (avoid timezone issues)
+                        var year = endDateObj.getFullYear();
+                        var month = String(endDateObj.getMonth() + 1).padStart(2, '0');
+                        var day = String(endDateObj.getDate()).padStart(2, '0');
+                        $scope.tentitiveEndDate = year + '-' + month + '-' + day;
+                    }   
                 }
 
                 debugger;
@@ -215,7 +225,9 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
 
     $scope.saveApplication = function () {
         debugger;
-        let date1 = new Date($scope.tentitiveStartDate).getTime();
+        // Convert dates to Date objects for comparison
+        var startDateForCompare = $scope.tentitiveStartDate instanceof Date ? $scope.tentitiveStartDate : new Date($scope.tentitiveStartDate);
+        let date1 = startDateForCompare.getTime();
         let date2 = new Date($scope.Pecfar_dateInformationText).getTime();
 
         let testdateyear = new Date($scope.Pecfar_dateInformationText).getFullYear();
@@ -224,7 +236,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
 
         if ($scope.proposalDetails.Title_Of_Project__c == undefined || $scope.proposalDetails.Title_Of_Project__c == "") {
             $scope.proposalDetails.Title_Of__c=$scope.proposalDetails.Title_Of_Project__c;
-            swal("info", "Please Enter Title of project.", "info");
+            swal("Info", "Please Enter Title of project.", "Info");
             $("#txtTitle").addClass('border-theme');    
             return;
         }
@@ -238,13 +250,13 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
                 }
             }
             if ($scope.selectedTheme.length <= 0) {
-                swal("info", "Please select at least one Subtopic.", "info");
+                swal("Info", "Please select at least one Subtopic.", "Info");
                 return;
             }
         }
 
         if (date1 < date2) {
-            swal("Basic Details", "Fellowship should tentatively start after  " + testdatedate + "/" + testdatemonth + "/" + testdateyear, "info");
+            swal("Basic Details", "Fellowship should tentatively start after  " + testdatedate + "/" + testdatemonth + "/" + testdateyear, "Info");
             $("#txtBirthdate").addClass('border-theme');
             return;
         }
@@ -305,13 +317,26 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
             $("#txtSD").addClass('border-theme');
             return;
         } else if ($scope.tentitiveStartDate != undefined || $scope.tentitiveStartDate != "") {
-            startyear = $scope.tentitiveStartDate.getUTCFullYear();
-            startmonth = $scope.startDate ? $scope.tentitiveStartDate.getUTCMonth() + 1 : $scope.tentitiveStartDate.getUTCMonth() + 2;
-            //startmonth = $scope.tentitiveStartDate.getUTCMonth()+1;
-            startday = $scope.tentitiveStartDate.getDate();
+            // Handle both Date objects and date strings (yyyy-MM-dd format from HTML input)
+            var startDateObj;
+            if ($scope.tentitiveStartDate instanceof Date) {
+                startDateObj = $scope.tentitiveStartDate;
+            } else if (typeof $scope.tentitiveStartDate === 'string' && $scope.tentitiveStartDate.includes('-')) {
+                // Parse yyyy-MM-dd format string
+                var dateParts = $scope.tentitiveStartDate.split('-');
+                startDateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+            } else {
+                startDateObj = new Date($scope.tentitiveStartDate);
+            }
+            startyear = startDateObj.getFullYear();
+            startmonth = startDateObj.getMonth() + 1; // Always add 1 since months are 0-indexed
+            startday = startDateObj.getDate();
         }
 
-        if ($scope.tentitiveStartDate < $scope.announcementDate) {
+        // Convert to Date objects for comparison
+        var startDateForCompare = $scope.tentitiveStartDate instanceof Date ? $scope.tentitiveStartDate : new Date($scope.tentitiveStartDate);
+        var announcementDateForCompare = $scope.announcementDate instanceof Date ? $scope.announcementDate : new Date($scope.announcementDate);
+        if (startDateForCompare < announcementDateForCompare) {
             swal("Proposal Detail", "Tentative Start Date should not be previous to result announcement date.");
             $("#txtSD").addClass('border-theme');
             return;
@@ -322,9 +347,20 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
             $("#txtED").addClass('border-theme');
             return;
         } else if ($scope.tentitiveEndDate != undefined || $scope.tentitiveEndDate != "") {
-            endyear = $scope.tentitiveEndDate.getUTCFullYear();
-            endmonth = $scope.tentitiveEndDate.getUTCMonth() + 1;
-            endday = $scope.tentitiveEndDate.getDate();
+            // Handle both Date objects and date strings (yyyy-MM-dd format from HTML input)
+            var endDateObj;
+            if ($scope.tentitiveEndDate instanceof Date) {
+                endDateObj = $scope.tentitiveEndDate;
+            } else if (typeof $scope.tentitiveEndDate === 'string' && $scope.tentitiveEndDate.includes('-')) {
+                // Parse yyyy-MM-dd format string
+                var dateParts = $scope.tentitiveEndDate.split('-');
+                endDateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+            } else {
+                endDateObj = new Date($scope.tentitiveEndDate);
+            }
+            endyear = endDateObj.getFullYear();
+            endmonth = endDateObj.getMonth() + 1;
+            endday = endDateObj.getDate();
         }
 
         console.log('tentitiveStartDate :', $scope.tentitiveStartDate);
@@ -333,14 +369,15 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         console.log('tentitiveEndDate1 :', new Date($scope.tentitiveEndDate).toLocaleString());
         console.log('announcementdate :', new Date($scope.announcementDate).toLocaleString());
 
-        if ($scope.tentitiveEndDate < $scope.announcementDate) {
+        // Convert end date for comparison
+        var endDateForCompare = $scope.tentitiveEndDate instanceof Date ? $scope.tentitiveEndDate : new Date($scope.tentitiveEndDate);
+        if (endDateForCompare < announcementDateForCompare) {
             swal("Proposal Detail", "Tentative End Date should not be previous to result announcement date.");
             $("#txtED").addClass('border-theme');
             return;
         }
 
-
-        if ($scope.tentitiveStartDate > $scope.tentitiveEndDate) {
+        if (startDateForCompare > endDateForCompare) {
             swal("Proposal Detail", "Tentative End Date should not be previous to Tentative Start Date.");
             $("#txtSD").addClass('border-theme');
             $("#txtED").addClass('border-theme');
@@ -351,7 +388,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         console.log('tentitiveEndDate :', $scope.tentitiveEndDate);
 
         debugger;
-        if ($scope.tentitiveStartDate == $scope.tentitiveEndDate) {
+        if (startDateForCompare.getTime() === endDateForCompare.getTime()) {
             swal("Proposal Detail", "Tentative End Date should not be same to Tentative Start Date.");
             $("#txtSD").addClass('border-theme');
             $("#txtED").addClass('border-theme');
@@ -363,7 +400,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         // console.log('dayDifference :: '+$scope.dayDifference);
 
         // if($scope.dayDifference >= 365){
-        //     swal("info", 'Duration must be less than one year.',"info");
+        //     swal("Info", 'Duration must be less than one year.',"Info");
         //     $("#txtED").addClass('border-theme');
         //     return;   
         // }
@@ -386,18 +423,21 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
             return;
         }
 
-        var endDate = moment($scope.tentitiveEndDate);
-        var starDate = moment($scope.tentitiveStartDate);
+        // Convert to Date objects for moment.js
+        var startDateForMoment = $scope.tentitiveStartDate instanceof Date ? $scope.tentitiveStartDate : new Date($scope.tentitiveStartDate);
+        var endDateForMoment = $scope.tentitiveEndDate instanceof Date ? $scope.tentitiveEndDate : new Date($scope.tentitiveEndDate);
+        var endDate = moment(endDateForMoment);
+        var starDate = moment(startDateForMoment);
         var years = endDate.diff(starDate, 'days');
 
         if (years > 60) {
-            swal("Basic Details", "Duration should not be more than 2 months", "info");
+            swal("Basic Details", "Duration should not be more than 2 months", "Info");
             $("#txtED").addClass('border-theme');
             return;
         }
 
         if (years < 30) {
-            swal("Basic Details", "Duration should not be less than 1 month.", "info");
+            swal("Basic Details", "Duration should not be less than 1 month.", "Info");
             $("#txtED").addClass('border-theme');
             return;
         }
@@ -435,7 +475,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
                     icon: "success",
                     button: "ok!",
                 }).then((value) => {
-                    $scope.redirectPageURL('Achievements_Pecfar');
+                    $scope.redirectPageURL('Attachments_Pecfar');
                     $rootScope.projectId = result;
                 });
 

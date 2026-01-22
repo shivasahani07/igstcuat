@@ -156,7 +156,7 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
       }
     //   var age = moment().diff(''+birthyear+'-'+birthmonth+'-'+birthday+'', 'years');
     //   if(age>35){
-    //     swal("Personal Info", "Age can not be more than 35 years", "info");
+    //     swal("Personal Info", "Age can not be more than 35 years", "Info");
     //     return;
     //   }
     // if($scope.applicantDetails.Country_Code__c == undefined){
@@ -218,12 +218,12 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
             return;
     }
     if($scope.emailCheck == true){
-        swal('info','Email already exists.','info');
+        swal('Info','Email already exists.','Info');
         $("#txtEmail").addClass('border-theme');
             return;
     }
     if ($scope.MailingStreet1 == undefined || $scope.MailingStreet1 == "") {
-        swal("info", "Please enter Line 1.","info");
+        swal("Info", "Please enter Line 1.","Info");
         $("#txtMailingL1").addClass('border-theme');
         return; 
     }
@@ -373,7 +373,7 @@ $scope.getProjectdetils();
         if (file != undefined) {
             if (file.size <= maxFileSize) {
                 if(file.size<fileSizeMin){
-                  swal("info", "File must be between 30 to 500 kb in size.  Your file is too small.  Please try again.","info");
+                  swal("Info", "File must be between 30 to 500 kb in size.  Your file is too small.  Please try again.","Info");
                   $scope.setLostValues();
                   return; 
                     // alert("File must be between 30 to 50 kb in size.  Your file is too small.  Please try again.");
@@ -398,7 +398,7 @@ $scope.getProjectdetils();
                     if (fileSize < maxStringSize) {
                         $scope.uploadAttachment(type , userDocId, fileId);
                     } else {
-                      swal("info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".","info");
+                      swal("Info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".","Info");
                       $scope.setLostValues();
                       return;
                         // alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
@@ -406,13 +406,13 @@ $scope.getProjectdetils();
         
                 }
                 fileReader.onerror = function (e) {
-                  swal("info", "There was an error reading the file.  Please try again.","info");
+                  swal("Info", "There was an error reading the file.  Please try again.","Info");
                   $scope.setLostValues();
                       return;
                     // alert("There was an error reading the file.  Please try again.");
                 }
                 fileReader.onabort = function (e) {
-                  swal("info", "There was an error reading the file.  Please try again.","info");
+                  swal("Info", "There was an error reading the file.  Please try again.","Info");
                   $scope.setLostValues();
                       return;
                     // alert("There was an error reading the file.  Please try again.");
@@ -421,7 +421,7 @@ $scope.getProjectdetils();
                 fileReader.readAsBinaryString(file);  //Read the body of the file
         
             } else {
-              swal("info", "File must be under 500 kb in size.  Your file is too large.  Please try again.","info");
+              swal("Info", "File must be under 500 kb in size.  Your file is too large.  Please try again.","Info");
               $scope.setLostValues();
              // $scope.getContactWiser();
                       return;
@@ -429,7 +429,7 @@ $scope.getProjectdetils();
                 $scope.showSpinnereditProf = false;
             }
         } else {
-          swal("info", "You must choose a file before trying to upload it","info");
+          swal("Info", "You must choose a file before trying to upload it","Info");
           $scope.setLostValues();
             return;
             // alert("You must choose a file before trying to upload it");

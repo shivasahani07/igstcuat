@@ -68,7 +68,7 @@ angular.module('cp_app').controller('declaration_ctrl', function($scope,$sce,$ro
     
         //.ContentDistribution.DistributionPublicUrl
     }
-      $scope.uploadFile = function (type, userDocId, fileId) {
+      $scope.uploadFile = function (type, userDocId, fileId, maxFileSize) {
         debugger;
         $scope.showSpinnereditProf = true;
         var file;
@@ -85,6 +85,10 @@ angular.module('cp_app').controller('declaration_ctrl', function($scope,$sce,$ro
     }
     console.log(file);
         if (file != undefined) {
+            // Set default maxFileSize to 1MB if not provided
+            if (maxFileSize === undefined || maxFileSize === null) {
+                maxFileSize = 1048576; // 1MB in bytes
+            }
             if (file.size <= maxFileSize) {
                 
                 attachmentName = file.name;

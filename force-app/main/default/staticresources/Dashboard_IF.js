@@ -131,6 +131,9 @@ $scope.getActiveCampaignData = function() {
                 $scope.PDIF_phddate_onlydate = result[0].PhD_Enroll_ment_Date_PDIF__c;
                 $scope.PIEF_PhD_time = result[0].PIEF_PhD_time__c;
 
+
+                $scope.PIEF_phd_limit = result[0].PIEF_PhD_time__c;
+
                  $scope.endDate=new Date(result[0].Campaign_End_Date__c,);
 
                 //Set Campaign ID;
@@ -673,8 +676,15 @@ $scope.getActiveCampaignData();
         $scope.PhDDate=false;
         $scope.showEnrolDate=true;
         $scope.DivPDIF=false;
+
+        //SET NUll 
+        $scope.PhD_Awarded_Date__c=null;
+        $scope.Thesis_Submission_Date__c=null;
     }
     $scope.clickRadioPDIF=function(){
+      //SET NUll 
+      $scope.PhD_Enroll_Date__c=null;
+
         $scope.showEnrolDate=false;
         $scope.showAwardDrop=true;  
         $scope.DivPDIF=true;
