@@ -307,6 +307,32 @@ public without sharing class ApplicantPortal_Contoller {
         ];
         return con.Name;
     }
+
+    @RemoteAction
+    public static Map<String, String> getUserDetails(String hashcode){
+
+        System.debug('------------------ getUserDetails() --------------------');
+
+        Map<String, String> userDetails = new Map<String, String>();
+        
+        if(String.isBlank(hashcode)) {
+            return userDetails;
+        }
+
+        Contact con = [
+            SELECT Id, Name, Email, Profile_Pic_Attachment_Id__c
+            FROM Contact 
+            WHERE Login_hash_code__c = :hashcode
+            LIMIT 1
+        ];
+        
+        if(con != null) {
+            userDetails.put('email', con.Email != null ? con.Email : '');
+            userDetails.put('profilePicId', con.Profile_Pic_Attachment_Id__c != null ? String.valueOf(con.Profile_Pic_Attachment_Id__c) : '');
+        }
+        
+        return userDetails;
+    }
 	
     
     public class UserWrap {

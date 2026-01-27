@@ -406,7 +406,7 @@
                             </label>
                             <span class="required-asterisk" style="color:red;">*</span>
                             <input name="Proposed Start Date" placeholder="Proposed Start Date" class="form-control"
-                                type="date"
+                                ng-init="tentitiveStartDate=(tentitiveStartDate | date:'yyyy-MM-dd')" type="date"
                                 ng-model="tentitiveStartDate" ng-focus="removeClass2('txtSD')" id="txtSD"
                                 ng-disabled="proposalStage" />
                         </div>
@@ -417,7 +417,7 @@
                             </label>
                             <span class="required-asterisk" style="color:red;">*</span>
                             <input name="Proposed End Date" placeholder="Proposed End Date" class="form-control"
-                                type="date"
+                                ng-init="tentitiveEndDate=(tentitiveEndDate | date:'yyyy-MM-dd')" type="date"
                                 ng-model="tentitiveEndDate" ng-focus="removeClass2('txtED')" id="txtED"
                                 ng-disabled="proposalStage" />
                         </div>

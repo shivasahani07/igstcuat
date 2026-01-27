@@ -150,6 +150,66 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
 
     $scope.applicantAssociationListData;
     $scope.contactName;
+    $scope.showUserDropdown = false;
+    $scope.userEmail = '';
+    $scope.userProfilePicId = null;
+    $scope.profilePicUrl = '';
+
+    // Toggle user dropdown menu
+    $scope.toggleUserDropdown = function (event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        $scope.showUserDropdown = !$scope.showUserDropdown;
+    };
+
+    // Close dropdown when clicking outside
+    $scope.$on('$locationChangeSuccess', function () {
+        $scope.showUserDropdown = false;
+    });
+
+    // Close dropdown when clicking outside (document click handler)
+    angular.element(document).on('click', function(event) {
+        if ($scope.showUserDropdown && !angular.element(event.target).closest('.user-profile-dropdown').length) {
+            $scope.$apply(function() {
+                $scope.showUserDropdown = false;
+            });
+        }
+    });
+
+    // Get user email and profile picture
+    $scope.getUserDetails = function () {
+        const hashCode = localStorage.getItem('hashCode');
+        if (!hashCode) {
+            console.error('hashCode not found in localStorage');
+            // Use existing data if available
+            $scope.userEmail = $rootScope.applicantEmail || '';
+            return;
+        }
+
+        ApplicantPortal_Contoller.getUserDetails(hashCode, function (result, event) {
+            if (event.status && result != null) {
+                $scope.userEmail = result.email || $rootScope.applicantEmail || '';
+                $scope.userProfilePicId = result.profilePicId || null;
+                
+                if ($scope.userProfilePicId) {
+                    var baseURL = window.location.origin;
+                    $scope.profilePicUrl = baseURL + '/ApplicantDashboard/servlet/servlet.FileDownload?file=' + $scope.userProfilePicId;
+                }
+                $scope.$apply();
+            } else {
+                // Fallback to existing data
+                $scope.userEmail = $rootScope.applicantEmail || '';
+            }
+        });
+    };
+
+    // Navigate to reset password page
+    $scope.navigateToResetPassword = function () {
+        var baseURL = window.location.origin;
+        var resetPasswordUrl = baseURL + '/ApplicantDashboard/PortalResetPassword';
+        window.location.href = resetPasswordUrl;
+    };
 
     //**********************Added BY Karthik For Dropdown
     $scope.yearList = yearList;
@@ -457,6 +517,7 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
         });
     }
     $scope.getContactName();
+    $scope.getUserDetails();
 
     /*$scope.getApplicantData = function () {
         debugger;
@@ -889,11 +950,25 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
 
     // Navigate to home/dashboard - removes hash but keeps query params
     $scope.navigateToHome = function () {
+        // Reset to dashboard view
+        $scope.selectedMenu = 'Programs';
+        $scope.selectedFAQ = null;
+        $rootScope.isRoutedView = false;
+        
+        // Clear any route and navigate to base URL
         var baseUrl = window.location.origin + window.location.pathname;
         if (window.location.search) {
             baseUrl += window.location.search;
         }
-        window.location.href = baseUrl;
+        
+        // Remove hash from URL
+        if (window.location.hash) {
+            window.location.href = baseUrl;
+        } else {
+            // If already on base URL, just reset the view
+            $location.path('');
+            $scope.$apply();
+        }
     };
 
     $scope.downloadApplicationPdf = function (id) {

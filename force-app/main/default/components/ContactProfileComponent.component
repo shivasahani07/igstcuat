@@ -1,10 +1,16 @@
-<apex:page sidebar="false"
-           showHeader="false"
-           standardStylesheets="false"
-           docType="html-5.0"
-           controller="ContactProfileController">
-    
-    <style>
+<apex:component controller="ContactProfileController">
+
+    <!-- Attribute to receive Contact Id -->
+    <apex:attribute name="contactId"
+        type="Id"
+        description="Contact Id used to load and save profile data"
+        required="true"
+        assignTo="{!recordId}" />
+
+    <!-- ===================== -->
+    <!-- CONTACT PROFILE UI -->
+    <!-- ===================== -->
+     <style>
         /* Scoped styles for contact profile component */
         .contact-profile-container {
         font-family: "Segoe UI", Arial, sans-serif;
@@ -79,55 +85,55 @@
         }
         
         /* ===== Profile Upload ===== */
-        .contact-profile-container .profile-upload {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 2px dashed #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        position: relative;
-        cursor: pointer;
+       .contact-profile-container .profile-upload {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
         }
-        
+
         .contact-profile-container .file-input {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        cursor: pointer;
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
         }
-        
+
         .contact-profile-container .upload-text {
-        font-size: 12px;
-        color: #999;
-        pointer-events: none;
-        text-align: center;
-        padding: 0 8px;
+            font-size: 12px;
+            color: #999;
+            pointer-events: none;
+            text-align: center;
+            padding: 0 8px;
         }
         
         .contact-profile-container .profile-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-        display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
         }
         
         .contact-profile-container .profile-upload.has-image .upload-text {
-        display: none;
+            display: none;
         }
         
         .contact-profile-container .profile-upload.has-image .profile-image {
-        display: block;
+            display: block;
         }
         
         .contact-profile-container .profile-upload:hover {
-        border-color: #5b2dab;
-        background: #f5f5f5;
+            border-color: #5b2dab;
+            background: #f5f5f5;
         }
-        
+
         
         /* ===== Form ===== */
         .contact-profile-container .form-grid {
@@ -215,525 +221,527 @@
         color: #666;
         margin-top: 6px;
         }
-        
+
         /* ===== Tab Content ===== */
         .contact-profile-container .tab-content {
-        display: none;
+            display: none;
         }
-        
+
         .contact-profile-container .tab-content.active {
-        display: block;
+            display: block;
         }
-        
+
         /* ===== Section Card ===== */
         .contact-profile-container .section-card {
-        background: #fff;
-        border-radius: 14px;
-        margin-top: 20px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            background: #fff;
+            border-radius: 14px;
+            margin-top: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        
+
         /* ===== Grid Tables ===== */
         .contact-profile-container .grid-header, 
         .contact-profile-container .grid-row {
-        display: grid;
-        gap: 12px;
-        align-items: center;
+            display: grid;
+            gap: 12px;
+            align-items: center;
         }
-        
+
         .contact-profile-container .grid-header {
-        font-weight: 600;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
         }
-        
+
         .contact-profile-container .grid-row {
-        margin-top: 12px;
+            margin-top: 12px;
         }
         
         .contact-profile-container .grid-row > div {
-        display: flex;
-        align-items: center;
-        padding: 4px 0;
+            display: flex;
+            align-items: center;
+            padding: 4px 0;
         }
         
         /* Ensure input fields in grid rows are properly styled */
         .contact-profile-container .grid-row input,
         .contact-profile-container .grid-row select,
         .contact-profile-container .grid-row textarea {
-        width: 100%;
-        min-width: 0;
-        height: 36px;
-        padding: 0 8px;
-        margin: 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
+            width: 100%;
+            min-width: 0;
+            height: 36px;
+            padding: 0 8px;
+            margin: 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
         }
         
         .contact-profile-container .grid-row textarea {
-        height: auto;
-        min-height: 100px;
-        padding: 8px;
+            height: auto;
+            min-height: 100px;
+            padding: 8px;
         }
-        
+
         .contact-profile-container .action-icons {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
         }
-        
+
         .contact-profile-container .icon-btn {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        color: #fff;
-        font-size: 14px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-size: 14px;
         }
-        
+
         .contact-profile-container .icon-add { background: #5b2dab; }
         .contact-profile-container .icon-delete { background: #e74c3c; }
         .contact-profile-container .icon-edit { background: #000; }
-        
+
         .contact-profile-container .section-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
         }
-        
-        
-        
-        
+
+
+
+
         /* ===== Accordion ===== */
         .contact-profile-container .accordion-item {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
         }
-        
+
         .contact-profile-container .accordion-header {
-        background: #eaf2ff;
-        padding: 12px 16px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background 0.2s;
+            background: #eaf2ff;
+            padding: 12px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
         }
         
         .contact-profile-container .accordion-header:hover {
-        background: #d4e4ff;
+            background: #d4e4ff;
         }
-        
+
         .contact-profile-container .accordion-header::after {
-        content: "⌄";
-        font-size: 14px;
-        transition: transform 0.2s;
+            content: "⌄";
+            font-size: 14px;
+            transition: transform 0.2s;
         }
-        
+
         .contact-profile-container .accordion-item.active .accordion-header::after {
-        content: "⌃";
+            content: "⌃";
         }
-        
+
         .contact-profile-container .accordion-body {
-        display: none;
-        padding: 14px;
-        background: #fff;
+            display: none;
+            padding: 14px;
+            background: #fff;
         }
-        
+
         .contact-profile-container .accordion-item.active .accordion-body {
-        display: block;
+            display: block;
         }
         
         /* Override Salesforce default styles for input fields */
         .contact-profile-container .form-control,
         .contact-profile-container input,
         .contact-profile-container select {
-        font-family: "Segoe UI", Arial, sans-serif !important;
+            font-family: "Segoe UI", Arial, sans-serif !important;
         }
         
         /* Button spacing */
         .contact-profile-container .btn-primary {
-        margin-left: 10px;
+            margin-left: 10px;
         }
         
         .contact-profile-container .btn-primary:first-child {
-        margin-left: 0;
+            margin-left: 0;
         }
-        
-        
+
+
     </style>
     
     <!-- ===== Contact Profile Container ===== -->
-    <div class="contact-profile-container">
-        <!-- ===== Tabs ===== -->
-        <div class="tabs">
-            <div class="tab active" onclick="openTab(0)">Basic Details</div>
-            <div class="tab" onclick="openTab(1)">Education Details</div>
-            <div class="tab" onclick="openTab(2)">Employment Details</div>
-            <div class="tab" onclick="openTab(3)">Achievements</div>
-            <div class="tab" onclick="openTab(4)">Publications</div>
+<div class="contact-profile-container" id="contactProfileRoot">
+    <!-- ===== Tabs ===== -->
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(0)">Basic Details</div>
+        <div class="tab" onclick="openTab(1)">Education Details</div>
+        <div class="tab" onclick="openTab(2)">Employment Details</div>
+        <div class="tab" onclick="openTab(3)">Achievements</div>
+        <div class="tab" onclick="openTab(4)">Publications</div>
+
+    </div>
+    
+    <div class="tab-content active">
+    <!-- ===== Card ===== -->
+    <div class="card">
+        
+        <div id="contactForm">
+        <div class="header-row">
+           
+             <div class="profile-upload" id="profileUploadDiv">
+                <!-- Display existing image if available -->
+                <img id="existingProfileImage" 
+                     alt="Profile Picture" 
+                     class="profile-image"
+                     style="display:none;"
+                     onerror="handleImageError(this);"
+                     onload="handleImageLoad(this);"/>
+                
+                <!-- Visible text (shown when no image) -->
+                <span class="upload-text" id="uploadText">Click to<br/>Upload Photo</span>
+                
+                <!-- Standard HTML file input -->
+                <input type="file" 
+                       id="profileFileInput"
+                       accept="image/png,image/jpeg,image/jpg"
+                       style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"
+                       onchange="handleFileSelect(this);"/>
+            </div>
+           
+            <button type="button" onclick="saveContactData();" class="btn-primary">Save</button>
+        </div>
+        
+        <div id="messages" style="margin-top: 10px;"></div>
+        
+        <!-- ===== Form ===== -->
+        <div class="form-grid">
+            
+            <div class="form-group">
+                <label>Salutation <span>*</span></label>
+                <select id="contactSalutation" class="form-control">
+                    <option value="">--Select--</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Prof">Prof</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>First Name <span>*</span></label>
+                <input type="text" id="contactFirstName" class="form-control" value="{!con.FirstName}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Last Name <span>*</span></label>
+                <input type="text" id="contactLastName" class="form-control" value="{!con.LastName}"/>
+            </div>
+            
+            <div class="form-group full-width">
+                <label>Current Position / Designation <span>*</span></label>
+                <input type="text" id="contactDesignation" class="form-control" value="{!con.Designation__c}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Institution / Industry</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="instType" value="Academia" id="instTypeAcademia"/> Academia
+                    </label>
+                    <label>
+                        <input type="radio" name="instType" value="Industry" id="instTypeIndustry"/> Industry
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Institution / Organisation Name</label>                
+                <input type="text" id="contactInstitution" class="form-control" value="{!con.Account.Name}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Department / Division</label>
+                <input type="text" id="contactDepartment" class="form-control" value="{!con.Department}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span>*</span></label>
+                <input type="email" id="contactEmail" class="form-control" value="{!con.Email}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Phone <span>*</span></label>
+                <input type="text" id="contactPhone" class="form-control" value="{!con.MobilePhone}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Country <span>*</span></label>
+                <input type="text" id="contactCountry" class="form-control" value="{!con.MailingCountry}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Street <span>*</span></label>
+                <input type="text" id="contactStreet" class="form-control" value="{!con.MailingStreet}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>State <span>*</span></label>
+                <input type="text" id="contactState" class="form-control" value="{!con.MailingState}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>City <span>*</span></label>
+                <input type="text" id="contactCity" class="form-control" value="{!con.MailingCity}"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Postal / Zip Code <span>*</span></label>
+                <input type="text" id="contactPostalCode" class="form-control" value="{!con.MailingPostalCode}"/>
+            </div>
             
         </div>
         
-        <div class="tab-content active">
-            <!-- ===== Card ===== -->
-            <div class="card">
-                
-                <div id="contactForm">
-                    <div class="header-row">
-                        
-                        <div class="profile-upload" id="profileUploadDiv">
-                            <!-- Display existing image if available -->
-                            <img id="existingProfileImage" 
-                                 alt="Profile Picture" 
-                                 class="profile-image"
-                                 style="display:none;"
-                                 onerror="handleImageError(this);"
-                                 onload="handleImageLoad(this);"/>
-                            
-                            <!-- Visible text (shown when no image) -->
-                            <span class="upload-text" id="uploadText">Click to<br/>Upload Photo</span>
-                            
-                            <!-- Standard HTML file input -->
-                            <input type="file" 
-                                   id="profileFileInput"
-                                   accept="image/png,image/jpeg,image/jpg"
-                                   style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"
-                                   onchange="handleFileSelect(this);"/>
-                        </div>
-                        
-                        <button type="button" onclick="saveContactData();" class="btn-primary">Save</button>
-                    </div>
-                    
-                    <div id="messages" style="margin-top: 10px;"></div>
-                    
-                    <!-- ===== Form ===== -->
-                    <div class="form-grid">
-                        
-                        <div class="form-group">
-                            <label>Salutation <span>*</span></label>
-                            <select id="contactSalutation" class="form-control">
-                                <option value="">--Select--</option>
-                                <option value="Dr">Dr</option>
-                                <option value="Mr">Mr</option>
-                                <option value="Mrs">Mrs</option>
-                                <option value="Ms">Ms</option>
-                                <option value="Prof">Prof</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>First Name <span>*</span></label>
-                            <input type="text" id="contactFirstName" class="form-control" value="{!con.FirstName}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Last Name <span>*</span></label>
-                            <input type="text" id="contactLastName" class="form-control" value="{!con.LastName}"/>
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label>Current Position / Designation <span>*</span></label>
-                            <input type="text" id="contactDesignation" class="form-control" value="{!con.Designation__c}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Institution / Industry</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="instType" value="Academia" id="instTypeAcademia"/> Academia
-                                </label>
-                                <label>
-                                    <input type="radio" name="instType" value="Industry" id="instTypeIndustry"/> Industry
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Institution / Organisation Name</label>                
-                            <input type="text" id="contactInstitution" class="form-control" value="{!con.Account.Name}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Department / Division</label>
-                            <input type="text" id="contactDepartment" class="form-control" value="{!con.Department}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Email <span>*</span></label>
-                            <input type="email" id="contactEmail" class="form-control" value="{!con.Email}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Phone <span>*</span></label>
-                            <input type="text" id="contactPhone" class="form-control" value="{!con.MobilePhone}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Country <span>*</span></label>
-                            <input type="text" id="contactCountry" class="form-control" value="{!con.MailingCountry}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Street <span>*</span></label>
-                            <input type="text" id="contactStreet" class="form-control" value="{!con.MailingStreet}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>State <span>*</span></label>
-                            <input type="text" id="contactState" class="form-control" value="{!con.MailingState}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>City <span>*</span></label>
-                            <input type="text" id="contactCity" class="form-control" value="{!con.MailingCity}"/>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Postal / Zip Code <span>*</span></label>
-                            <input type="text" id="contactPostalCode" class="form-control" value="{!con.MailingPostalCode}"/>
-                        </div>
-                        
-                    </div>
-                    
-                    <!-- ===== Signature ===== -->
-                    <div class="signature">
-                        <label>Signature</label><br/>
-                        <input type="file" id="signatureFile"/>
-                        <button type="button" class="upload-btn" onclick="uploadSignature();">Upload</button>
-                        
-                        <div class="hint">
-                            • Signature should be done by blue/black colour pen<br/>
-                            • Dimension: 200 × 230 pixels<br/>
-                            • Size: 20 KB – 50 KB
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="tab-content">
+        <!-- ===== Signature ===== -->
+        <div class="signature">
+            <label>Signature</label><br/>
+            <input type="file" id="signatureFile"/>
+            <button type="button" class="upload-btn" onclick="uploadSignature();">Upload</button>
             
-            <div id="educationForm">
-                
-                <div class="section-card">
-                    <div id="educationMessages" style="margin-bottom:10px;"></div>
-                    
-                    <div class="section-title">Education</div>
-                    
-                    <!-- Header -->
-                    <div class="grid-header"
-                         style="grid-template-columns: 1.2fr 1.5fr 1.5fr 1fr 1fr 60px;">
-                        <div>Degree<span style="color:red">*</span></div>
-                        <div>Institution<span style="color:red">*</span></div>
-                        <div>Specialisation<span style="color:red">*</span></div>
-                        <div>Start Date<span style="color:red">*</span></div>
-                        <div>End Date<span style="color:red">*</span></div>
-                        <div></div>
-                    </div>
-                    
-                    <!-- Dynamic Rows Container -->
-                    <div id="educationRowsContainer">
-                        <!-- Rows will be populated by JavaScript -->
-                    </div>
-                    
-                    <div style="margin-top:20px;text-align:right;">
-                        <button type="button" onclick="saveEducationData();" class="btn-primary">Save Education</button>
-                        <button type="button" onclick="addEducationRow();" class="btn-primary">Add Row</button>
-                    </div>
-                    
-                </div>
-                
+            <div class="hint">
+                • Signature should be done by blue/black colour pen<br/>
+                • Dimension: 200 × 230 pixels<br/>
+                • Size: 20 KB – 50 KB
             </div>
         </div>
         
-        
-        <div class="tab-content">
-            
-            <div id="employmentForm">
-                
-                <div class="section-card">
-                    <div id="employmentMessages" style="margin-bottom:10px;"></div>
-                    
-                    <div class="section-title">Employment</div>
-                    
-                    <!-- Header -->
-                    <div class="grid-header"
-                         style="grid-template-columns: 1.8fr 1.4fr 1fr 1fr 60px;">
-                        <div>Organisation<span style="color:red">*</span></div>
-                        <div>Position<span style="color:red">*</span></div>
-                        <div>Start Date<span style="color:red">*</span></div>
-                        <div>End Date<span style="color:red">*</span></div>
-                        <div></div>
-                    </div>
-                    
-                    <!-- Dynamic Rows Container -->
-                    <div id="employmentRowsContainer">x
-                        <!-- Rows will be populated by JavaScript -->
-                    </div>
-                    
-                    <div style="margin-top:20px;text-align:right;">
-                        <button type="button" onclick="saveEmploymentData();" class="btn-primary">Save Employment</button>
-                        <button type="button" onclick="addEmploymentRow();" class="btn-primary">Add Row</button>
-                    </div>
-                    
-                </div>
-                
-            </div>
         </div>
-        
-        <!-- ================= ACHIEVEMENTS TAB ================= -->
-        <div class="tab-content">
-            
-            <div id="achievementForm">
-                <div id="achievementMessages" style="margin-top: 10px;"></div>
-                
-                <div class="section-card">
-                    <div class="section-title">Achievements</div>
-                    
-                    <!-- Achievement Fields -->
-                    <div id="achievementFields">
-                        <!-- Awards & Honours -->
-                        <div class="accordion-item">
-                            <div class="accordion-header" onclick="toggleAccordion(this)">
-                                Awards and Honours
-                            </div>
-                            <div class="accordion-body">
-                                <div id="achievementAwards"
-                                     contenteditable="true"
-                                     class="form-control"
-                                     style="width:100%; min-height:200px; padding:10px;">
-                                </div>
-                                
-                                <!-- <textarea id="achievementAwards" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
-                            </div>
-                        </div>
-                        
-                        <!-- Patents -->
-                        <div class="accordion-item">
-                            <div class="accordion-header" onclick="toggleAccordion(this)">
-                                List of Patents filed / granted
-                            </div>
-                            <div class="accordion-body">
-                                <div id="achievementPatents"
-                                     contenteditable="true"
-                                     class="form-control"
-                                     style="width:100%; min-height:200px; padding:10px;">
-                                </div>
-                                <!-- <textarea id="achievementPatents" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
-                            </div>
-                        </div>
-                        
-                        <!-- Book Chapters -->
-                        <div class="accordion-item">
-                            <div class="accordion-header" onclick="toggleAccordion(this)">
-                                Book Chapters / Monographs
-                            </div>
-                            <div class="accordion-body">
-                                <div id="achievementBookChapters"
-                                     contenteditable="true"
-                                     class="form-control"
-                                     style="width:100%; min-height:200px; padding:10px;">
-                                </div>
-                                <!-- <textarea id="achievementBookChapters" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
-                            </div>
-                        </div>
-                        
-                        <!-- Other Achievements -->
-                        <div class="accordion-item">
-                            <div class="accordion-header" onclick="toggleAccordion(this)">
-                                Any other notable achievements
-                            </div>
-                            <div class="accordion-body">
-                                <div id="achievementOther"
-                                     contenteditable="true"
-                                     class="form-control"
-                                     style="width:100%; min-height:200px; padding:10px;">
-                                </div>
-                                
-                                <!-- <textarea id="achievementOther" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top:20px;text-align:right;">
-                        <button type="button" onclick="saveAchievementData();" class="btn-primary">Save Achievements</button>
-                    </div>
-                    
-                </div>
-                
+    </div>
+    </div>
+    
+    <div class="tab-content">
+
+    <div id="educationForm">
+
+        <div class="section-card">
+            <div id="educationMessages" style="margin-bottom:10px;"></div>
+
+            <div class="section-title">Education</div>
+
+            <!-- Header -->
+            <div class="grid-header"
+                 style="grid-template-columns: 1.2fr 1.5fr 1.5fr 1fr 1fr 60px;">
+                <div>Degree<span style="color:red">*</span></div>
+                <div>Institution<span style="color:red">*</span></div>
+                <div>Specialisation<span style="color:red">*</span></div>
+                <div>Start Date<span style="color:red">*</span></div>
+                <div>End Date<span style="color:red">*</span></div>
+                <div></div>
             </div>
-        </div>
-        
-        
-        <!-- ================= Publication TAB ================= -->
-        <div class="tab-content">
-            
-            <div id="PublicationForm">
-                <div id="publicationMessages" style="margin-top: 10px;"></div>
-                
-                <div class="section-card">
-                    <div class="section-title">Publication</div>
-                    
-                    <!-- Publications Field -->
-                    <div id="publicationFields">
-                        <div class="accordion-item active">
-                            <div class="accordion-header" onclick="toggleAccordion(this)">
-                                List of Publications
-                            </div>
-                            <div class="accordion-body">
-                                <div id="achievementPublications"
-                                     contenteditable="true"
-                                     class="form-control"
-                                     style="width:100%; min-height:200px; padding:10px;">
-                                </div>
-                                <!-- <textarea id="achievementPublications" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top:20px;text-align:right;">
-                        <button type="button" onclick="savePublicationData();" class="btn-primary">Save Publications</button>
-                    </div>
-                    
-                </div>
-                
+
+            <!-- Dynamic Rows Container -->
+            <div id="educationRowsContainer">
+                <!-- Rows will be populated by JavaScript -->
             </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="saveEducationData();" class="btn-primary">Save Education</button>
+                <button type="button" onclick="addEducationRow();" class="btn-primary">Add Row</button>
+            </div>
+
         </div>
+
+    </div>
+</div>
+
+    
+<div class="tab-content">
+
+    <div id="employmentForm">
+
+        <div class="section-card">
+            <div id="employmentMessages" style="margin-bottom:10px;"></div>
+
+            <div class="section-title">Employment</div>
+
+            <!-- Header -->
+            <div class="grid-header"
+                 style="grid-template-columns: 1.8fr 1.4fr 1fr 1fr 60px;">
+                <div>Organisation<span style="color:red">*</span></div>
+                <div>Position<span style="color:red">*</span></div>
+                <div>Start Date<span style="color:red">*</span></div>
+                <div>End Date<span style="color:red">*</span></div>
+                <div></div>
+            </div>
+
+            <!-- Dynamic Rows Container -->
+            <div id="employmentRowsContainer">
+                <!-- Rows will be populated by JavaScript -->
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="saveEmploymentData();" class="btn-primary">Save Employment</button>
+                <button type="button" onclick="addEmploymentRow();" class="btn-primary">Add Row</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= ACHIEVEMENTS TAB ================= -->
+<div class="tab-content">
+
+    <div id="achievementForm">
+        <div id="achievementMessages" style="margin-top: 10px;"></div>
         
+        <div class="section-card">
+            <div class="section-title">Achievements</div>
+
+            <!-- Achievement Fields -->
+            <div id="achievementFields">
+                <!-- Awards & Honours -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Awards and Honours
+                    </div>
+                    <div class="accordion-body">
+                        <div id="achievementAwards"
+                            contenteditable="true"
+                            class="form-control"
+                            style="width:100%; min-height:200px; padding:10px;">
+                        </div>
+
+                        <!-- <textarea id="achievementAwards" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
+                    </div>
+                </div>
+
+                <!-- Patents -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        List of Patents filed / granted
+                    </div>
+                    <div class="accordion-body">
+                        <div id="achievementPatents"
+                            contenteditable="true"
+                            class="form-control"
+                            style="width:100%; min-height:200px; padding:10px;">
+                        </div>
+                        <!-- <textarea id="achievementPatents" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
+                    </div>
+                </div>
+
+                <!-- Book Chapters -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Book Chapters / Monographs
+                    </div>
+                    <div class="accordion-body">
+                        <div id="achievementBookChapters"
+                            contenteditable="true"
+                            class="form-control"
+                            style="width:100%; min-height:200px; padding:10px;">
+                        </div>
+                        <!-- <textarea id="achievementBookChapters" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
+                    </div>
+                </div>
+
+                <!-- Other Achievements -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Any other notable achievements
+                    </div>
+                    <div class="accordion-body">
+                        <div id="achievementOther"
+                            contenteditable="true"
+                            class="form-control"
+                            style="width:100%; min-height:200px; padding:10px;">
+                        </div>
+
+                        <!-- <textarea id="achievementOther" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="saveAchievementData();" class="btn-primary">Save Achievements</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ================= Publication TAB ================= -->
+<div class="tab-content">
+
+    <div id="PublicationForm">
+        <div id="publicationMessages" style="margin-top: 10px;"></div>
         
-        
-        
-        
-        
-        
-        
-        
-        
-        <script>
+        <div class="section-card">
+            <div class="section-title">Publication</div>
+
+            <!-- Publications Field -->
+            <div id="publicationFields">
+                <div class="accordion-item active">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        List of Publications
+                    </div>
+                    <div class="accordion-body">
+                        <div id="achievementPublications"
+                            contenteditable="true"
+                            class="form-control"
+                            style="width:100%; min-height:200px; padding:10px;">
+                        </div>
+                        <!-- <textarea id="achievementPublications" class="form-control" style="width:100%; height:200px; padding: 10px;"></textarea> -->
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;text-align:right;">
+                <button type="button" onclick="savePublicationData();" class="btn-primary">Save Publications</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<script>
         function openTab(tabIndex) {
-            var container = document.querySelector('.contact-profile-container');
+           // var container = document.querySelector('.contact-profile-container');
+            var container = document.getElementById('contactProfileRoot');
             if (!container) return;
             
             var tabs = container.querySelectorAll('.tab');
             var contents = container.querySelectorAll('.tab-content');
-            
+
             tabs.forEach(t => t.classList.remove('active'));
             contents.forEach(c => c.classList.remove('active'));
-            
+
             if (tabs[tabIndex] && contents[tabIndex]) {
                 tabs[tabIndex].classList.add('active');
                 contents[tabIndex].classList.add('active');
             }
         }
-        
+
         
         function toggleAccordion(header) {
             var item = header.parentElement;
@@ -901,13 +909,22 @@
         }
         
         // Check if existing image loaded successfully on page load
-        window.addEventListener('load', function() {
+        // window.addEventListener('load', function() {
+        //     loadContactData();
+        //     loadEducationData();
+        //     loadEmploymentData();
+        //     loadAchievementData();
+        //     loadProfileImage();
+        // });
+
+        document.addEventListener('DOMContentLoaded', function () {
             loadContactData();
             loadEducationData();
             loadEmploymentData();
             loadAchievementData();
             loadProfileImage();
         });
+
         
         // ========== DATA LOADING FUNCTIONS ==========
         
@@ -985,22 +1002,22 @@
         function loadAchievementData() {
             try {
                 var achievementData = JSON.parse('{!JSENCODE(achievementListJSON)}');
-                
+
                 if (achievementData && achievementData.length > 0) {
                     var ach = achievementData[0];
-                    
+
                     document.getElementById('achievementAwards').innerHTML =
                         ach.Awards_Honours__c || '';
-                    
+
                     document.getElementById('achievementPatents').innerHTML =
                         ach.List_of_Patents_filed__c || '';
-                    
+
                     document.getElementById('achievementBookChapters').innerHTML =
                         ach.Book_Chapters__c || '';
-                    
+
                     document.getElementById('achievementOther').innerHTML =
                         ach.Any_other_achievements__c || '';
-                    
+
                     document.getElementById('achievementPublications').innerHTML =
                         ach.List_of_Publications__c || '';
                 }
@@ -1008,7 +1025,7 @@
                 console.error('Error loading achievement data', e);
             }
         }
-        
+
         
         function loadProfileImage() {
             debugger
@@ -1079,44 +1096,44 @@
         //         row.remove();
         //     }
         // }
-        
+
         function removeEducationRow(index) {
-            if (!confirm('Are you sure you want to delete this education record?')) {
-                return; // ❌ Cancel clicked
+    if (!confirm('Are you sure you want to delete this education record?')) {
+        return; // ❌ Cancel clicked
+    }
+
+    var row = document.getElementById('eduRow_' + index);
+    if (!row) return;
+
+    var recordId = row.querySelector('.eduId').value;
+
+    // ✅ If record already saved → delete from Salesforce
+    if (recordId) {
+        ContactProfileController.deleteEducationRecord(
+            recordId,
+            function (result, event) {
+                if (event.status && result === 'SUCCESS') {
+                    row.remove();
+                    showMessage(
+                        'educationMessages',
+                        'Education record deleted successfully.',
+                        'success'
+                    );
+                } else {
+                    showMessage(
+                        'educationMessages',
+                        result || 'Error deleting record',
+                        'error'
+                    );
+                }
             }
-            
-            var row = document.getElementById('eduRow_' + index);
-            if (!row) return;
-            
-            var recordId = row.querySelector('.eduId').value;
-            
-            // ✅ If record already saved → delete from Salesforce
-            if (recordId) {
-                ContactProfileController.deleteEducationRecord(
-                    recordId,
-                    function (result, event) {
-                        if (event.status && result === 'SUCCESS') {
-                            row.remove();
-                            showMessage(
-                                'educationMessages',
-                                'Education record deleted successfully.',
-                                'success'
-                            );
-                        } else {
-                            showMessage(
-                                'educationMessages',
-                                result || 'Error deleting record',
-                                'error'
-                            );
-                        }
-                    }
-                );
-            } else {
-                // 🆕 Unsaved row → just remove UI
-                row.remove();
-            }
-        }
-        
+        );
+    } else {
+        // 🆕 Unsaved row → just remove UI
+        row.remove();
+    }
+}
+
         
         function addEmploymentRowHTML(emp, index) {
             debugger
@@ -1157,40 +1174,40 @@
         //     }
         // }
         function removeEmploymentRow(index) {
-            if (!confirm('Are you sure you want to delete this employment record?')) {
-                return;
+    if (!confirm('Are you sure you want to delete this employment record?')) {
+        return;
+    }
+
+    var row = document.getElementById('empRow_' + index);
+    if (!row) return;
+
+    var recordId = row.querySelector('.empId').value;
+
+    if (recordId) {
+        ContactProfileController.deleteEmploymentRecord(
+            recordId,
+            function (result, event) {
+                if (event.status && result === 'SUCCESS') {
+                    row.remove();
+                    showMessage(
+                        'employmentMessages',
+                        'Employment record deleted successfully.',
+                        'success'
+                    );
+                } else {
+                    showMessage(
+                        'employmentMessages',
+                        result || 'Error deleting record',
+                        'error'
+                    );
+                }
             }
-            
-            var row = document.getElementById('empRow_' + index);
-            if (!row) return;
-            
-            var recordId = row.querySelector('.empId').value;
-            
-            if (recordId) {
-                ContactProfileController.deleteEmploymentRecord(
-                    recordId,
-                    function (result, event) {
-                        if (event.status && result === 'SUCCESS') {
-                            row.remove();
-                            showMessage(
-                                'employmentMessages',
-                                'Employment record deleted successfully.',
-                                'success'
-                            );
-                        } else {
-                            showMessage(
-                                'employmentMessages',
-                                result || 'Error deleting record',
-                                'error'
-                            );
-                        }
-                    }
-                );
-            } else {
-                row.remove();
-            }
-        }
-        
+        );
+    } else {
+        row.remove();
+    }
+}
+
         
         // ========== SAVE FUNCTIONS ==========
         
@@ -1212,7 +1229,7 @@
                 MailingState: document.getElementById('contactState').value,
                 MailingCity: document.getElementById('contactCity').value,
                 MailingPostalCode: document.getElementById('contactPostalCode').value,
-                
+
                 AccountName: document.getElementById('contactInstitution').value
             };
             
@@ -1229,24 +1246,24 @@
                     showMessage('messages', 'Error saving profile: ' + event.message, 'error');
                 }
             });
-            //             Visualforce.remoting.Manager.invokeAction(
-            //     '{!$RemoteAction.ContactProfileController.saveContactProfile}',
-            //     contactData,
-            //     function (result, event) {
-            //         if (event.status) {
-            //             showMessage(
-            //                 'messages',
-            //                 result === 'SUCCESS'
-            //                     ? 'Profile saved successfully!'
-            //                     : result,
-            //                 result === 'SUCCESS' ? 'success' : 'error'
-            //             );
-            //         } else {
-            //             showMessage('messages', event.message, 'error');
-            //         }
-            //     }
-            // );
-            
+    //             Visualforce.remoting.Manager.invokeAction(
+    //     '{!$RemoteAction.ContactProfileController.saveContactProfile}',
+    //     contactData,
+    //     function (result, event) {
+    //         if (event.status) {
+    //             showMessage(
+    //                 'messages',
+    //                 result === 'SUCCESS'
+    //                     ? 'Profile saved successfully!'
+    //                     : result,
+    //                 result === 'SUCCESS' ? 'success' : 'error'
+    //             );
+    //         } else {
+    //             showMessage('messages', event.message, 'error');
+    //         }
+    //     }
+    // );
+
         }
         
         function saveEducationData() {
@@ -1273,20 +1290,20 @@
             debugger           
             ContactProfileController.saveEducationDetails(contactId,JSON.stringify(educationList),function (result, event) {
                 debugger;
-                if (event.status) {
-                    showMessage(
-                        'educationMessages',
-                        result === 'SUCCESS'
-                        ? 'Education details saved successfully!'
-                        : result,
-                        result === 'SUCCESS' ? 'success' : 'error'
-                    );
-                } else {
-                    showMessage('messages', event.message, 'error');
+                    if (event.status) {
+                        showMessage(
+                            'educationMessages',
+                            result === 'SUCCESS'
+                                ? 'Education details saved successfully!'
+                                : result,
+                            result === 'SUCCESS' ? 'success' : 'error'
+                        );
+                    } else {
+                        showMessage('messages', event.message, 'error');
+                    }
                 }
-            }
-                                                         );
-            
+            );
+
         }
         
         function saveEmploymentData() {
@@ -1311,33 +1328,33 @@
             
             debugger           
             ContactProfileController.saveEmploymentDetails(contactId,JSON.stringify(employmentList),function (result, event) {
-                debugger;
-                if (event.status) {
-                    if (result === 'SUCCESS') {
-                        showMessage(
-                            'employmentMessages',
-                            'Employment details saved successfully!',
-                            'success'
-                        );
+            debugger;
+                    if (event.status) {
+                        if (result === 'SUCCESS') {
+                            showMessage(
+                                'employmentMessages',
+                                'Employment details saved successfully!',
+                                'success'
+                            );
+                        } else {
+                            showMessage('messages', result, 'error');
+                        }
                     } else {
-                        showMessage('messages', result, 'error');
+                        showMessage(
+                            'messages',
+                            'Error saving employment: ' + event.message,
+                            'error'
+                        );
                     }
-                } else {
-                    showMessage(
-                        'messages',
-                        'Error saving employment: ' + event.message,
-                        'error'
-                    );
                 }
-            }
-                                                          );
+            );
         }
         
         
-        
+
         // function saveAchievementData() {
         //     var contactId = '{!con.Id}';
-        
+
         //     var achievement = {
         //         Contact__c: contactId,
         //         Awards_Honours__c: document.getElementById('achievementAwards').value,
@@ -1345,7 +1362,7 @@
         //         Book_Chapters__c: document.getElementById('achievementBookChapters').value,
         //         Any_other_achievements__c: document.getElementById('achievementOther').value
         //     };
-        
+
         //     // Attach existing Id if present
         //     try {
         //         var list = JSON.parse('{!JSENCODE(achievementListJSON)}');
@@ -1353,7 +1370,7 @@
         //             achievement.Id = list[0].Id;
         //         }
         //     } catch (e) {}
-        
+
         //     debugger
         //         ContactProfileController.saveAchievementDetails(contactId,JSON.stringify([achievement]),function (result, event) {
         //             debugger
@@ -1370,64 +1387,63 @@
         //             }
         //         }
         //     );
-        
+
         // }
         function saveAchievementData() {
-            var contactId = '{!con.Id}';
-            
-            var achievement = {
-                Contact__c: contactId,
-                Awards_Honours__c:
-                document.getElementById('achievementAwards').innerHTML,
-                List_of_Patents_filed__c:
-                document.getElementById('achievementPatents').innerHTML,
-                Book_Chapters__c:
-                document.getElementById('achievementBookChapters').innerHTML,
-                Any_other_achievements__c:
-                document.getElementById('achievementOther').innerHTML,
-                List_of_Publications__c:
-                document.getElementById('achievementPublications').innerHTML
-            };
-            
-            // Attach existing Id if present
-            try {
-                var list = JSON.parse('{!JSENCODE(achievementListJSON)}');
-                if (list && list.length > 0) {
-                    achievement.Id = list[0].Id;
-                }
-            } catch (e) {}
-            
-            ContactProfileController.saveAchievementDetails(
-                contactId,
-                JSON.stringify([achievement]),
-                function (result, event) {
-                    if (event.status) {
-                        showMessage(
-                            'achievementMessages',
-                            result === 'SUCCESS'
-                            ? 'Achievements saved successfully!'
-                            : result,
-                            result === 'SUCCESS' ? 'success' : 'error'
-                        );
-                    } else {
-                        showMessage('achievementMessages', event.message, 'error');
-                    }
-                }
-            );
+    var contactId = '{!con.Id}';
+
+    var achievement = {
+        Contact__c: contactId,
+        Awards_Honours__c:
+            document.getElementById('achievementAwards').innerHTML,
+        List_of_Patents_filed__c:
+            document.getElementById('achievementPatents').innerHTML,
+        Book_Chapters__c:
+            document.getElementById('achievementBookChapters').innerHTML,
+        Any_other_achievements__c:
+            document.getElementById('achievementOther').innerHTML,
+        List_of_Publications__c:
+            document.getElementById('achievementPublications').innerHTML
+    };
+
+    // Attach existing Id if present
+    try {
+        var list = JSON.parse('{!JSENCODE(achievementListJSON)}');
+        if (list && list.length > 0) {
+            achievement.Id = list[0].Id;
         }
-        
-        
+    } catch (e) {}
+
+    ContactProfileController.saveAchievementDetails(
+        contactId,
+        JSON.stringify([achievement]),
+        function (result, event) {
+            if (event.status) {
+                showMessage(
+                    'achievementMessages',
+                    result === 'SUCCESS'
+                        ? 'Achievements saved successfully!'
+                        : result,
+                    result === 'SUCCESS' ? 'success' : 'error'
+                );
+            } else {
+                showMessage('achievementMessages', event.message, 'error');
+            }
+        }
+    );
+}
+
+
         
         
         function savePublicationData() {
             var contactId = '{!con.Id}';
-            
+
             var achievement = {
                 Contact__c: contactId,
-                //List_of_Publications__c: document.getElementById('achievementPublications').value
-                List_of_Publications__c: document.getElementById('achievementPublications').innerHTML
+                List_of_Publications__c: document.getElementById('achievementPublications').value
             };
-            
+
             // Attach existing Achievement Id if present
             try {
                 var list = JSON.parse('{!JSENCODE(achievementListJSON)}');
@@ -1435,25 +1451,25 @@
                     achievement.Id = list[0].Id;
                 }
             } catch (e) {}
-            
-            debugger
-            ContactProfileController.saveAchievementDetails(contactId,JSON.stringify([achievement]),function (result, event) {
+    
                 debugger
-                if (event.status) {
-                    showMessage(
-                        'publicationMessages',
-                        result === 'SUCCESS'
-                        ? 'Publications saved successfully!'
-                        : result,
-                        result === 'SUCCESS' ? 'success' : 'error'
-                    );
-                } else {
-                    showMessage('publicationMessages', event.message, 'error');
-                }
-            }
-                                                           );
-        }
-        
+                ContactProfileController.saveAchievementDetails(contactId,JSON.stringify([achievement]),function (result, event) {
+                 debugger
+                        if (event.status) {
+                            showMessage(
+                                'publicationMessages',
+                                result === 'SUCCESS'
+                                    ? 'Publications saved successfully!'
+                                    : result,
+                                result === 'SUCCESS' ? 'success' : 'error'
+                            );
+                        } else {
+                            showMessage('publicationMessages', event.message, 'error');
+                        }
+                    }
+                );
+             }
+
         
         function showMessage(containerId, message, type) {
             debugger
@@ -1490,8 +1506,8 @@
                 });
             }
         }
-        
+
         </script>
-    </div>
-    <!-- End Contact Profile Container -->
-</apex:page>
+</div>
+
+</apex:component>

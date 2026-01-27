@@ -27,7 +27,7 @@
     <types>
         <members>*</members>
         <name>LightningComponentBundle</name>
-    </types>git init
+    </types>
     <types>
         <members>*</members>
         <name>StaticResource</name>

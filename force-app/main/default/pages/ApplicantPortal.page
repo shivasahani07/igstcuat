@@ -165,9 +165,7 @@
             /* font-family: 'Segoe UI', sans-serif; */
             font-family: "Nunito Sans", sans-serif;
             background-color: #f6f6fb;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
+            min-height: 100vh;
         }
 
         /* Sidebar */
@@ -178,6 +176,11 @@
             display: flex;
             flex-direction: column;
             padding-top: 0;
+            margin-top: 70px;
+            height: calc(100vh - 70px);
+            position: fixed;
+            left: 0;
+            overflow-y: auto;
         }
 
         .sidebar-appPortal .logo {
@@ -227,6 +230,9 @@
             overflow-y: auto;
             scrollbar-width: none;
             background-color: #F9F9FB;
+            margin-left: 240px;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
         }
 
         .header {
@@ -241,90 +247,231 @@
             color: #333;
         }
 
-        /* Global Header - Fixed at top right corner */
-        .global-header {
+        /* Top Bar - Full Width Header */
+        .top-bar {
             position: fixed;
             top: 0;
+            left: 0;
             right: 0;
             z-index: 1000;
             background-color: #fff;
-            padding: 11px 30px;
+            padding: 15px 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
-            min-width: 300px;
+            height: 70px;
         }
 
-        .global-header span {
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .top-bar-logo {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .top-bar-logo img {
+            max-height: 50px;
+            height: auto;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
             font-weight: 500;
             color: #333;
             font-size: 15px;
             white-space: nowrap;
         }
 
-        .global-header i {
-            color: #4b0082;
-            font-size: 18px;
+        .user-profile-dropdown {
+            position: relative;
         }
-        
-        .global-header-btn {
-            background-color: #4b0082;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
+
+        .user-profile-trigger {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
             transition: background-color 0.3s ease;
-            white-space: nowrap;
         }
-        
-        .global-header-btn:hover {
-            background-color: #6e40aa;
+
+        .user-profile-trigger:hover {
+            background-color: #f5f5f5;
         }
-        
-        .global-header-btn i {
+
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-avatar,
+        .user-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .user-avatar-placeholder {
+            background-color: #ff9800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
+            font-size: 18px;
+        }
+
+        .user-status-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background-color: #4caf50;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .dropdown-arrow {
+            color: #666;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 280px;
+            padding: 16px 0;
+            z-index: 1001;
+        }
+
+        .dropdown-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 16px 16px 16px;
+        }
+
+        .dropdown-avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .dropdown-avatar,
+        .dropdown-avatar-placeholder {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .dropdown-avatar-placeholder {
+            background-color: #ff9800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .dropdown-user-details {
+            flex: 1;
+        }
+
+        .dropdown-user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-user-email {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 8px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
             font-size: 14px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
         }
-        
-        .global-header-btn.logout-btn {
-            background-color: #d32f2f;
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
         }
-        
-        .global-header-btn.logout-btn:hover {
-            background-color: #b71c1c;
+
+        .dropdown-item i {
+            color: #666;
+            width: 18px;
+            text-align: center;
         }
-        
-        /* Responsive adjustments for global header */
+
+        /* Responsive adjustments for top bar */
         @media(max-width: 768px) {
-            .global-header {
+            .top-bar {
                 padding: 12px 15px;
-                min-width: auto;
-                gap: 8px;
-                flex-wrap: wrap;
+                height: auto;
+                min-height: 60px;
             }
-            
-            .global-header span {
+
+            .top-bar-logo img {
+                height: 40px;
+            }
+
+            .user-name {
                 font-size: 13px;
+                display: none;
             }
-            
-            .global-header i {
-                font-size: 16px;
+
+            .user-avatar,
+            .user-avatar-placeholder {
+                width: 35px;
+                height: 35px;
             }
-            
-            .global-header-btn {
-                padding: 6px 12px;
-                font-size: 12px;
+
+            .user-dropdown-menu {
+                min-width: 250px;
+                right: -10px;
             }
         }
 
-        /* Adjust main content areas to account for global header */
+        /* Adjust main content areas to account for top bar */
         .main-div {
             padding-top: 0;
         }
@@ -333,9 +480,12 @@
             padding-top: 0;
         }
         
-        /* Adjust routed view container for global header */
+        /* Adjust routed view container for top bar */
         div[ng-if="$root.isRoutedView"] {
-            padding-top: 0;
+            padding-top: 70px;
+            margin-left: 0;
+            min-height: calc(100vh - 70px);
+            overflow-y: auto;
         }
 
         h2 {
@@ -435,6 +585,11 @@
             color: #9747FF;
             margin-right: 7px;
         }
+        
+        .fa-check-square{
+            color: #00C950;
+            margin-right: 7px;
+            }
 
         .btn-container {
             margin-top: auto;
@@ -485,8 +640,8 @@
 
         .main-div {
             display: flex;
-            overflow: auto;
-            scrollbar-width: none;
+            min-height: calc(100vh - 70px);
+            /* padding-top: 70px; */
         }
 
         /* Loader CSS */
@@ -716,6 +871,13 @@
 
             .sidebar-appPortal {
                 width: 200px;
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+
+            .main-content {
+                margin-left: 200px;
+                margin-top: 60px;
             }
         }
     </style>
@@ -919,22 +1081,26 @@
             </div>
         </div>
         <div class="top-bar-right">
-            <i class="fa-solid fa-bell notification-icon"></i>
+            <!-- <i class="fa-solid fa-bell notification-icon"></i> -->
             <span class="user-name">{{contactName || 'Loading...'}}</span>
             <div class="user-profile-dropdown" ng-class="{'dropdown-open': showUserDropdown}">
-                <div class="user-profile-trigger" ng-click="toggleUserDropdown()">
-                    <img ng-if="userProfilePicId" class="user-avatar" src="{{profilePicUrl}}" alt="Profile Picture"/>
-                    <div ng-if="!userProfilePicId" class="user-avatar-placeholder">
-                        <i class="fa-solid fa-user"></i>
+                <div class="user-profile-trigger" ng-click="toggleUserDropdown($event)">
+                    <div class="avatar-wrapper">
+                        <img ng-if="userProfilePicId" class="user-avatar" src="{{profilePicUrl}}" alt="Profile Picture"/>
+                        <div ng-if="!userProfilePicId" class="user-avatar-placeholder">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="user-status-indicator"></div>
                     </div>
-                    <div class="user-status-indicator"></div>
                     <i class="fa-solid fa-chevron-up dropdown-arrow" ng-class="{'rotated': showUserDropdown}"></i>
                 </div>
                 <div class="user-dropdown-menu" ng-show="showUserDropdown">
                     <div class="dropdown-user-info">
-                        <img ng-if="userProfilePicId" class="dropdown-avatar" src="{{profilePicUrl}}" alt="Profile Picture"/>
-                        <div ng-if="!userProfilePicId" class="dropdown-avatar-placeholder">
-                            <i class="fa-solid fa-user"></i>
+                        <div class="dropdown-avatar-wrapper">
+                            <img ng-if="userProfilePicId" class="dropdown-avatar" src="{{profilePicUrl}}" alt="Profile Picture"/>
+                            <div ng-if="!userProfilePicId" class="dropdown-avatar-placeholder">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
                         </div>
                         <div class="dropdown-user-details">
                             <div class="dropdown-user-name">{{contactName || 'Loading...'}}</div>
@@ -942,6 +1108,9 @@
                         </div>
                     </div>
                     <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" ng-click="navigateToHome(); showUserDropdown = false;">
+                        <i class="fa-solid fa-house"></i> Home
+                    </a>
                     <a href="#" class="dropdown-item" ng-click="navigateToResetPassword(); showUserDropdown = false;">
                         <i class="fa-solid fa-key"></i> Reset Password
                     </a>
@@ -955,7 +1124,7 @@
     
         <div ng-else="isLoading" class="main-div" ng-if="!$root.isRoutedView">
         <div class="sidebar-appPortal">
-            <div class="igstc-logo">
+            <div class="igstc-logo" style="display: none;">
                 <img src="{!URLFOR($Resource.Logo)}" alt="IGSTC Logo"/>
             </div>
             <div class="nav-item" ng-class="{active: selectedMenu === 'Dashboard'}" ng-click="showSection('Dashboard')">
@@ -1008,10 +1177,12 @@
                         <div class="program-deadline">Application Deadline: {{p.deadline}}</div>  
                         <div class="program-proposal"><i class="fa fa-id-card" aria-hidden="true"></i><span class="program-proposal-text">Proposal No: </span>{{p.PropName}}</div>
                         <!--<div class="program-desc"><i class="fa fa-file-text" aria-hidden="true"></i><span class="program-desc-text"> Title: </span>{{p.desc}}</div>-->
-                        <div class="program-desc"
+                        <div class="program-proposal"
                                  ng-if="p.proposalStage !== 'Draft'"
-                                 >
-                            Status: Application Submitted
+                                 ><i class="fa fa-check-square" aria-hidden="true"></i>
+
+
+                           <span class="program-proposal-text">Status: </span> Application Submitted
                             </div>
                         <div class="program-desc"><i class="fa fa-file-text" aria-hidden="true"></i><span class="program-desc-text"> Title of Project: </span>{{p.titleOfProject}}</div>
                         <div class="btn-container">
@@ -1240,13 +1411,14 @@
             </div>
             <div ng-if="selectedMenu === 'Profile'">
                 <h2>Profile</h2>
+                
                 <div class="card-grid">
                 <!-- <apex:include pageName="contactprofile">
                     <apex:param name="id" value="{!contactId}"/>
                 </apex:include> -->
                 <iframe
                     src="/apex/contactprofile?id={!contactId}"
-                    width="1000px"
+                    width="1300px"
                     height="1000px"
                     frameborder="0">
                 </iframe>
@@ -1254,7 +1426,7 @@
             </div>
         </div>
     </div>
-    <div ng-else="isLoading" style="background-color: #fff; overflow: auto; scrollbar-width: none; width: 100%;" ng-if="$root.isRoutedView">  
+    <div ng-else="isLoading" style="background-color: #fff; overflow-y: auto; scrollbar-width: none; width: 100%; min-height: calc(100vh - 70px); padding-top: 70px;" ng-if="$root.isRoutedView">  
         <ng-view>
         </ng-view>
     </div>
