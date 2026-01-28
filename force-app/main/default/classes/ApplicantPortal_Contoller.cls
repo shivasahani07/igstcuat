@@ -555,6 +555,213 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
         return String.join(new List<String>(s.split('')), ' ');
     }
 
+
+        //**************************************Support Case ***********************************************
+        // @RemoteAction
+        // public static Map<String, Object> createSupportCase(String name,String email,String comment,String proposalId) {
+        //     Map<String, Object> res = new Map<String, Object>();
+        //     try {
+        //         if (String.isBlank(name) || String.isBlank(email) || String.isBlank(comment)) {
+        //             res.put('success', false);
+        //             res.put('message', 'Please fill all mandatory fields.');
+        //             return res;
+        //         }
+
+        //         Case c = new Case(
+        //             SuppliedName = name,
+        //             SuppliedEmail = email,
+        //             Subject = 'IGSTC Support Request',
+        //             Origin = 'Web',
+        //             Comments__c = comment
+        //         );
+        //         if (!String.isBlank(proposalId)) {
+        //             c.Application__c = proposalId;
+        //         }
+        //         insert c;
+
+        //         res.put('success', true);
+        //         res.put('message', 'SUCCESS');
+        //         return res;
+
+        //     } 
+        //     catch (Exception e) {
+        //         res.put('success', false);
+        //         res.put('message', e.getMessage());
+        //         return res;
+        //     }
+        // }
+
+
+        @RemoteAction
+        public static Map<String, Object> createSupportCase(String name,String email,String comment,String proposalNumber) {
+            Map<String, Object> res = new Map<String, Object>();
+            try {
+                if (String.isBlank(name) || String.isBlank(email) || String.isBlank(comment)) {
+                    res.put('success', false);
+                    res.put('message', 'Please fill all mandatory fields.');
+                    return res;
+                }
+                // Email format validation
+                String emailRegex = '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$';
+                if (!Pattern.matches(emailRegex, email)) {
+                    res.put('success', false);
+                    res.put('message', 'Invalid email format.');
+                    return res;
+                }
+                // Find Contact by Email
+                Contact matchedContact;
+                List<Contact> contacts = [SELECT Id FROM Contact WHERE Email = :email LIMIT 1];
+                if (!contacts.isEmpty()) {
+                    matchedContact = contacts[0];
+                }
+                 /* ======================
+                FIND PROPOSAL BY NAME
+                ====================== */
+                Id proposalId;
+                if (!String.isBlank(proposalNumber)) {
+                    List<Application_Proposal__c> proposals = [SELECT Id FROM Application_Proposal__c WHERE Name = :proposalNumber LIMIT 1];
+                    if (!proposals.isEmpty()) {
+                        proposalId = proposals[0].Id;
+                    } else {
+                        res.put('success', false);
+                        res.put('message', 'Invalid Proposal Number.');
+                        return res;
+                    }
+                }
+
+                // Create Case
+                Case c = new Case(
+                    SuppliedName  = name,
+                    SuppliedEmail = email,
+                    Application_Number__c=proposalNumber,
+                    Status = 'Pending',
+                    Subject       = 'Support Ticket from Applicant Portal',
+                    Origin        = 'Portal',
+                    Comments__c   = comment
+                );
+                //  Tag Contact if found
+                if (matchedContact != null) {
+                    c.ContactId = matchedContact.Id;
+                }
+                // Optional Proposal link
+                if (proposalId != null) {
+                    c.Application__c = proposalId;
+                }
+                insert c;
+
+                res.put('success', true);
+                res.put('message', 'SUCCESS');
+                return res;
+
+            } catch (Exception e) {
+                res.put('success', false);
+                res.put('message', e.getMessage());
+                return res;
+            }
+        }
+
+
+    //**************************************Fetch Tickets (Cases) for Logged-in Contact***********************************************
+
+        @RemoteAction
+        public static List<CaseWrapper> getMyTickets(Id contactId) {
+            List<CaseWrapper> result = new List<CaseWrapper>();
+
+            for (Case c : [SELECT Id,CaseNumber,Status,SuppliedEmail,SuppliedName,Application_Number__c,Comments__c FROM Case WHERE ContactId = :contactId ORDER BY CreatedDate DESC]) {
+                result.add(new CaseWrapper(c));
+            }
+            return result;
+        }
+
+        public class CaseWrapper {
+            public String caseNumber;
+            public String applicationNumber;
+            public String status;
+            public String email;
+            public String name;
+            public String comments;
+
+            public CaseWrapper(Case c) {
+                caseNumber = c.CaseNumber;
+                applicationNumber = String.isBlank(c.Application_Number__c) ? 'NA' : c.Application_Number__c;
+                status = c.Status;
+                email = c.SuppliedEmail;
+                name = c.SuppliedName;
+                comments = c.Comments__c; // rich text
+            }
+        }
+
+        //**************************************Fetch Tickets (Cases) for Logged-in Contact***********************************************
+
+        //**************************************Raise Tickets (Cases) for Logged-in Contact***********************************************
+
+
+        @RemoteAction
+        public static List<ProposalWrapper> getProposalsForContact(Id contactId) {
+            List<ProposalWrapper> result = new List<ProposalWrapper>();
+
+            for (Applicant_Proposal_Association__c apa : [SELECT Proposals__r.Id,Proposals__r.Name FROM Applicant_Proposal_Association__c WHERE Contact__c = :contactId]) {
+                result.add(new ProposalWrapper(apa.Proposals__r.Id,apa.Proposals__r.Name));
+            }
+            return result;
+        }
+
+        public class ProposalWrapper {
+            public Id proposalId;
+            public String proposalNumber;
+
+            public ProposalWrapper(Id id, String name) {
+                proposalId = id;
+                proposalNumber = name;
+            }
+        }
+
+
+        @RemoteAction
+        public static String createTicket(
+            Id contactId,
+            String proposalNumber,
+            String comments
+        ) {
+            try {
+                // Validate proposal number (if provided)
+                Id proposalId;
+                if (!String.isBlank(proposalNumber)) {
+                    List<Application_Proposal__c> proposals = [SELECT Id FROM Application_Proposal__c WHERE Name = :proposalNumber LIMIT 1];
+                    if (proposals.isEmpty()) {
+                        return 'INVALID_PROPOSAL';
+                    }
+                    proposalId = proposals[0].Id;
+                }
+
+                // Fetch contact once
+                Contact con = [SELECT Name, Email FROM Contact WHERE Id = :contactId LIMIT 1];
+
+                // Create Case
+                Case c = new Case();
+                c.ContactId = contactId;
+                c.Subject = 'Support Ticket from Applicant Portal';
+                c.Origin = 'Portal';
+                c.Status = 'Pending';
+                c.Comments__c = comments;
+                c.SuppliedName = con.Name;
+                c.SuppliedEmail = con.Email;
+                if (proposalId != null) {
+                    c.Application_Number__c = proposalNumber;
+                }
+                insert c;
+                return 'SUCCESS';
+
+            } catch (Exception e) {
+                System.debug('Ticket creation error: ' + e.getMessage());
+                return 'ERROR';
+            }
+        }
+
+        //**************************************Raise Tickets (Cases) for Logged-in Contact***********************************************
+
+
+
     //************************************** PROJECT DETAIL PAGE ***********************************************
     
     @RemoteAction

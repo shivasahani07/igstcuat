@@ -1335,43 +1335,7 @@
         
         
         
-        // function saveAchievementData() {
-        //     var contactId = '{!con.Id}';
-        
-        //     var achievement = {
-        //         Contact__c: contactId,
-        //         Awards_Honours__c: document.getElementById('achievementAwards').value,
-        //         List_of_Patents_filed__c: document.getElementById('achievementPatents').value,
-        //         Book_Chapters__c: document.getElementById('achievementBookChapters').value,
-        //         Any_other_achievements__c: document.getElementById('achievementOther').value
-        //     };
-        
-        //     // Attach existing Id if present
-        //     try {
-        //         var list = JSON.parse('{!JSENCODE(achievementListJSON)}');
-        //         if (list && list.length > 0) {
-        //             achievement.Id = list[0].Id;
-        //         }
-        //     } catch (e) {}
-        
-        //     debugger
-        //         ContactProfileController.saveAchievementDetails(contactId,JSON.stringify([achievement]),function (result, event) {
-        //             debugger
-        //             if (event.status) {
-        //                 showMessage(
-        //                     'achievementMessages',
-        //                     result === 'SUCCESS'
-        //                         ? 'Achievements saved successfully!'
-        //                         : result,
-        //                     result === 'SUCCESS' ? 'success' : 'error'
-        //                 );
-        //             } else {
-        //                 showMessage('achievementMessages', event.message, 'error');
-        //             }
-        //         }
-        //     );
-        
-        // }
+    
         function saveAchievementData() {
             var contactId = '{!con.Id}';
             

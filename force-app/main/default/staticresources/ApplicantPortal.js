@@ -46,7 +46,7 @@ function wysiwygeditor($scope) {
     $scope.disabled = false;
 };
 
-app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $window, $location, $element) {
+app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $window, $location, $element,$sce) {
     $scope.config = {};
     debugger;
     $scope.isLoading = false;
@@ -817,6 +817,11 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
     $scope.showSection = function (menu) {
         $scope.selectedMenu = menu;
         $scope.selectedFAQ = null; // Reset FAQ detail view when switching sections
+
+        if (menu === 'Help') {
+            $scope.loadMyTickets();
+            $scope.loadProposalsForContact();
+        }
     };
 
     // FAQ data
@@ -947,6 +952,174 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
     $scope.backToFAQ = function() {
         $scope.selectedFAQ = null;
     };
+
+
+    //**************************************Fetch Tickets (Cases) for Logged-in Contact***********************************************
+
+    $scope.tickets = [];
+    $scope.isTicketsLoading = false;
+
+    $scope.loadMyTickets = function () {
+        $scope.isTicketsLoading = true;
+
+        ApplicantPortal_Contoller.getMyTickets(
+            $rootScope.contactId,
+            function (result, event) {
+                if (event.status && result) {
+                    $scope.tickets = result;
+                } else {
+                    $scope.tickets = [];
+                }
+                $scope.isTicketsLoading = false;
+                $scope.$apply();
+            }
+        );
+    };
+
+    // ---------------- View Comments ----------------
+       $scope.showViewCommentsModal = false;
+        $scope.selectedTicketComments = '';
+
+        $scope.openViewCommentsModal = function (ticket) {
+            if (ticket && ticket.comments) {
+                // TRUST HTML so Angular renders it
+                $scope.selectedTicketComments = $sce.trustAsHtml(ticket.comments);
+            } else {
+                $scope.selectedTicketComments = $sce.trustAsHtml('<i>No comments available</i>');
+            }
+            $scope.showViewCommentsModal = true;
+        };
+
+        $scope.closeViewCommentsModal = function () {
+            $scope.showViewCommentsModal = false;
+        };
+
+
+    //**************************************Fetch Tickets (Cases) for Logged-in Contact***********************************************
+
+
+
+    // ************************************** Raise Ticket **************************************
+
+        // ---------------- Proposals Autocomplete ----------------
+            $scope.proposals = [];
+            $scope.filteredProposals = [];
+            $scope.showProposalDropdown = false;
+
+            $scope.loadProposalsForContact = function () {
+                ApplicantPortal_Contoller.getProposalsForContact(
+                    $rootScope.contactId,
+                    function (result, event) {
+                        if (event.status && result) {
+                            $scope.proposals = result;
+                        }
+                        $scope.$apply();
+                    }
+                );
+            };
+
+
+            $scope.filterProposals = function () {
+                if (!$scope.ticket.proposalNumber) {
+                    $scope.filteredProposals = [];
+                    $scope.showProposalDropdown = false;
+                    return;
+                }
+
+                var search = $scope.ticket.proposalNumber.toLowerCase();
+
+                $scope.filteredProposals = $scope.proposals.filter(function (p) {
+                    return p.proposalNumber.toLowerCase().includes(search);
+                });
+
+                $scope.showProposalDropdown = true;
+            };
+
+            $scope.selectProposal = function (proposal) {
+                $scope.ticket.proposalNumber = proposal.proposalNumber;
+                $scope.showProposalDropdown = false;
+            };
+
+ // ---------------- Proposals Autocomplete ----------------
+
+
+        $scope.showRaiseTicketModal = false;
+        $scope.isTicketSaving = false;
+
+        $scope.ticket = {
+            proposalNumber: '',
+            comments: ''
+        };
+
+        $scope.openRaiseTicketModal = function () {
+            $scope.ticket = {
+                proposalNumber: '',
+                comments: ''
+            };
+            $scope.showRaiseTicketModal = true;
+        };
+
+        $scope.closeRaiseTicketModal = function () {
+            $scope.showRaiseTicketModal = false;
+        };
+
+        // Submit ticket
+        $scope.submitTicket = function () {
+            if (!$scope.ticket.comments) {
+                alert('Please enter comments');
+                return;
+            }
+            $scope.isTicketSaving = true;          
+            ApplicantPortal_Contoller.createTicket(
+                $rootScope.contactId,
+                $scope.ticket.proposalNumber,
+                $scope.ticket.comments,
+                function (result, event) {
+                    if (event.status) {
+                        if (result === 'SUCCESS') {
+                            //alert('Ticket raised successfully');
+                             $scope.showToast('Ticket raised successfully', 'success');
+                            $scope.closeRaiseTicketModal();
+                            $scope.loadMyTickets();
+                        } else if (result === 'INVALID_PROPOSAL') {
+                           // alert('Invalid Application / Proposal Number');
+                             $scope.showToast('Invalid Application / Proposal Number', 'error');
+                        } else {
+                           // alert('Error while creating ticket');
+                            $scope.showToast('Error while creating ticket', 'error');
+                        }
+                    }
+                    $scope.$apply();
+                }
+            );
+
+        };
+
+
+
+
+        // ---------------- Toast Popup ----------------
+        $scope.toast = {
+            show: false,
+            message: '',
+            type: 'success'
+        };
+
+        $scope.showToast = function (message, type) {
+            $scope.toast.message = message;
+            $scope.toast.type = type || 'success';
+            $scope.toast.show = true;
+
+            // Auto hide after 3 seconds
+            setTimeout(function () {
+                $scope.$apply(function () {
+                    $scope.toast.show = false;
+                });
+            }, 3000);
+        };
+
+    // ************************************** Raise Ticket **************************************
+
 
     // Navigate to home/dashboard - removes hash but keeps query params
     $scope.navigateToHome = function () {

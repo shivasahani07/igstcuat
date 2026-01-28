@@ -55,10 +55,10 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                       Campaign__c: $scope.campaigntype,
                       Account:result[0].Account || ''
                   };
-                  //$scope.emailCheck = true;
+                  $scope.emailCheck = false;
               }       
               else{
-                  $scope.emailCheck = false;
+                  $scope.emailCheck = true;
             }
             $scope.$apply();
           }
@@ -320,7 +320,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                            
  
                         if($scope.emailCheck == true){
-                            swal('Info','Email already exists.','Info');
+                            swal('Info','Email does not exists.','Info');
                             $("#txtIndEmail").addClass('border-theme');
                                 return;
                         }
@@ -382,7 +382,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                             }
    
                             if($scope.emailCheck == true){
-                                swal('Info','Email already exists.','Info');
+                                swal('Info','Email does not exists.','Info');
                                 $("#txtGerEmail").addClass('border-theme');
                                     return;
                             }

@@ -16,7 +16,7 @@ public without sharing class ContactProfileController {
             String attId = String.valueOf(profileImageId);
             // Ensure it's 18 characters for the URL
             // if (attId.length() == 15) {
-            //     attId = attId + 'AAA';
+                //     attId = attId + 'AAA';
             // }
             return '/servlet/servlet.FileDownload?file=' + attId;
         }
@@ -52,22 +52,22 @@ public without sharing class ContactProfileController {
                 // Fetch Contact with related Education and Employment details
                 con = [
                     SELECT Id, Salutation, FirstName, LastName, Email, Phone,MobilePhone,
-                    MailingCountry, MailingCity, MailingPostalCode,MailingState,
-                    MailingStreet, Title,Designation__c,Department,AccountId,Account.Id,Account.Name,
-                    Profile_Pic_Attachment_Id__c, Uploaded__c,
-                    (SELECT Id, Name, Degree__c, Institution_Name__c, Area_of_specialization__c, 
-                     Start_Year__c, End_Year__c, CGPA__c, Percentage__c, Percentage_cgpa__c,
-                     Start_Date__c, End_Date__c, Nature_of_PhD_Work__c, Nature_of_Thesis_Work__c,
-                     Thesis_Supervisor__c, Thesis_Type__c, Title_Thesis__c
-                     FROM Education_Details__r
-                     ORDER BY End_Year__c DESC NULLS LAST, Start_Year__c DESC NULLS LAST),
-                    (SELECT Id, Name, Organization_Name__c, Position__c, Start_Date__c, End_Date__c,
-                     Start_Year__c, End_Year__c, Nature_of_Job__c, current_employement__c
-                     FROM Employment_Details__r
-                     ORDER BY End_Date__c DESC NULLS LAST, Start_Date__c DESC NULLS LAST),
-                    (SELECT Id, Name, Awards_Honours__c, List_of_Publications__c, Book_Chapters__c, List_of_Patents_filed__c, Any_other_achievements__c                                   
-                     FROM Achievements__r
-                     ORDER BY CreatedDate DESC)
+                           MailingCountry, MailingCity, MailingPostalCode,MailingState,
+                           MailingStreet, Title,Designation__c,Department,AccountId,Account.Id,Account.Name,
+                           Profile_Pic_Attachment_Id__c, Uploaded__c,
+                           (SELECT Id, Name, Degree__c, Institution_Name__c, Area_of_specialization__c, 
+                                   Start_Year__c, End_Year__c, CGPA__c, Percentage__c, Percentage_cgpa__c,
+                                   Start_Date__c, End_Date__c, Nature_of_PhD_Work__c, Nature_of_Thesis_Work__c,
+                                   Thesis_Supervisor__c, Thesis_Type__c, Title_Thesis__c
+                            FROM Education_Details__r
+                            ORDER BY End_Year__c DESC NULLS LAST, Start_Year__c DESC NULLS LAST),
+                           (SELECT Id, Name, Organization_Name__c, Position__c, Start_Date__c, End_Date__c,
+                                   Start_Year__c, End_Year__c, Nature_of_Job__c, current_employement__c
+                            FROM Employment_Details__r
+                            ORDER BY End_Date__c DESC NULLS LAST, Start_Date__c DESC NULLS LAST),
+                            (SELECT Id, Name, Awards_Honours__c, List_of_Publications__c, Book_Chapters__c, List_of_Patents_filed__c, Any_other_achievements__c                                   
+                            FROM Achievements__r
+                            ORDER BY CreatedDate DESC)
                     FROM Contact
                     WHERE Id = :recordId
                     LIMIT 1
@@ -88,7 +88,7 @@ public without sharing class ContactProfileController {
                     try {
                         List<Achievement__c> achList = [
                             SELECT Id, Name, Awards_Honours__c, List_of_Publications__c, 
-                            Book_Chapters__c, List_of_Patents_filed__c, Any_other_achievements__c
+                                   Book_Chapters__c, List_of_Patents_filed__c, Any_other_achievements__c
                             FROM Achievement__c
                             WHERE Contact__c = :con.Id
                             ORDER BY CreatedDate DESC
@@ -104,7 +104,7 @@ public without sharing class ContactProfileController {
             } catch (Exception e) {
                 ApexPages.addMessage(
                     new ApexPages.Message(ApexPages.Severity.ERROR, 'Error loading contact: ' + e.getMessage())
-                );
+                    );
                 con = new Contact();
                 educationList = new List<Education_Details__c>();
                 employmentList = new List<Employment_Details__c>();
@@ -126,7 +126,7 @@ public without sharing class ContactProfileController {
                     String attIdStr = String.valueOf(con.Profile_Pic_Attachment_Id__c);
                     // If it's 15 chars, convert to 18 chars for full ID
                     // if (attIdStr.length() == 15) {
-                    //     attIdStr = attIdStr + 'AAA';
+                        //     attIdStr = attIdStr + 'AAA';
                     // }
                     profileImageId = Id.valueOf(attIdStr);
                 } else {
@@ -206,20 +206,21 @@ public without sharing class ContactProfileController {
     
     // @RemoteAction
     // public static String saveContactProfile(Contact contactData) {
-    //     try {
-    //         if (contactData != null) {
-    //             upsert contactData;
-    //             return 'SUCCESS';
-    //         }
-    //         return 'ERROR: No contact data provided';
-    //     } catch (Exception e) {
-    //         System.debug('Error saving contact: ' + e.getMessage());
-    //         return 'ERROR: ' + e.getMessage();
-    //     }
+        //     try {
+            //         if (contactData != null) {
+                //             upsert contactData;
+                //             return 'SUCCESS';
+            //         }
+            //         return 'ERROR: No contact data provided';
+        //     } catch (Exception e) {
+            //         System.debug('Error saving contact: ' + e.getMessage());
+            //         return 'ERROR: ' + e.getMessage();
+        //     }
     // }
     @RemoteAction
     public static String saveContactProfile(Map<String, Object> contactData) {
         try {
+            
             Contact c = new Contact();
             c.Id = (String) contactData.get('Id');
             c.Salutation = (String) contactData.get('Salutation');
@@ -241,11 +242,11 @@ public without sharing class ContactProfileController {
                 Account acc;
                 
                 List<Account> accList = [
-                    SELECT Id
-                    FROM Account
-                    WHERE Name = :accountName
-                    LIMIT 1
-                ];
+                SELECT Id
+                FROM Account
+                WHERE Name = :accountName
+                LIMIT 1
+            ];
                 
                 if (!accList.isEmpty()) {
                     acc = accList[0];
@@ -269,7 +270,7 @@ public without sharing class ContactProfileController {
     @RemoteAction
     public static String saveEducationDetails(
         String contactId,
-        String educationJson
+    String educationJson
     ) {
         try {
             List<Object> rawList =
@@ -322,13 +323,13 @@ public without sharing class ContactProfileController {
     @RemoteAction
     public static String saveEmploymentDetails(
         String contactId,
-        String employmentJson
+    String employmentJson
     ) {
         try {
             List<Employment_Details__c> employmentList =
                 (List<Employment_Details__c>) JSON.deserialize(
-                    employmentJson,
-                    List<Employment_Details__c>.class
+                employmentJson,
+            List<Employment_Details__c>.class
                 );
             
             if (employmentList == null || employmentList.isEmpty()) {
@@ -348,27 +349,27 @@ public without sharing class ContactProfileController {
             return 'ERROR: ' + e.getMessage();
         }
     }
-    
+
     @RemoteAction
-    public static String deleteEducationRecord(String recordId) {
-        try {
-            delete new Education_Details__c(Id = recordId);
-            return 'SUCCESS';
-        } catch (Exception e) {
-            return 'ERROR: ' + e.getMessage();
-        }
+public static String deleteEducationRecord(String recordId) {
+    try {
+        delete new Education_Details__c(Id = recordId);
+        return 'SUCCESS';
+    } catch (Exception e) {
+        return 'ERROR: ' + e.getMessage();
     }
-    
-    @RemoteAction
-    public static String deleteEmploymentRecord(String recordId) {
-        try {
-            delete new Employment_Details__c(Id = recordId);
-            return 'SUCCESS';
-        } catch (Exception e) {
-            return 'ERROR: ' + e.getMessage();
-        }
+}
+
+@RemoteAction
+public static String deleteEmploymentRecord(String recordId) {
+    try {
+        delete new Employment_Details__c(Id = recordId);
+        return 'SUCCESS';
+    } catch (Exception e) {
+        return 'ERROR: ' + e.getMessage();
     }
-    
+}
+
     
     
     
@@ -377,13 +378,13 @@ public without sharing class ContactProfileController {
     @RemoteAction
     public static String saveAchievementDetails(
         String contactId,
-        String achievementJson
+    String achievementJson
     ) {
         try {
             List<Achievement__c> achievements =
                 (List<Achievement__c>) JSON.deserialize(
-                    achievementJson,
-                    List<Achievement__c>.class
+                achievementJson,
+            List<Achievement__c>.class
                 );
             
             if (achievements == null || achievements.isEmpty()) {
@@ -427,7 +428,7 @@ public without sharing class ContactProfileController {
     public void addEducationRow() {
         educationList.add(new Education_Details__c(Contact__c = con.Id));
     }   
-    
+           
     public void addEmploymentRow() {
         employmentList.add(new Employment_Details__c(Contact__c = con.Id));
     }
