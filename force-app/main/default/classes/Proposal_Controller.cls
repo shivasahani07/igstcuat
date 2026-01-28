@@ -1817,14 +1817,14 @@ return appProposal;
                     LIMIT 1
                 ];
  
-                // Find Primary APA
+                // Find Primary APA (using APA.Is_Coordinator__c)
                 for(Applicant_Proposal_Association__c apa : [
-                    SELECT Id, Contact__c, Contact__r.Is_Primary__c
+                    SELECT Id, Contact__c, Is_Coordinator__c
                     FROM Applicant_Proposal_Association__c
                     WHERE Proposals__c = :proposalId
                     AND Contact__c IN :conIds
                 ]){
-                    if(apa.Contact__r.Is_Primary__c == true){
+                    if(apa.Is_Coordinator__c == true){
                         primaryAPA = apa;
                         break;
                     }
@@ -1856,25 +1856,18 @@ return appProposal;
                 insert proposalRec;
  
                 List<Applicant_Proposal_Association__c> apaList = new List<Applicant_Proposal_Association__c>();
+                Integer idx = 0;
                 for(Contact c : conList){
-                    apaList.add(new Applicant_Proposal_Association__c(
+                    Applicant_Proposal_Association__c apa = new Applicant_Proposal_Association__c(
                         Contact__c = c.Id,
                         Proposals__c = proposalRec.Id
-                    ));
+                    );
+                    apa.Is_Coordinator__c = (idx == 0);
+                    apaList.add(apa);
+                    if (idx == 0) primaryAPA = apa;
+                    idx++;
                 }
                 insert apaList;
- 
-                // Find Primary APA
-                for(Applicant_Proposal_Association__c apa : [
-                    SELECT Id, Contact__r.Is_Primary__c
-                    FROM Applicant_Proposal_Association__c
-                    WHERE Proposals__c = :proposalRec.Id
-                ]){
-                    if(apa.Contact__r.Is_Primary__c == true){
-                        primaryAPA = apa;
-                        break;
-                    }
-                }
             }
  
             // ---------------- WRAPPER RESPONSE ----------------
@@ -4544,52 +4537,93 @@ return null;
         }
     }
     
-    public static List<Contact> getPairingDetails(String hashcode, String campaignId){
-        // Get the contact by hashcode
-        Contact conRec = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name,MailingCountry, Is_Primary__c, Birthdate FROM Contact WHERE Login_Hash_Code__c = :hashcode  LIMIT 1];
+    public static List<PairingContactWrapper> getPairingDetails(String hashcode, String campaignId){
+        Contact conRec = [SELECT Id FROM Contact WHERE Login_Hash_Code__c = :hashcode LIMIT 1];
         
-        // Query if contact has any junction records
-        List<Applicant_Proposal_Association__c> associations = [SELECT Id,Proposals__c FROM Applicant_Proposal_Association__c WHERE Contact__c = :conRec.Id And Proposals__r.RecordType_Name__c='PECFAR' LIMIT 1];
+        List<Applicant_Proposal_Association__c> associations = [
+            SELECT Id, Proposals__c 
+            FROM Applicant_Proposal_Association__c 
+            WHERE Contact__c = :conRec.Id 
+            AND Proposals__r.RecordType_Name__c = 'PECFAR' 
+            LIMIT 1
+        ];
         
-        List<Contact> conList;
+        List<PairingContactWrapper> wrapperList = new List<PairingContactWrapper>();
+        
         if (!associations.isEmpty()) {
-            // Existing proposal from junction
             Id proposalId = associations[0].Proposals__c;
             
-            // Query contacts linked via junction for that proposal
-            conList = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Is_Primary__c, Birthdate 
-                       FROM Contact WHERE Id IN (SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :proposalId)];
-        } else {       
-            // Return only the single contact just linked newly
-            conList = new List<Contact>{conRec};
-                }
+            List<Applicant_Proposal_Association__c> apaList = [
+                SELECT Id, Is_Coordinator__c, Contact__c, 
+                       Contact__r.Id, Contact__r.FirstName, Contact__r.LastName, 
+                       Contact__r.Email, Contact__r.AccountId, Contact__r.Account.Name, 
+                       Contact__r.MailingCountry, Contact__r.Birthdate
+                FROM Applicant_Proposal_Association__c 
+                WHERE Proposals__c = :proposalId
+            ];
+            
+            for (Applicant_Proposal_Association__c apa : apaList) {
+                PairingContactWrapper wrapper = new PairingContactWrapper();
+                wrapper.contact = apa.Contact__r;
+                wrapper.Is_Coordinator__c = apa.Is_Coordinator__c == true;
+                wrapper.apaId = apa.Id;
+                wrapperList.add(wrapper);
+            }
+        } else {
+            PairingContactWrapper wrapper = new PairingContactWrapper();
+            wrapper.contact = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Birthdate 
+                              FROM Contact WHERE Id = :conRec.Id];
+            wrapper.Is_Coordinator__c = true;
+            wrapper.apaId = null;
+            wrapperList.add(wrapper);
+        }
         
-        return conList;
+        return wrapperList;
     }
 
 
     //***********************************NEW METHOD ADDED BY KARTHIK for pairing page
-     public static List<Contact> getPairingDetailsinWiser(String hashcode, String proposalId){
-        // Get the contact by hashcode
-        Contact conRec = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name,MailingCountry, Is_Primary__c, Birthdate FROM Contact WHERE Login_Hash_Code__c = :hashcode  LIMIT 1];
+     public static List<PairingContactWrapper> getPairingDetailsinWiser(String hashcode, String proposalId){
+        Contact conRec = [SELECT Id FROM Contact WHERE Login_Hash_Code__c = :hashcode LIMIT 1];
         
-        // Query if contact has any junction records
-        List<Applicant_Proposal_Association__c> associations = [SELECT Id,Proposals__c FROM Applicant_Proposal_Association__c WHERE Contact__c = :conRec.Id And Proposals__c=:proposalId LIMIT 1];
+        List<Applicant_Proposal_Association__c> associations = [
+            SELECT Id, Proposals__c 
+            FROM Applicant_Proposal_Association__c 
+            WHERE Contact__c = :conRec.Id 
+            AND Proposals__c = :proposalId 
+            LIMIT 1
+        ];
         
-        List<Contact> conList;
+        List<PairingContactWrapper> wrapperList = new List<PairingContactWrapper>();
+        
         if (!associations.isEmpty()) {
-            // Existing proposal from junction
-            //Id proposalId = associations[0].Proposals__c;
+            Id propId = proposalId;
+            List<Applicant_Proposal_Association__c> apaList = [
+                SELECT Id, Is_Coordinator__c, Contact__c, 
+                       Contact__r.Id, Contact__r.FirstName, Contact__r.LastName, 
+                       Contact__r.Email, Contact__r.AccountId, Contact__r.Account.Name, 
+                       Contact__r.MailingCountry, Contact__r.Birthdate
+                FROM Applicant_Proposal_Association__c 
+                WHERE Proposals__c = :propId
+            ];
             
-            // Query contacts linked via junction for that proposal
-            conList = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Is_Primary__c, Birthdate 
-                       FROM Contact WHERE Id IN (SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :proposalId)];
-        } else {       
-            // Return only the single contact just linked newly
-            conList = new List<Contact>{conRec};
-                }
+            for (Applicant_Proposal_Association__c apa : apaList) {
+                PairingContactWrapper wrapper = new PairingContactWrapper();
+                wrapper.contact = apa.Contact__r;
+                wrapper.Is_Coordinator__c = apa.Is_Coordinator__c == true;
+                wrapper.apaId = apa.Id;
+                wrapperList.add(wrapper);
+            }
+        } else {
+            PairingContactWrapper wrapper = new PairingContactWrapper();
+            wrapper.contact = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Birthdate 
+                              FROM Contact WHERE Id = :conRec.Id];
+            wrapper.Is_Coordinator__c = true;
+            wrapper.apaId = null;
+            wrapperList.add(wrapper);
+        }
         
-        return conList;
+        return wrapperList;
     }
     ////********************************************************** */
     
@@ -4877,14 +4911,20 @@ public static insertPairingWrapper insertPairingDetails(List<wrapperPairing> con
                 existingAssocMap.put(apa.Contact__c, apa);
             }
 
-            // Create associations for all contacts that don't have one yet
-            for (Id conId : contactIds) {
+            // Create associations for all contacts that don't have one yet.
+            // contactList/contList order: [0] = coordinator, [1] = partner. Set Is_Coordinator__c accordingly.
+            Integer contactIndex = 0;
+            for (Contact c : contList) {
+                Id conId = c.Id;
                 if (!existingAssocMap.containsKey(conId)) {
-                    assocToInsert.add(new Applicant_Proposal_Association__c(
+                    Applicant_Proposal_Association__c apa = new Applicant_Proposal_Association__c(
                         Contact__c = conId,
                         Proposals__c = singleProposal.Id
-                    ));
+                    );
+                    apa.Is_Coordinator__c = (contactIndex == 0);
+                    assocToInsert.add(apa);
                 }
+                contactIndex++;
             }
 
             // Insert missing associations
@@ -4947,6 +4987,11 @@ public class insertPairingWrapper {
     public Applicant_Proposal_Association__c apa { get; set; }
 }
 
+public class PairingContactWrapper {
+    public Contact contact { get; set; }
+    public Boolean Is_Coordinator__c { get; set; }
+    public Id apaId { get; set; }
+}
 
 
 

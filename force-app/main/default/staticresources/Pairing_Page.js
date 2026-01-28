@@ -69,12 +69,12 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
     $scope.getcampaigntype = function(){
         debugger;
         $scope.primary = false;
-        ApplicantPortal_Contoller.getcampaigntype($rootScope.candidateId, function(result,event){//changed userId to candidateId
+        ApplicantPortal_Contoller.getcampaigntype($rootScope.candidateId, $rootScope.proposalId, function(result,event){//changed userId to candidateId
             debugger;
             if(event.status && result != null){
                 debugger;
               // $scope.campaigntype = result.Campaign__c;
-                if(result.Is_Primary__c == true){
+                if(result.Is_Coordinator__c == true){
                     $scope.primary = false;
                 }else{
                     $scope.primary = true;
@@ -156,36 +156,40 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
         }
         ApplicantPortal_Contoller.getPairingDetails($rootScope.candidateId,$rootScope.campaignId,function (result, event) {
             if (event.status) {
-                if(result != null){
-                    for(var i=0;i<result.length;i++){
-                        if(result[i].Birthdate!=null || result[i].Birthdate != undefined){
+                var listToUse = result;
+                if (result != null && result.length > 0 && result[0].contact != null) {
+                    listToUse = [];
+                    for (var k = 0; k < result.length; k++) {
+                        var flat = angular.copy(result[k].contact);
+                        flat.Is_Coordinator__c = result[k].Is_Coordinator__c;
+                        listToUse.push(flat);
+                    }
+                }
+                if(listToUse != null){
+                    for(var i=0;i<listToUse.length;i++){
+                        if(listToUse[i].Birthdate!=null || listToUse[i].Birthdate != undefined){
                             $scope.birthDatepresent[i] = true;
-                            result[i].Birthdate = new Date(result[i].Birthdate);
+                            listToUse[i].Birthdate = new Date(listToUse[i].Birthdate);
                         }else{
                             $scope.birthDatepresent[i] = false;
                         }
  
-                        if(result[i].Account != undefined){
-                            if(result[i].FirstName != undefined || result[i].FirstName != ''){
-                                result[i].FirstName = result[i].FirstName ? result[i].FirstName.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&') : result[i].FirstName;  
+                        if(listToUse[i].Account != undefined){
+                            if(listToUse[i].FirstName != undefined || listToUse[i].FirstName != ''){
+                                listToUse[i].FirstName = listToUse[i].FirstName ? listToUse[i].FirstName.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&') : listToUse[i].FirstName;  
                             }
-                            if(result[i].LastName != undefined || result[i].LastName != ''){
-                                result[i].LastName = result[i].LastName ? result[i].LastName.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&') : result[i].LastName;  
+                            if(listToUse[i].LastName != undefined || listToUse[i].LastName != ''){
+                                listToUse[i].LastName = listToUse[i].LastName ? listToUse[i].LastName.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&') : listToUse[i].LastName;  
                             }
-                            if(result[i].Account.Name != undefined || result[i].Account.Name != ''){
-                                result[i].Account.Name = result[i].Account.Name ? result[i].Account.Name.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&') : result[i].Account.Name;  
+                            if(listToUse[i].Account.Name != undefined || listToUse[i].Account.Name != ''){
+                                listToUse[i].Account.Name = listToUse[i].Account.Name ? listToUse[i].Account.Name.replace(/&amp;/g,'&').replaceAll('&amp;amp;','&').replaceAll('&amp;gt;','>').replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&') : listToUse[i].Account.Name;  
                             }
                         }
                     }
-                   /* if(result[0].Proposals__r.Campaign__r.EndDate != undefined){
-                        $scope.endDate = new Date(result[0].Proposals__r.Campaign__r.EndDate);
-                    }*/
-                   
                 }
                 debugger;
-               // $rootScope.projectId = result[0].Proposals__c;
  
-                if (result == null || result.length == 0) {
+                if (listToUse == null || listToUse.length == 0) {
                     $scope.pairingDetails.push({
                         "FirstName": "",
                         "LastName": "",
@@ -195,9 +199,9 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                         "Campaign__c":$scope.campaigntype
                     });
                 }else{
-                    for(var i=0;i<result.length;i++){
-                        if(result[i].Is_Primary__c == true){
-                            $scope.pairingDetails = result[i];
+                    for(var i=0;i<listToUse.length;i++){
+                        if(listToUse[i].Is_Coordinator__c == true){
+                            $scope.pairingDetails = listToUse[i];
                             if($scope.pairingDetails.MailingCountry == "India"){
                                 $scope.pairList.MailingCountry = "Germany";
                                 $scope.country2 = "German";
@@ -207,8 +211,8 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                                 $scope.country2 = "Indian";
                                 $scope.country1 = "German";
                             }
-                        }else if(result[i].Is_Primary__c == false){
-                            $scope.pairList = result[i];
+                        }else if(listToUse[i].Is_Coordinator__c == false){
+                            $scope.pairList = listToUse[i];
                             if($scope.pairList.MailingCountry == "Germany"){
                                 $scope.pairingDetails.MailingCountry = "India";
                                 $scope.country1 = "Indian";
@@ -428,7 +432,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                         let date1 = new Date($scope.detailedList[i].Birthdate).getTime();
                         let date2 = new Date($scope.Pecfar_DOB).getTime();
                        
-                        if($scope.detailedList[i].Is_Primary__c == true){
+                        if($scope.detailedList[i].Is_Coordinator__c == true){
                            
                             //if(years >  ($scope.Pecfar_age_limit * 365)){
                             if(date1 < date2 ){

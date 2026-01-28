@@ -991,14 +991,14 @@ proposalRec.Broad_area_of_research__c = hostDetails.Broad_area_of_research__c;
 
 upsert proposalRec;
 
-// Find Primary APA
+// Find Primary APA (using APA.Is_Coordinator__c)
 for(Applicant_Proposal_Association__c apa : [
-SELECT Id, Contact__c, Contact__r.Is_Primary__c
+SELECT Id, Contact__c, Is_Coordinator__c
 FROM Applicant_Proposal_Association__c
 WHERE Proposals__c = :proposalId
 AND Contact__c IN :conIds
 ]){
-if(apa.Contact__r.Is_Primary__c == true){
+if(apa.Is_Coordinator__c == true){
 primaryAPA = apa;
 break;
 }
@@ -1053,13 +1053,13 @@ Proposals__c = proposalRec.Id
 }
 insert apaList;
 
-// Find Primary APA
+// Find Primary APA (using APA.Is_Coordinator__c)
 for(Applicant_Proposal_Association__c apa : [
-SELECT Id, Contact__r.Is_Primary__c
+SELECT Id, Is_Coordinator__c
 FROM Applicant_Proposal_Association__c
 WHERE Proposals__c = :proposalRec.Id
 ]){
-if(apa.Contact__r.Is_Primary__c == true){
+if(apa.Is_Coordinator__c == true){
 primaryAPA = apa;
 break;
 }
@@ -1393,7 +1393,7 @@ amr.add(amsingle);   */
     public String submitSingApp(String projectId, Integer year, Integer month, Integer day){
         try{
             
-            Applicant_Proposal_Association__c apaRec = [Select Id,Name, Contact__r.Declaration_Sign_Date__c, Proposals__c FROM Applicant_Proposal_Association__c Where Proposals__c =:projectId AND Contact__r.Is_Primary__c = true];
+            Applicant_Proposal_Association__c apaRec = [Select Id,Name, Contact__r.Declaration_Sign_Date__c, Proposals__c FROM Applicant_Proposal_Association__c Where Proposals__c =:projectId AND Is_Coordinator__c = true];
             
             if(year!=0){
                 Date newDate=Date.newInstance(year,month,day);

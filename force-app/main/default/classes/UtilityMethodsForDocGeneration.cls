@@ -469,7 +469,7 @@ public class UtilityMethodsForDocGeneration {
             List<String> contactEmailList = new List<String>();
             String contactEmail;
             if(conList[0].Proposals__r.RecordType.DeveloperName == 'Industrial_Fellowships'){
-                contactEmail = [Select Email From Contact where Proposals__c =: propId and Is_Primary__c = true].Email;
+                contactEmail = [SELECT Contact__r.Email FROM Applicant_Proposal_Association__c WHERE Proposals__c = :propId AND Is_Coordinator__c = true LIMIT 1].Contact__r.Email;
                 contactEmailList.add(contactEmail);
             }
             else if(conList[0].Proposals__r.RecordType.DeveloperName == 'PECFAR'){
@@ -591,7 +591,8 @@ public class UtilityMethodsForDocGeneration {
         try{
             List<Messaging.SingleEmailMessage> emailList = new List<Messaging.SingleEmailMessage>();
             List<Contact> contactList = [Select Email,Name,Login_Hash_Code__c,Proposals__c,proposals__r.Acronym__c From Contact where Proposals__c =: propId ]; 
-            Contact primaryContact = [Select Email,Name,Login_Hash_Code__c,Proposals__c,proposals__r.Acronym__c,proposals__r.Title_Of__c From Contact where Proposals__c =: propId and Is_Primary__c = true limit 1]; 
+            Applicant_Proposal_Association__c primaryAPA = [SELECT Id, Contact__c, Contact__r.Email, Contact__r.Name, Contact__r.Login_Hash_Code__c, Contact__r.Proposals__c, Proposals__r.Acronym__c, Proposals__r.Title_Of__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :propId AND Is_Coordinator__c = true LIMIT 1];
+            Contact primaryContact = [Select Email,Name,Login_Hash_Code__c,Proposals__c,proposals__r.Acronym__c,proposals__r.Title_Of__c From Contact where Id = :primaryAPA.Contact__c]; 
             List<Attachment> attList = [Select Id,name,Body,ContentType from attachment where Id = :attId]; 
             List<Application_Proposal__c> appList = New List<Application_Proposal__c>();  
             List<EmailMessage> listOfEmailMesToInsert = New List<EmailMessage>();        
@@ -986,9 +987,9 @@ public class UtilityMethodsForDocGeneration {
 
                 List<Application_Proposal__c> appList = New List<Application_Proposal__c>();
                 List<Contact> conList = [SELECT Id,Name,Salutation,Email,FirstName,LastName,Campaign__c,ApplicationId__c,Proposals__r.Tentative_Start_Date__c,Proposals__r.Duration_In_Months_Max_36__c,Login_Hash_Code__c FROM Contact WHERE Proposals__c =: propId AND MailingCountry = 'India'];
-                String HostInstitute = [Select Email,account.name From Contact where Proposals__c =: propId and Is_Primary__c = false].account.name; 
+                String HostInstitute = [SELECT Contact__r.Account.Name FROM Applicant_Proposal_Association__c WHERE Proposals__c = :propId AND Is_Coordinator__c = false LIMIT 1].Contact__r.Account.Name;
             Application_Proposal__c ap = [select id,Title_Of__c from Application_Proposal__c where id =: propId];
-            Id contactId = [Select Email From Contact where Proposals__c =: propId and Is_Primary__c = true].Id; 
+            Id contactId = [SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :propId AND Is_Coordinator__c = true LIMIT 1].Contact__c; 
                 List<String> attachmentsListToBeReturned = new List<String>();
                 Emailtemplate emailTempRec = New Emailtemplate();
                 List<Attachment> attList = [Select Id,name,Body,ContentType from attachment where parentId = :propId order by createdDate DESC];
@@ -1072,7 +1073,10 @@ public class UtilityMethodsForDocGeneration {
         try{
             Application_Proposal__c applicationProposalRecord = [SELECT Id, RecordType.Name From Application_Proposal__c WHERE Id =: propId];
             List<Messaging.SingleEmailMessage> emailList = new List<Messaging.SingleEmailMessage>();
-            List<Contact> conList = [Select Salutation,LastName,Email,FirstName,Name,Login_Hash_Code__c,Is_Primary__c,Proposals__c,Proposals__r.Title_Of__c,AccountName__c,Proposals__r.Duration_In_Months_Max_36__c,Proposals__r.Tentative_Start_Date__c From Contact where Proposals__c =: propId AND Is_Primary__c = true];
+            List<Applicant_Proposal_Association__c> primaryAPAList = [SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :propId AND Is_Coordinator__c = true];
+            Set<Id> primaryContactIds = new Set<Id>();
+            for (Applicant_Proposal_Association__c a : primaryAPAList) primaryContactIds.add(a.Contact__c);
+            List<Contact> conList = [Select Salutation,LastName,Email,FirstName,Name,Login_Hash_Code__c,Proposals__c,Proposals__r.Title_Of__c,AccountName__c,Proposals__r.Duration_In_Months_Max_36__c,Proposals__r.Tentative_Start_Date__c From Contact where Id IN :primaryContactIds];
             List<Attachment> attList = [Select Id,name,Body,ContentType from attachment where Id = :attId]; 
             List<Application_Proposal__c> appList = New List<Application_Proposal__c>();
             List<EmailMessage> listOfEmailMesToInsert = New List<EmailMessage>();

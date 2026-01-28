@@ -546,7 +546,7 @@ public class RegenerateDisbursementRecords {
                 //contact con = [select id,proposals__c,Is_Primary__c from contact where proposals__c =: ap.Id and Is_Primary__c = true];
                 Integer TotalAmount = ApprovedAmountMap.get(ap.id) ;   
                 if(ap.Grantee_Recipient__c == 'Indian Grant' ){
-                    contact con = [select id,proposals__c,Is_Primary__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
+                    contact con = [select id,proposals__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
                     //Record1
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
@@ -612,7 +612,7 @@ public class RegenerateDisbursementRecords {
                     
                 }
                 else if(ap.Grantee_Recipient__c == 'Split Grant' ){
-                    contact con = [select id,proposals__c,Is_Primary__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
+                    contact con = [select id,proposals__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
                     //Record1
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
@@ -715,7 +715,9 @@ public class RegenerateDisbursementRecords {
                             }
                         }
                         for(Application_Proposal__c app : applicationRecord){
-                            Contact con = [SELECT Id,Name,account.BillingCountry,Proposals__c,Proposals__r.Disbursement_Type_for_German_Awardee__c,Proposals__r.Name,Tentative_End_Date__c,Tentative_Start_Date__c,Proposals__r.RecordType_Name__c FROM Contact WHERE Proposals__c =: app.id AND Is_Primary__c = true];
+                            List<Applicant_Proposal_Association__c> apaList = [SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :app.Id AND Is_Coordinator__c = true LIMIT 1];
+                            if (apaList.isEmpty()) continue;
+                            Contact con = [SELECT Id,Name,account.BillingCountry,Proposals__c,Proposals__r.Disbursement_Type_for_German_Awardee__c,Proposals__r.Name,Tentative_End_Date__c,Tentative_Start_Date__c,Proposals__r.RecordType_Name__c FROM Contact WHERE Id = :apaList[0].Contact__c];
                             String invalidNumbers = '[^0-9]';
                             //Integer TotalAmount = Integer.valueOf(app.Total_funding_requested_from_IGSTC__c.replaceAll(invalidNumbers,''));
                             Integer TotalAmount = ApprovedAmountMap.get(app.id) ; 

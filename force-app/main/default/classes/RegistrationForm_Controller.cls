@@ -566,7 +566,6 @@ insert contact; */
                     acc.Is_Coordinator__c=true;    
                 }
                 acc.Website=contactDetails.Homepage_URL__c;
-                acc.Is_Primary__c = true;
                 acc.Proposals__c = appProposal.Id;
                 insert acc;
                 system.debug('acc ::'+acc);
@@ -575,11 +574,16 @@ insert contact; */
                 if(String.isBlank(contactDetails.Login_Hash_Code__c)){
                     contactDetails.Login_Hash_Code__c = Utility.generateRandomString();
                 }
-                contactDetails.Is_Primary__c = true;
                 contactDetails.Proposals__c = appProposal.Id;
                 contactDetails.Salutation = contactDetails.Title;
                 insert contactDetails;
                 system.debug('contactDetails ::'+contactDetails);
+                Applicant_Proposal_Association__c apa = new Applicant_Proposal_Association__c(
+                    Contact__c = contactDetails.Id,
+                    Proposals__c = appProposal.Id,
+                    Is_Coordinator__c = true
+                );
+                insert apa;
             }
             
             return contactDetails.Login_Hash_Code__c ;

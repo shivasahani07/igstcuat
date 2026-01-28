@@ -918,12 +918,12 @@ public class ProposalTriggerHandler {
         List<Application_Proposal__c> proposalList = [select id,Name,Tentative_Start_Date__c,Tentative_End_Date__c,Country_of_Venue__c,Proposed_Date__c,Workshop_Finish_Date__c from Application_Proposal__c where id IN : proposalId];
         
             for(Application_Proposal__c ap : proposalList){
-                contact con = [select id,proposals__c,Is_Primary__c,name from contact where proposals__c =: ap.Id and Is_Primary__c = true];
+                Applicant_Proposal_Association__c apa = [SELECT Id, Contact__c, Contact__r.Name FROM Applicant_Proposal_Association__c WHERE Proposals__c = :ap.Id AND Is_Coordinator__c = true LIMIT 1];
                     //Record1
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
                     disbursementRecord.Tranche__c = '1'; 
-                    disbursementRecord.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord.Tranche__c + '-' + con.Name;
+                    disbursementRecord.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord.Tranche__c + '-' + apa.Contact__r.Name;
                     if(ap.Tentative_Start_Date__c != null ){
                         disbursementRecord.Start_Date__c = ap.Tentative_Start_Date__c; 
                     }
@@ -933,7 +933,7 @@ public class ProposalTriggerHandler {
                     disbursementRecord.Amount__c = 75000;
                     system.debug('Amount 1 ----> '+disbursementRecord.Amount__c);
                     disbursementRecord.Release_Grant_Amount__c = disbursementRecord.Amount__c;
-                    disbursementRecord.Contact__c = con.id;
+                    disbursementRecord.Contact__c = apa.Contact__c;
                     disbursementList.add(disbursementRecord);
                     
                                 
@@ -988,7 +988,7 @@ public class ProposalTriggerHandler {
                 //contact con = [select id,proposals__c,Is_Primary__c from contact where proposals__c =: ap.Id and Is_Primary__c = true];
                 Integer TotalAmount = ApprovedAmountMap.get(ap.id) ;   
                 if(ap.Grantee_Recipient__c == 'Indian Grant' ){
-                    contact con = [select id,proposals__c,Is_Primary__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
+                    contact con = [select id,proposals__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
                     //Record1
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
@@ -1021,7 +1021,7 @@ public class ProposalTriggerHandler {
                     
                 }
                 else if(ap.Grantee_Recipient__c == 'German Grant' ){
-                    contact con1 = [select id,proposals__c,Is_Primary__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'Germany' limit 1];
+                    contact con1 = [select id,proposals__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'Germany' limit 1];
                     //Record1
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
@@ -1054,7 +1054,7 @@ public class ProposalTriggerHandler {
                     
                 }
                 else if(ap.Grantee_Recipient__c == 'Split Grant' ){
-                    contact con = [select id,proposals__c,Is_Primary__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
+                    contact con = [select id,proposals__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'India' limit 1];
                     //Record1
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
@@ -1085,7 +1085,7 @@ public class ProposalTriggerHandler {
                     disbursementRecord1.Contact__c = con.id;
                     disbursementList.add(disbursementRecord1);
                     
-                    contact con1 = [select id,proposals__c,Is_Primary__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'Germany' limit 1];
+                    contact con1 = [select id,proposals__c, account.BillingCountry,name from contact where proposals__c =: ap.Id and account.BillingCountry = 'Germany' limit 1];
                     //Record3
                     Disbursement_Schedule__c disbursementRecord2 = New Disbursement_Schedule__c();
                     disbursementRecord2.Proposals__c = ap.Id;
@@ -1191,7 +1191,7 @@ public class ProposalTriggerHandler {
             system.debug('test=>count1ApprovedAmount=>'+count1ApprovedAmount);
             
             for(Application_Proposal__c ap : proposalList){
-                contact con = [select id,proposals__c,Is_Primary__c,name from contact where proposals__c =: ap.Id and Is_Primary__c = true];
+                Applicant_Proposal_Association__c apaRec = [SELECT Id, Contact__c, Contact__r.Name FROM Applicant_Proposal_Association__c WHERE Proposals__c = :ap.Id AND Is_Coordinator__c = true LIMIT 1];
                 if(totalCountApprovedAmount.containsKey(ap.Id) || count1ApprovedAmount.containsKey(ap.Id) || count2ApprovedAmount.containsKey(ap.Id) || count3ApprovedAmount.containsKey(ap.Id)){
                     if(count1ApprovedAmount.get(ap.Id) != totalCountApprovedAmount.get(ap.Id) || count2ApprovedAmount.get(ap.Id) != totalCountApprovedAmount.get(ap.Id) || count3ApprovedAmount.get(ap.Id) != totalCountApprovedAmount.get(ap.Id)){
                         ap.addError('Please update all expense heads approved amount!!');
@@ -1202,7 +1202,7 @@ public class ProposalTriggerHandler {
                     Disbursement_Schedule__c disbursementRecord = New Disbursement_Schedule__c();
                     disbursementRecord.Proposals__c = ap.Id;
                     disbursementRecord.Tranche__c = '1'; 
-                    disbursementRecord.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord.Tranche__c + '-' + con.Name;
+                    disbursementRecord.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord.Tranche__c + '-' + apaRec.Contact__r.Name;
                     if(ap.Tentative_Start_Date__c != null){
                         disbursementRecord.Start_Date__c = ap.Tentative_Start_Date__c; 
                         disbursementRecord.End_Date__c = ap.Tentative_Start_Date__c.addyears(1).addDays(-1); 
@@ -1210,14 +1210,14 @@ public class ProposalTriggerHandler {
                     disbursementRecord.Amount__c = mapOfyear1ApprovedAmount.get(ap.Id);
                     system.debug('Amount 1 ----> '+disbursementRecord.Amount__c);
                     disbursementRecord.Release_Grant_Amount__c = disbursementRecord.Amount__c;
-                    disbursementRecord.Contact__c = con.id;
+                    disbursementRecord.Contact__c = apaRec.Contact__c;
                     disbursementList.add(disbursementRecord);
                     
                     //Record 2
                     Disbursement_Schedule__c disbursementRecord1 = New Disbursement_Schedule__c();
                     disbursementRecord1.Proposals__c = ap.Id;
                     disbursementRecord1.Tranche__c = '2'; 
-                    disbursementRecord1.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord1.Tranche__c + '-' + con.Name;
+                    disbursementRecord1.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord1.Tranche__c + '-' + apaRec.Contact__r.Name;
                     if(ap.Tentative_Start_Date__c != null){
                         disbursementRecord1.Start_Date__c = ap.Tentative_Start_Date__c.addyears(1);
                         disbursementRecord1.End_Date__c = ap.Tentative_Start_Date__c.addyears(2).addDays(-1); 
@@ -1225,14 +1225,14 @@ public class ProposalTriggerHandler {
                     disbursementRecord1.Amount__c = mapOfyear2ApprovedAmount.get(ap.Id);
                     system.debug('Amount 1 ----> '+disbursementRecord1.Amount__c);
                     disbursementRecord1.Release_Grant_Amount__c = disbursementRecord1.Amount__c;
-                    disbursementRecord1.Contact__c = con.id;
+                    disbursementRecord1.Contact__c = apaRec.Contact__c;
                     disbursementList.add(disbursementRecord1);
                     
                     //Record 3
                     Disbursement_Schedule__c disbursementRecord2 = New Disbursement_Schedule__c();
                     disbursementRecord2.Proposals__c = ap.Id;
                     disbursementRecord2.Tranche__c = '3'; 
-                    disbursementRecord2.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord2.Tranche__c + '-' + con.Name;
+                    disbursementRecord2.Disbursement_Name__c = 'DS-' + ap.Name.replace('IGSTC-','') + '-' + disbursementRecord2.Tranche__c + '-' + apaRec.Contact__r.Name;
                     if(ap.Tentative_Start_Date__c != null){
                         disbursementRecord2.Start_Date__c = ap.Tentative_Start_Date__c.addyears(2);
                         disbursementRecord2.End_Date__c = ap.Tentative_Start_Date__c.addyears(3).addDays(-1); 
@@ -1240,7 +1240,7 @@ public class ProposalTriggerHandler {
                     disbursementRecord2.Amount__c = mapOfyear3ApprovedAmount.get(ap.Id);
                     system.debug('Amount 1 ----> '+disbursementRecord2.Amount__c);
                     disbursementRecord2.Release_Grant_Amount__c = disbursementRecord2.Amount__c;
-                    disbursementRecord2.Contact__c = con.id;
+                    disbursementRecord2.Contact__c = apaRec.Contact__c;
                     disbursementList.add(disbursementRecord2);
                 }
                 if(!disbursementList.isEmpty()){
@@ -1290,7 +1290,8 @@ public class ProposalTriggerHandler {
                 }
             }
             for(Application_Proposal__c app : applicationRecord){
-                Contact con = [SELECT Id,Name,account.BillingCountry,Proposals__c,Proposals__r.Disbursement_Type_for_German_Awardee__c,Proposals__r.Name,Tentative_End_Date__c,Tentative_Start_Date__c,Proposals__r.RecordType_Name__c FROM Contact WHERE Proposals__c =: app.id AND Is_Primary__c = true];
+                Applicant_Proposal_Association__c apaRec = [SELECT Id, Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :app.Id AND Is_Coordinator__c = true LIMIT 1];
+                Contact con = [SELECT Id,Name,account.BillingCountry,Proposals__c,Proposals__r.Disbursement_Type_for_German_Awardee__c,Proposals__r.Name,Tentative_End_Date__c,Tentative_Start_Date__c,Proposals__r.RecordType_Name__c FROM Contact WHERE Id = :apaRec.Contact__c];
                 String invalidNumbers = '[^0-9]';
                 //Integer TotalAmount = Integer.valueOf(app.Total_funding_requested_from_IGSTC__c.replaceAll(invalidNumbers,''));
                 Integer TotalAmount = ApprovedAmountMap.get(app.id) ; 

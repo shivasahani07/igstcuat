@@ -191,7 +191,7 @@ public without sharing class ApplicantPortal_Contoller {
         con = new Contact();
         
         if(!string.isBlank(candidateId)){
-            List<contact> applicantDetails = [SELECT Id,Email,Status__c,account.Is_Coordinator__c,name,Account.Id,Proposals__c,Proposals__r.Campaign__r.Name,Email_Verified__c,Is_Primary__c,Campaign__c,Login_Hash_Code__c,(SELECT Id, Proposals__r.Id, Proposals__r.Stage__c, Proposals__r.Proposal_Stages__c FROM Applicant_Proposal_Associations__r) FROM contact WHERE Login_hash_code__c =:candidateId];
+            List<contact> applicantDetails = [SELECT Id,Email,Status__c,account.Is_Coordinator__c,name,Account.Id,Proposals__c,Proposals__r.Campaign__r.Name,Email_Verified__c,Campaign__c,Login_Hash_Code__c,(SELECT Id, Is_Coordinator__c, Proposals__r.Id, Proposals__r.Stage__c, Proposals__r.Proposal_Stages__c FROM Applicant_Proposal_Associations__r) FROM contact WHERE Login_hash_code__c =:candidateId];
             for(Contact conRec : applicantDetails){
                 emailVerified = String.valueOf(conRec.Email_Verified__c);
             }
@@ -224,9 +224,14 @@ public without sharing class ApplicantPortal_Contoller {
                 campaigntype = applicantDetails[0].Campaign__c;
                 applicantName=applicantDetails[0].Name;
                 applicantEmail=applicantDetails[0].Email;
-                isPrimaryContact=applicantDetails[0].Is_Primary__c;
                 accountId=applicantDetails[0].Account.Id;
-                isCoordinator=applicantDetails[0].Account.Is_Coordinator__c;
+                if(!applicantDetails[0].Applicant_Proposal_Associations__r.isEmpty()){
+                    isPrimaryContact = applicantDetails[0].Applicant_Proposal_Associations__r[0].Is_Coordinator__c;
+                    isCoordinator = applicantDetails[0].Applicant_Proposal_Associations__r[0].Is_Coordinator__c;
+                } else {
+                    isPrimaryContact = false;
+                    isCoordinator = applicantDetails[0].Account.Is_Coordinator__c;
+                }
                 if(applicantDetails[0].Status__c == 'Submitted'){
                     partnerSubmission = true;
                 }else {
@@ -577,7 +582,6 @@ public without sharing class ApplicantPortal_Contoller {
             Contact con = new Contact();
             acc.Name = newUser.org;
             acc.Is_Coordinator__c = true; // Changed by Rukasar
-            acc.Is_Primary__c = true;
             insert acc;
             con.AccountId = acc.Id;
             con.Title = newUser.title;
@@ -586,7 +590,6 @@ public without sharing class ApplicantPortal_Contoller {
             con.Email = newUser.Email;
             con.Password__c = newUser.password;
             con.MailingCountry = newUser.country;
-            con.Is_Primary__c = true;
             if(String.isNotBlank(newUser.birthdate)) {
                 con.Birthdate = Date.valueOf(newUser.birthdate);
             }
@@ -1591,14 +1594,14 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     }
     
     @RemoteAction
-    public static List<Contact> getPairingDetails(string hashcode, String campaignId){
+    public static List<Proposal_Controller.PairingContactWrapper> getPairingDetails(string hashcode, String campaignId){
         return Proposal_Controller.getPairingDetails(hashcode,campaignId);
     }
 
     ///*************************New Method aaded by Karthik 
     @RemoteAction
-    public static List<Contact> getPairingDetailsinWiser(string hashcode, String campaignId){
-        return Proposal_Controller.getPairingDetailsinWiser(hashcode,campaignId);
+    public static List<Proposal_Controller.PairingContactWrapper> getPairingDetailsinWiser(string hashcode, String proposalId){
+        return Proposal_Controller.getPairingDetailsinWiser(hashcode, proposalId);
     }
 
 
@@ -1852,10 +1855,37 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     }
     
     @RemoteAction
-    public static Contact getcampaigntype(string hashcode){
+    public static Applicant_Proposal_Association__c getcampaigntype(string hashcode, string proposalId){
         try{
-            Contact conrec = [SELECT Id,Name,Is_Primary__c from Contact where Login_Hash_Code__c=: hashcode];
-            return conrec;
+            Contact conrec = [SELECT Id FROM Contact WHERE Login_Hash_Code__c = :hashcode LIMIT 1];
+            
+            Id propId = String.isNotBlank(proposalId) ? Id.valueOf(proposalId) : null;
+            if(propId == null){
+                List<Applicant_Proposal_Association__c> apaList = [
+                    SELECT Id, Proposals__c 
+                    FROM Applicant_Proposal_Association__c 
+                    WHERE Contact__c = :conrec.Id 
+                    AND Proposals__r.RecordType_Name__c = 'PECFAR'
+                    ORDER BY CreatedDate DESC 
+                    LIMIT 1
+                ];
+                if(!apaList.isEmpty()){
+                    propId = apaList[0].Proposals__c;
+                }
+            }
+            
+            if(propId == null){
+                return null;
+            }
+            
+            Applicant_Proposal_Association__c apa = [
+                SELECT Id, Is_Coordinator__c, Contact__c, Proposals__c 
+                FROM Applicant_Proposal_Association__c 
+                WHERE Contact__c = :conrec.Id 
+                AND Proposals__c = :propId
+                LIMIT 1
+            ];
+            return apa;
         }catch(exception e){
             return null;
         }

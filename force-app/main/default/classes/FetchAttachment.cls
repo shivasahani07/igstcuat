@@ -5,8 +5,9 @@ public class FetchAttachment {
         system.debug('proIDList ::'+proIDList);
         try{
             String ProId = proIDList[0];
-            Contact conRecord = [SELECT Id,Salutation,Name,FirstName,LastName,Campaign__c,ApplicationId__c FROM Contact WHERE Proposals__c =: ProId and Is_Primary__c = true];
-            String contactEmail = [Select Email From Contact where Proposals__c =: ProId and Is_Primary__c = true].Email; 
+            Applicant_Proposal_Association__c apa = [SELECT Id, Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :ProId AND Is_Coordinator__c = true LIMIT 1];
+            Contact conRecord = [SELECT Id,Salutation,Name,FirstName,LastName,Campaign__c,ApplicationId__c,Email FROM Contact WHERE Id = :apa.Contact__c];
+            String contactEmail = conRecord.Email; 
             List<String> attachmentsListToBeReturned = new List<String>();
             Emailtemplate emailTempRec = New Emailtemplate();
             Id orgWideEmailAddressId = [SELECT Id FROM OrgWideEmailAddress WHERE Address = 'noreply@igstc.org'].Id;
