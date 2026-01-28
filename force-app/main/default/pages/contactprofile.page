@@ -718,6 +718,38 @@
         
         
         <script>
+        // Store the resolved remote action at page load time
+        var REMOTE_ACTION_SAVE_CONTACT = '{!JSENCODE($RemoteAction.ContactProfileController.saveContactProfile)}';
+        var REMOTE_ACTION_SAVE_EDUCATION = '{!JSENCODE($RemoteAction.ContactProfileController.saveEducationDetails)}';
+        var REMOTE_ACTION_SAVE_EMPLOYMENT = '{!JSENCODE($RemoteAction.ContactProfileController.saveEmploymentDetails)}';
+        var REMOTE_ACTION_SAVE_ACHIEVEMENT = '{!JSENCODE($RemoteAction.ContactProfileController.saveAchievementDetails)}';
+        var REMOTE_ACTION_DELETE_EDUCATION = '{!JSENCODE($RemoteAction.ContactProfileController.deleteEducationRecord)}';
+        var REMOTE_ACTION_DELETE_EMPLOYMENT = '{!JSENCODE($RemoteAction.ContactProfileController.deleteEmploymentRecord)}';
+        var REMOTE_ACTION_UPLOAD_PIC = '{!JSENCODE($RemoteAction.ContactProfileController.doUploadProfilePic)}';
+        var REMOTE_ACTION_GET_IMAGE = '{!JSENCODE($RemoteAction.ContactProfileController.getProfileImageUrl)}';
+        
+        console.log('Resolved remote actions:', {
+            saveContact: REMOTE_ACTION_SAVE_CONTACT,
+            saveEducation: REMOTE_ACTION_SAVE_EDUCATION,
+            saveEmployment: REMOTE_ACTION_SAVE_EMPLOYMENT
+        });
+        
+        // Ensure Visualforce remoting is available - wait for it to load
+        (function() {
+            var checkRemoting = setInterval(function() {
+                if (typeof Visualforce !== 'undefined' && Visualforce.remoting && Visualforce.remoting.Manager) {
+                    clearInterval(checkRemoting);
+                    console.log('Visualforce remoting ready');
+                    console.log('Visualforce object:', Visualforce);
+                }
+            }, 100);
+            
+            // Stop checking after 5 seconds
+            setTimeout(function() {
+                clearInterval(checkRemoting);
+            }, 5000);
+        })();
+        
         function openTab(tabIndex) {
             var container = document.querySelector('.contact-profile-container');
             if (!container) return;
@@ -852,7 +884,8 @@
             
             // Call RemoteAction
             debugger
-            ContactProfileController.doUploadProfilePic(
+            Visualforce.remoting.Manager.invokeAction(
+                REMOTE_ACTION_UPLOAD_PIC,
                 contactId,
                 attachmentBody,
                 attachmentName,
@@ -862,7 +895,7 @@
                     if (event.type === 'exception') {
                         console.error('Exception:', event);
                         alert('Error uploading image: ' + event.message);
-                    } else                     if (event.status) {
+                    } else if (event.status) {
                         if (doneUploading) {
                             // Upload complete
                             showMessage('messages', 'Profile picture uploaded successfully!', 'success');
@@ -900,13 +933,37 @@
             }
         }
         
+        // Initialize Visualforce Remoting - ensure it's available
+        function initializeRemoting() {
+            if (typeof Visualforce !== 'undefined' && Visualforce.remoting && Visualforce.remoting.Manager) {
+                console.log('Visualforce remoting initialized');
+                return true;
+            } else {
+                console.warn('Visualforce remoting not ready, retrying...');
+                setTimeout(initializeRemoting, 100);
+                return false;
+            }
+        }
+        
         // Check if existing image loaded successfully on page load
         window.addEventListener('load', function() {
-            loadContactData();
-            loadEducationData();
-            loadEmploymentData();
-            loadAchievementData();
-            loadProfileImage();
+            // Wait for Visualforce remoting to be ready
+            if (initializeRemoting()) {
+                loadContactData();
+                loadEducationData();
+                loadEmploymentData();
+                loadAchievementData();
+                loadProfileImage();
+            } else {
+                // Retry after a short delay
+                setTimeout(function() {
+                    loadContactData();
+                    loadEducationData();
+                    loadEmploymentData();
+                    loadAchievementData();
+                    loadProfileImage();
+                }, 500);
+            }
         });
         
         // ========== DATA LOADING FUNCTIONS ==========
@@ -1024,16 +1081,21 @@
                 }
             } else if (contactId) {
                 // Fallback to RemoteAction if Visualforce value is not available
-                ContactProfileController.getProfileImageUrl(contactId, function(result, event) {
-                    if (result && result !== 'null' && result !== '') {
-                        var img = document.getElementById('existingProfileImage');
-                        if (img) {
-                            img.src = result;
-                            img.style.display = 'block';
-                            handleImageLoad(img);
+                Visualforce.remoting.Manager.invokeAction(
+                    REMOTE_ACTION_GET_IMAGE,
+                    contactId,
+                    function(result, event) {
+                        if (event.status && result && result !== 'null' && result !== '') {
+                            var img = document.getElementById('existingProfileImage');
+                            if (img) {
+                                img.src = result;
+                                img.style.display = 'block';
+                                handleImageLoad(img);
+                            }
                         }
-                    }
-                });
+                    },
+                    { escape: true }
+                );
             }
         }
         
@@ -1092,7 +1154,8 @@
             
             // ✅ If record already saved → delete from Salesforce
             if (recordId) {
-                ContactProfileController.deleteEducationRecord(
+                Visualforce.remoting.Manager.invokeAction(
+                    REMOTE_ACTION_DELETE_EDUCATION,
                     recordId,
                     function (result, event) {
                         if (event.status && result === 'SUCCESS') {
@@ -1109,7 +1172,8 @@
                                 'error'
                             );
                         }
-                    }
+                    },
+                    { escape: true }
                 );
             } else {
                 // 🆕 Unsaved row → just remove UI
@@ -1167,7 +1231,8 @@
             var recordId = row.querySelector('.empId').value;
             
             if (recordId) {
-                ContactProfileController.deleteEmploymentRecord(
+                Visualforce.remoting.Manager.invokeAction(
+                    REMOTE_ACTION_DELETE_EMPLOYMENT,
                     recordId,
                     function (result, event) {
                         if (event.status && result === 'SUCCESS') {
@@ -1184,7 +1249,8 @@
                                 'error'
                             );
                         }
-                    }
+                    },
+                    { escape: true }
                 );
             } else {
                 row.remove();
@@ -1217,36 +1283,62 @@
             };
             
             debugger
-            ContactProfileController.saveContactProfile(contactData, function(result, event) {
-                debugger
-                if (event.status) {
-                    if (result === 'SUCCESS') {
-                        showMessage('messages', 'Profile saved successfully!', 'success');
-                    } else {
-                        showMessage('messages', result, 'error');
-                    }
-                } else {
-                    showMessage('messages', 'Error saving profile: ' + event.message, 'error');
-                }
-            });
-            //             Visualforce.remoting.Manager.invokeAction(
-            //     '{!$RemoteAction.ContactProfileController.saveContactProfile}',
-            //     contactData,
-            //     function (result, event) {
-            //         if (event.status) {
-            //             showMessage(
-            //                 'messages',
-            //                 result === 'SUCCESS'
-            //                     ? 'Profile saved successfully!'
-            //                     : result,
-            //                 result === 'SUCCESS' ? 'success' : 'error'
-            //             );
-            //         } else {
-            //             showMessage('messages', event.message, 'error');
-            //         }
-            //     }
-            // );
+            // Ensure Visualforce remoting is available - use current window context
+            if (typeof Visualforce === 'undefined' || !Visualforce.remoting || !Visualforce.remoting.Manager) {
+                showMessage('messages', 'Error: Visualforce remoting not available. Please refresh the page.', 'error');
+                console.error('Visualforce remoting not available');
+                return;
+            }
             
+            try {
+                var remotingManager = Visualforce.remoting.Manager;
+                // Use the pre-resolved remote action
+                var remoteAction = REMOTE_ACTION_SAVE_CONTACT;
+                
+                console.log('Calling remoting action:', remoteAction);
+                console.log('Remoting manager available:', !!remotingManager);
+                
+                // If the action wasn't resolved (still contains $RemoteAction or is empty), try direct name
+                if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+                    console.warn('Remote action not resolved, trying direct name');
+                    remoteAction = 'ContactProfileController.saveContactProfile';
+                }
+                
+                // Make the remoting call
+                remotingManager.invokeAction(
+                    remoteAction,
+                    contactData,
+                    function (result, event) {
+                        debugger
+                        console.log('Remoting result:', result);
+                        console.log('Remoting event:', event);
+                        console.log('Event status:', event.status);
+                        console.log('Event type:', event.type);
+                        
+                        if (event.status) {
+                            if (result === 'SUCCESS') {
+                                showMessage('messages', 'Profile saved successfully!', 'success');
+                            } else {
+                                showMessage('messages', result, 'error');
+                            }
+                        } else {
+                            var errorMsg = 'Unknown error';
+                            if (event.message) {
+                                errorMsg = event.message;
+                            } else if (event.type === 'exception') {
+                                errorMsg = 'Exception occurred: ' + (event.where || 'Unknown location');
+                            }
+                            showMessage('messages', 'Error saving profile: ' + errorMsg, 'error');
+                            console.error('Full remoting error event:', JSON.stringify(event, null, 2));
+                        }
+                    },
+                    { escape: true, timeout: 30000 }
+                );
+            } catch (e) {
+                showMessage('messages', 'Error: ' + e.message, 'error');
+                console.error('Exception calling remoting:', e);
+                console.error('Stack:', e.stack);
+            }
         }
         
         function saveEducationData() {
@@ -1271,21 +1363,26 @@
             });
             
             debugger           
-            ContactProfileController.saveEducationDetails(contactId,JSON.stringify(educationList),function (result, event) {
-                debugger;
-                if (event.status) {
-                    showMessage(
-                        'educationMessages',
-                        result === 'SUCCESS'
-                        ? 'Education details saved successfully!'
-                        : result,
-                        result === 'SUCCESS' ? 'success' : 'error'
-                    );
-                } else {
-                    showMessage('messages', event.message, 'error');
-                }
-            }
-                                                         );
+            Visualforce.remoting.Manager.invokeAction(
+                REMOTE_ACTION_SAVE_EDUCATION,
+                contactId,
+                JSON.stringify(educationList),
+                function (result, event) {
+                    debugger;
+                    if (event.status) {
+                        showMessage(
+                            'educationMessages',
+                            result === 'SUCCESS'
+                            ? 'Education details saved successfully!'
+                            : result,
+                            result === 'SUCCESS' ? 'success' : 'error'
+                        );
+                    } else {
+                        showMessage('messages', event.message, 'error');
+                    }
+                },
+                { escape: true }
+            );
             
         }
         
@@ -1310,27 +1407,32 @@
             });
             
             debugger           
-            ContactProfileController.saveEmploymentDetails(contactId,JSON.stringify(employmentList),function (result, event) {
-                debugger;
-                if (event.status) {
-                    if (result === 'SUCCESS') {
-                        showMessage(
-                            'employmentMessages',
-                            'Employment details saved successfully!',
-                            'success'
-                        );
+            Visualforce.remoting.Manager.invokeAction(
+                REMOTE_ACTION_SAVE_EMPLOYMENT,
+                contactId,
+                JSON.stringify(employmentList),
+                function (result, event) {
+                    debugger;
+                    if (event.status) {
+                        if (result === 'SUCCESS') {
+                            showMessage(
+                                'employmentMessages',
+                                'Employment details saved successfully!',
+                                'success'
+                            );
+                        } else {
+                            showMessage('messages', result, 'error');
+                        }
                     } else {
-                        showMessage('messages', result, 'error');
+                        showMessage(
+                            'messages',
+                            'Error saving employment: ' + event.message,
+                            'error'
+                        );
                     }
-                } else {
-                    showMessage(
-                        'messages',
-                        'Error saving employment: ' + event.message,
-                        'error'
-                    );
-                }
-            }
-                                                          );
+                },
+                { escape: true }
+            );
         }
         
         
@@ -1361,7 +1463,8 @@
                 }
             } catch (e) {}
             
-            ContactProfileController.saveAchievementDetails(
+            Visualforce.remoting.Manager.invokeAction(
+                REMOTE_ACTION_SAVE_ACHIEVEMENT,
                 contactId,
                 JSON.stringify([achievement]),
                 function (result, event) {
@@ -1376,7 +1479,8 @@
                     } else {
                         showMessage('achievementMessages', event.message, 'error');
                     }
-                }
+                },
+                { escape: true }
             );
         }
         
@@ -1401,21 +1505,26 @@
             } catch (e) {}
             
             debugger
-            ContactProfileController.saveAchievementDetails(contactId,JSON.stringify([achievement]),function (result, event) {
-                debugger
-                if (event.status) {
-                    showMessage(
-                        'publicationMessages',
-                        result === 'SUCCESS'
-                        ? 'Publications saved successfully!'
-                        : result,
-                        result === 'SUCCESS' ? 'success' : 'error'
-                    );
-                } else {
-                    showMessage('publicationMessages', event.message, 'error');
-                }
-            }
-                                                           );
+            Visualforce.remoting.Manager.invokeAction(
+                REMOTE_ACTION_SAVE_ACHIEVEMENT,
+                contactId,
+                JSON.stringify([achievement]),
+                function (result, event) {
+                    debugger
+                    if (event.status) {
+                        showMessage(
+                            'publicationMessages',
+                            result === 'SUCCESS'
+                            ? 'Publications saved successfully!'
+                            : result,
+                            result === 'SUCCESS' ? 'success' : 'error'
+                        );
+                    } else {
+                        showMessage('publicationMessages', event.message, 'error');
+                    }
+                },
+                { escape: true }
+            );
         }
         
         
@@ -1442,16 +1551,21 @@
             var contactId = '{!con.Id}';
             if (contactId) {
                 debugger
-                ContactProfileController.getProfileImageUrl(contactId, function(result, event) {
-                    if (result && result !== 'null') {
-                        var img = document.getElementById('existingProfileImage');
-                        if (img) {
-                            img.src = result + '?t=' + new Date().getTime(); // Add timestamp to force refresh
-                            img.style.display = 'block';
-                            handleImageLoad(img);
+                Visualforce.remoting.Manager.invokeAction(
+                    REMOTE_ACTION_GET_IMAGE,
+                    contactId,
+                    function(result, event) {
+                        if (event.status && result && result !== 'null') {
+                            var img = document.getElementById('existingProfileImage');
+                            if (img) {
+                                img.src = result + '?t=' + new Date().getTime(); // Add timestamp to force refresh
+                                img.style.display = 'block';
+                                handleImageLoad(img);
+                            }
                         }
-                    }
-                });
+                    },
+                    { escape: true }
+                );
             }
         }
         

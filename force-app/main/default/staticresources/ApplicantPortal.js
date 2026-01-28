@@ -699,7 +699,7 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
                     }));
                 } else {
                     const appliedCampaignIds = new Set(
-                        // $scope.appliedPrograms.filter(a => a.campaignId).map(a => a.campaignId)
+                        $scope.appliedPrograms.filter(a => a.campaignId).map(a => a.campaignId)
                     );
 
                     $scope.allPrograms = $scope.allCamapigns
@@ -816,6 +816,12 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
 
     $scope.showSection = function (menu) {
         $scope.selectedMenu = menu;
+        // Load profile data when Profile section is selected
+        if (menu === 'Profile') {
+            setTimeout(function() {
+                loadAllProfileData();
+            }, 300);
+        }
         $scope.selectedFAQ = null; // Reset FAQ detail view when switching sections
 
         if (menu === 'Help') {
@@ -1205,6 +1211,1024 @@ app.controller('cp_dashboard_ctrl', function ($scope, $rootScope, $timeout, $win
 
 
 });
+
+// ========== CONTACT PROFILE FUNCTIONS (moved from contactprofile.page) ==========
+
+// Contact Profile Tab Management
+function openContactTab(tabIndex) {
+    var container = document.querySelector('.contact-profile-container');
+    if (!container) return;
+    
+    var tabs = container.querySelectorAll('.tab');
+    var contents = container.querySelectorAll('.tab-content');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+    
+    if (tabs[tabIndex] && contents[tabIndex]) {
+        tabs[tabIndex].classList.add('active');
+        contents[tabIndex].classList.add('active');
+    }
+}
+
+function toggleAccordion(header) {
+    var item = header.parentElement;
+    item.classList.toggle('active');
+}
+
+// Global variables for file upload
+var attachment = '';
+var attachmentName = '';
+var fileSize = 0;
+var positionIndex = 0;
+var doneUploading = false;
+var maxStringSize = 6000000; // ~6MB base64 encoded
+
+// Handle file selection
+function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+        var file = input.files[0];
+        var fileSizeInBytes = file.size;
+        var maxFileSize = 5242880; // 5MB
+        
+        // Validate file size
+        if (fileSizeInBytes > maxFileSize) {
+            alert('File size must be less than 5MB. Your file is ' + (fileSizeInBytes / 1024 / 1024).toFixed(2) + 'MB');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file type
+        var fileName = file.name.toLowerCase();
+        if (!(fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png'))) {
+            alert('Only JPG, JPEG, and PNG images are allowed');
+            input.value = '';
+            return;
+        }
+        
+        attachmentName = file.name;
+        
+        // Preview image first
+        var uploadDiv = document.getElementById('profileUploadDiv');
+        var previewReader = new FileReader();
+        
+        previewReader.onload = function(e) {
+            var img = uploadDiv.querySelector('.profile-image');
+            if (!img) {
+                img = document.createElement('img');
+                img.className = 'profile-image';
+                img.alt = 'Profile Picture';
+                uploadDiv.appendChild(img);
+            }
+            img.src = e.target.result;
+            uploadDiv.classList.add('has-image');
+            var uploadText = document.getElementById('uploadText');
+            if (uploadText) {
+                uploadText.style.display = 'none';
+            }
+        };
+        
+        previewReader.readAsDataURL(file);
+        
+        // Read file as binary string for upload
+        var fileReader = new FileReader();
+        fileReader.onload = function(e) {
+            attachment = btoa(e.target.result); // Convert to base64
+            fileSize = attachment.length;
+            
+            if (fileSize > maxStringSize) {
+                alert('Base64 encoded file is too large. Maximum size is ' + (maxStringSize / 1024 / 1024).toFixed(2) + 'MB. Your file is ' + (fileSize / 1024 / 1024).toFixed(2) + 'MB');
+                input.value = '';
+                return;
+            }
+            
+            // Auto-upload the file
+            uploadProfilePicture();
+        };
+        
+        fileReader.onerror = function(e) {
+            alert('There was an error reading the file. Please try again.');
+            input.value = '';
+        };
+        
+        fileReader.readAsBinaryString(file);
+    }
+}
+
+// Upload profile picture in chunks
+function uploadProfilePicture() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    if (!contactId || contactId === '') {
+        alert('Please save contact details first before uploading image');
+        return;
+    }
+    
+    positionIndex = 0;
+    doneUploading = false;
+    uploadAttachmentChunk();
+}
+
+function uploadAttachmentChunk() {
+    var chunkSize = 750000;
+    var attachmentBody = '';
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    
+    if (fileSize <= positionIndex + chunkSize) {
+        attachmentBody = attachment.substring(positionIndex);
+        doneUploading = true;
+    } else {
+        attachmentBody = attachment.substring(positionIndex, positionIndex + chunkSize);
+    }
+    
+    console.log('Uploading ' + attachmentBody.length + ' chars of ' + fileSize);
+    
+    // Call RemoteAction
+    var remoteAction = REMOTE_ACTION_UPLOAD_PIC;
+    if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+        remoteAction = 'ApplicantPortal_Contoller.doUploadProfilePic';
+    }
+    
+    Visualforce.remoting.Manager.invokeAction(
+        remoteAction,
+        contactId,
+        attachmentBody,
+        attachmentName,
+        function(result, event) {
+            console.log('Upload result:', result);
+            if (event.type === 'exception') {
+                console.error('Exception:', event);
+                alert('Error uploading image: ' + event.message);
+            } else if (event.status) {
+                if (doneUploading) {
+                    // Upload complete
+                    showMessage('messages', 'Profile picture uploaded successfully!', 'success');
+                    // Refresh profile image without reloading page
+                    setTimeout(function() {
+                        refreshProfileImage();
+                    }, 1000);
+                } else {
+                    // Continue with next chunk
+                    positionIndex += chunkSize;
+                    uploadAttachmentChunk();
+                }
+            } else {
+                showMessage('messages', 'Error uploading image. Please try again.', 'error');
+            }
+        },
+        { buffer: true, escape: true, timeout: 120000 }
+    );
+}
+
+// Handle image load success
+function handleImageLoad(img) {
+    var uploadDiv = document.getElementById('profileUploadDiv');
+    if (uploadDiv) {
+        uploadDiv.classList.add('has-image');
+    }
+}
+
+// Handle image load error
+function handleImageError(img) {
+    img.style.display = 'none';
+    var uploadDiv = document.getElementById('profileUploadDiv');
+    if (uploadDiv) {
+        uploadDiv.classList.remove('has-image');
+    }
+}
+
+// Initialize Visualforce Remoting - ensure it's available
+function initializeRemoting() {
+    if (typeof Visualforce !== 'undefined' && Visualforce.remoting && Visualforce.remoting.Manager) {
+        console.log('Visualforce remoting initialized');
+        return true;
+    } else {
+        console.warn('Visualforce remoting not ready, retrying...');
+        setTimeout(initializeRemoting, 100);
+        return false;
+    }
+}
+
+// Function to load all profile data when Profile section is visible
+function loadAllProfileData() {
+    console.log('Loading all profile data...');
+    console.log('contactProfileData:', contactProfileData);
+    
+    if (!contactProfileData) {
+        console.warn('contactProfileData is not defined');
+        return;
+    }
+    
+    // Check if Profile section DOM elements exist
+    var contactForm = document.getElementById('contactForm');
+    var educationContainer = document.getElementById('educationRowsContainer');
+    
+    if (!contactForm && !educationContainer) {
+        console.warn('Profile section DOM elements not found yet, retrying...');
+        setTimeout(function() {
+            loadAllProfileData();
+        }, 200);
+        return;
+    }
+    
+    // Wait a bit for DOM to be fully ready
+    setTimeout(function() {
+        console.log('Starting to load profile data...');
+        loadContactData();
+        loadEducationData();
+        loadEmploymentData();
+        loadAchievementData();
+        loadProfileImage();
+    }, 100);
+}
+
+// Check if existing image loaded successfully on page load
+window.addEventListener('load', function() {
+    // Wait for Visualforce remoting to be ready
+    if (initializeRemoting()) {
+        // Only load if Profile section might be visible
+        if (document.getElementById('contactForm') || document.getElementById('educationRowsContainer')) {
+            loadAllProfileData();
+        }
+    } else {
+        // Retry after a short delay
+        setTimeout(function() {
+            if (document.getElementById('contactForm') || document.getElementById('educationRowsContainer')) {
+                loadAllProfileData();
+            }
+        }, 500);
+    }
+});
+
+// Also watch for Profile menu selection via AngularJS (backup)
+if (typeof angular !== 'undefined') {
+    setTimeout(function() {
+        try {
+            var app = angular.module('cp_app');
+            if (app) {
+                app.run(function($rootScope) {
+                    $rootScope.$watch('selectedMenu', function(newVal, oldVal) {
+                        if (newVal === 'Profile' && newVal !== oldVal) {
+                            console.log('Profile menu selected via Angular watch');
+                            setTimeout(function() {
+                                loadAllProfileData();
+                            }, 300);
+                        }
+                    });
+                });
+            }
+        } catch (e) {
+            console.warn('Could not set up Angular watch:', e);
+        }
+    }, 1000);
+}
+
+// ========== DATA LOADING FUNCTIONS ==========
+
+function loadContactData() {
+    // Load contact data from contactProfileData object
+    if (!contactProfileData) return;
+    
+    // Set Salutation dropdown
+    if (contactProfileData.salutation) {
+        var salutationSelect = document.getElementById('contactSalutation');
+        if (salutationSelect) {
+            salutationSelect.value = contactProfileData.salutation;
+        }
+    }
+    
+    // Populate all form fields
+    if (contactProfileData.firstName) {
+        var firstNameEl = document.getElementById('contactFirstName');
+        if (firstNameEl) firstNameEl.value = contactProfileData.firstName;
+    }
+    
+    if (contactProfileData.lastName) {
+        var lastNameEl = document.getElementById('contactLastName');
+        if (lastNameEl) lastNameEl.value = contactProfileData.lastName;
+    }
+    
+    if (contactProfileData.designation) {
+        var designationEl = document.getElementById('contactDesignation');
+        if (designationEl) designationEl.value = contactProfileData.designation;
+    }
+    
+    if (contactProfileData.department) {
+        var departmentEl = document.getElementById('contactDepartment');
+        if (departmentEl) departmentEl.value = contactProfileData.department;
+    }
+    
+    if (contactProfileData.email) {
+        var emailEl = document.getElementById('contactEmail');
+        if (emailEl) emailEl.value = contactProfileData.email;
+    }
+    
+    if (contactProfileData.mobilePhone) {
+        var phoneEl = document.getElementById('contactPhone');
+        if (phoneEl) phoneEl.value = contactProfileData.mobilePhone;
+    }
+    
+    if (contactProfileData.mailingCountry) {
+        var countryEl = document.getElementById('contactCountry');
+        if (countryEl) countryEl.value = contactProfileData.mailingCountry;
+    }
+    
+    if (contactProfileData.mailingStreet) {
+        var streetEl = document.getElementById('contactStreet');
+        if (streetEl) streetEl.value = contactProfileData.mailingStreet;
+    }
+    
+    if (contactProfileData.mailingState) {
+        var stateEl = document.getElementById('contactState');
+        if (stateEl) stateEl.value = contactProfileData.mailingState;
+    }
+    
+    if (contactProfileData.mailingCity) {
+        var cityEl = document.getElementById('contactCity');
+        if (cityEl) cityEl.value = contactProfileData.mailingCity;
+    }
+    
+    if (contactProfileData.mailingPostalCode) {
+        var postalEl = document.getElementById('contactPostalCode');
+        if (postalEl) postalEl.value = contactProfileData.mailingPostalCode;
+    }
+    
+    if (contactProfileData.accountName) {
+        var institutionEl = document.getElementById('contactInstitution');
+        if (institutionEl) institutionEl.value = contactProfileData.accountName;
+    }
+}
+
+function loadEducationData() {
+    console.log('loadEducationData called');
+    try {
+        var container = document.getElementById('educationRowsContainer');
+        if (!container) {
+            console.warn('educationRowsContainer not found in DOM');
+            return;
+        }
+        
+        var jsonString = contactProfileData && contactProfileData.educationListJSON 
+            ? contactProfileData.educationListJSON 
+            : '[]';
+        
+        console.log('Education JSON string:', jsonString);
+        
+        // Handle empty string or null
+        if (!jsonString || jsonString === '' || jsonString === 'null' || jsonString === 'undefined') {
+            jsonString = '[]';
+        }
+        
+        var educationData = JSON.parse(jsonString);
+        console.log('Parsed education data:', educationData);
+        
+        container.innerHTML = '';
+        
+        if (educationData && educationData.length > 0) {
+            console.log('Loading ' + educationData.length + ' education records');
+            educationData.forEach(function(edu, index) {
+                addEducationRowHTML(edu, index);
+            });
+        } else {
+            console.log('No education data, adding empty row');
+            addEducationRowHTML(null, 0);
+        }
+    } catch (e) {
+        console.error('Error loading education data:', e);
+        console.error('JSON string was:', contactProfileData ? contactProfileData.educationListJSON : 'undefined');
+        var container = document.getElementById('educationRowsContainer');
+        if (container) {
+            container.innerHTML = '';
+            addEducationRowHTML(null, 0);
+        }
+    }
+}
+
+function loadEmploymentData() {
+    console.log('loadEmploymentData called');
+    try {
+        var container = document.getElementById('employmentRowsContainer');
+        if (!container) {
+            console.warn('employmentRowsContainer not found in DOM');
+            return;
+        }
+        
+        var jsonString = contactProfileData && contactProfileData.employmentListJSON 
+            ? contactProfileData.employmentListJSON 
+            : '[]';
+        
+        console.log('Employment JSON string:', jsonString);
+        
+        // Handle empty string or null
+        if (!jsonString || jsonString === '' || jsonString === 'null' || jsonString === 'undefined') {
+            jsonString = '[]';
+        }
+        
+        var employmentData = JSON.parse(jsonString);
+        console.log('Parsed employment data:', employmentData);
+        
+        container.innerHTML = '';
+        
+        if (employmentData && employmentData.length > 0) {
+            console.log('Loading ' + employmentData.length + ' employment records');
+            employmentData.forEach(function(emp, index) {
+                addEmploymentRowHTML(emp, index);
+            });
+        } else {
+            console.log('No employment data, adding empty row');
+            addEmploymentRowHTML(null, 0);
+        }
+    } catch (e) {
+        console.error('Error loading employment data:', e);
+        console.error('JSON string was:', contactProfileData ? contactProfileData.employmentListJSON : 'undefined');
+        var container = document.getElementById('employmentRowsContainer');
+        if (container) {
+            container.innerHTML = '';
+            addEmploymentRowHTML(null, 0);
+        }
+    }
+}
+
+function loadAchievementData() {
+    console.log('loadAchievementData called');
+    try {
+        var jsonString = contactProfileData && contactProfileData.achievementListJSON 
+            ? contactProfileData.achievementListJSON 
+            : '[]';
+        
+        console.log('Achievement JSON string:', jsonString);
+        
+        // Handle empty string or null
+        if (!jsonString || jsonString === '' || jsonString === 'null' || jsonString === 'undefined') {
+            jsonString = '[]';
+        }
+        
+        var achievementData = JSON.parse(jsonString);
+        console.log('Parsed achievement data:', achievementData);
+        
+        if (achievementData && achievementData.length > 0) {
+            var ach = achievementData[0];
+            console.log('Loading achievement:', ach);
+            
+            var awardsEl = document.getElementById('achievementAwards');
+            if (awardsEl) {
+                awardsEl.innerHTML = ach.Awards_Honours__c || '';
+                console.log('Loaded Awards_Honours__c:', ach.Awards_Honours__c);
+            } else {
+                console.warn('achievementAwards element not found');
+            }
+            
+            var patentsEl = document.getElementById('achievementPatents');
+            if (patentsEl) {
+                patentsEl.innerHTML = ach.List_of_Patents_filed__c || '';
+                console.log('Loaded List_of_Patents_filed__c:', ach.List_of_Patents_filed__c);
+            } else {
+                console.warn('achievementPatents element not found');
+            }
+            
+            var bookChaptersEl = document.getElementById('achievementBookChapters');
+            if (bookChaptersEl) {
+                bookChaptersEl.innerHTML = ach.Book_Chapters__c || '';
+                console.log('Loaded Book_Chapters__c:', ach.Book_Chapters__c);
+            } else {
+                console.warn('achievementBookChapters element not found');
+            }
+            
+            var otherEl = document.getElementById('achievementOther');
+            if (otherEl) {
+                otherEl.innerHTML = ach.Any_other_achievements__c || '';
+                console.log('Loaded Any_other_achievements__c:', ach.Any_other_achievements__c);
+            } else {
+                console.warn('achievementOther element not found');
+            }
+            
+            var publicationsEl = document.getElementById('achievementPublications');
+            if (publicationsEl) {
+                publicationsEl.innerHTML = ach.List_of_Publications__c || '';
+                console.log('Loaded List_of_Publications__c:', ach.List_of_Publications__c);
+            } else {
+                console.warn('achievementPublications element not found');
+            }
+        } else {
+            console.log('No achievement data found');
+        }
+    } catch (e) {
+        console.error('Error loading achievement data', e);
+        console.error('JSON string was:', contactProfileData ? contactProfileData.achievementListJSON : 'undefined');
+    }
+}
+
+function loadProfileImage() {
+    console.log('loadProfileImage called');
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    var profileImageUrl = contactProfileData ? contactProfileData.profileImageUrl : '';
+    
+    console.log('contactId:', contactId);
+    console.log('profileImageUrl:', profileImageUrl);
+    
+    var img = document.getElementById('existingProfileImage');
+    if (!img) {
+        console.warn('existingProfileImage element not found');
+        return;
+    }
+    
+    // First try to use the Visualforce expression value
+    if (profileImageUrl && profileImageUrl !== '' && profileImageUrl !== 'null' && profileImageUrl !== 'undefined') {
+        console.log('Using Visualforce expression URL:', profileImageUrl);
+        img.src = profileImageUrl;
+        img.style.display = 'block';
+        handleImageLoad(img);
+    } else if (contactId) {
+        console.log('Fetching profile image via RemoteAction for contactId:', contactId);
+        // Fallback to RemoteAction if Visualforce value is not available
+        var remoteAction = REMOTE_ACTION_GET_IMAGE;
+        if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+            remoteAction = 'ApplicantPortal_Contoller.getProfileImageUrl';
+        }
+        
+        Visualforce.remoting.Manager.invokeAction(
+            remoteAction,
+            contactId,
+            function(result, event) {
+                console.log('Profile image RemoteAction result:', result);
+                console.log('Profile image RemoteAction event:', event);
+                if (event.status && result && result !== 'null' && result !== '' && result !== 'undefined') {
+                    img.src = result;
+                    img.style.display = 'block';
+                    handleImageLoad(img);
+                } else {
+                    console.log('No profile image found or error occurred');
+                }
+            },
+            { escape: true }
+        );
+    } else {
+        console.log('No contactId available to load profile image');
+    }
+}
+
+// ========== ROW MANAGEMENT FUNCTIONS ==========
+
+function addEducationRowHTML(edu, index) {
+    var container = document.getElementById('educationRowsContainer');
+    if (!container) return;
+    
+    var row = document.createElement('div');
+    row.className = 'grid-row';
+    row.style.cssText = 'grid-template-columns: 1.2fr 1.5fr 1.5fr 1fr 1fr 60px;';
+    row.id = 'eduRow_' + index;
+    
+    var degreeValue = edu ? (edu.Degree__c || '') : '';
+    var institutionValue = edu ? (edu.Institution_Name__c || '') : '';
+    var specializationValue = edu ? (edu.Area_of_specialization__c || '') : '';
+    var startDateValue = edu && edu.Start_Date__c ? edu.Start_Date__c.split('T')[0] : '';
+    var endDateValue = edu && edu.End_Date__c ? edu.End_Date__c.split('T')[0] : '';
+    var eduId = edu ? (edu.Id || '') : '';
+    
+    row.innerHTML = '<input type="hidden" class="eduId" value="' + (eduId || '') + '"/>' +
+        '<input type="text" class="eduDegree form-control" value="' + degreeValue + '" placeholder="Degree"/>' +
+        '<input type="text" class="eduInstitution form-control" value="' + institutionValue + '" placeholder="Institution"/>' +
+        '<input type="text" class="eduSpecialization form-control" value="' + specializationValue + '" placeholder="Specialization"/>' +
+        '<input type="date" class="eduStartDate form-control" value="' + startDateValue + '"/>' +
+        '<input type="date" class="eduEndDate form-control" value="' + endDateValue + '"/>' +
+        '<div class="action-icons"><button type="button" class="icon-btn icon-delete" onclick="removeEducationRow(' + index + ')">×</button></div>';
+    
+    container.appendChild(row);
+}
+
+function addEducationRow() {
+    var container = document.getElementById('educationRowsContainer');
+    if (!container) return;
+    var index = container.children.length;
+    addEducationRowHTML(null, index);
+}
+
+function removeEducationRow(index) {
+    if (!confirm('Are you sure you want to delete this education record?')) {
+        return;
+    }
+    
+    var row = document.getElementById('eduRow_' + index);
+    if (!row) return;
+    
+    var recordId = row.querySelector('.eduId').value;
+    
+    // If record already saved → delete from Salesforce
+    if (recordId) {
+        var remoteAction = REMOTE_ACTION_DELETE_EDUCATION;
+        if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+            remoteAction = 'ApplicantPortal_Contoller.deleteEducationRecord';
+        }
+        
+        Visualforce.remoting.Manager.invokeAction(
+            remoteAction,
+            recordId,
+            function (result, event) {
+                if (event.status && result === 'SUCCESS') {
+                    row.remove();
+                    showMessage(
+                        'educationMessages',
+                        'Education record deleted successfully.',
+                        'success'
+                    );
+                } else {
+                    showMessage(
+                        'educationMessages',
+                        result || 'Error deleting record',
+                        'error'
+                    );
+                }
+            },
+            { escape: true }
+        );
+    } else {
+        // Unsaved row → just remove UI
+        row.remove();
+    }
+}
+
+function addEmploymentRowHTML(emp, index) {
+    var container = document.getElementById('employmentRowsContainer');
+    if (!container) return;
+    
+    var row = document.createElement('div');
+    row.className = 'grid-row';
+    row.style.cssText = 'grid-template-columns: 1.8fr 1.4fr 1fr 1fr 60px;';
+    row.id = 'empRow_' + index;
+    
+    var orgValue = emp ? (emp.Organization_Name__c || '') : '';
+    var positionValue = emp ? (emp.Position__c || '') : '';
+    var startDateValue = emp && emp.Start_Date__c ? emp.Start_Date__c.split('T')[0] : '';
+    var endDateValue = emp && emp.End_Date__c ? emp.End_Date__c.split('T')[0] : '';
+    var empId = emp ? (emp.Id || '') : '';
+    
+    row.innerHTML = '<input type="hidden" class="empId" value="' + (empId || '') + '"/>' +
+        '<input type="text" class="empOrganization form-control" value="' + orgValue + '" placeholder="Organization"/>' +
+        '<input type="text" class="empPosition form-control" value="' + positionValue + '" placeholder="Position"/>' +
+        '<input type="date" class="empStartDate form-control" value="' + startDateValue + '"/>' +
+        '<input type="date" class="empEndDate form-control" value="' + endDateValue + '"/>' +
+        '<div class="action-icons"><button type="button" class="icon-btn icon-delete" onclick="removeEmploymentRow(' + index + ')">×</button></div>';
+    
+    container.appendChild(row);
+}
+
+function addEmploymentRow() {
+    var container = document.getElementById('employmentRowsContainer');
+    if (!container) return;
+    var index = container.children.length;
+    addEmploymentRowHTML(null, index);
+}
+
+function removeEmploymentRow(index) {
+    if (!confirm('Are you sure you want to delete this employment record?')) {
+        return;
+    }
+    
+    var row = document.getElementById('empRow_' + index);
+    if (!row) return;
+    
+    var recordId = row.querySelector('.empId').value;
+    
+    if (recordId) {
+        var remoteAction = REMOTE_ACTION_DELETE_EMPLOYMENT;
+        if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+            remoteAction = 'ApplicantPortal_Contoller.deleteEmploymentRecord';
+        }
+        
+        Visualforce.remoting.Manager.invokeAction(
+            remoteAction,
+            recordId,
+            function (result, event) {
+                if (event.status && result === 'SUCCESS') {
+                    row.remove();
+                    showMessage(
+                        'employmentMessages',
+                        'Employment record deleted successfully.',
+                        'success'
+                    );
+                } else {
+                    showMessage(
+                        'employmentMessages',
+                        result || 'Error deleting record',
+                        'error'
+                    );
+                }
+            },
+            { escape: true }
+        );
+    } else {
+        row.remove();
+    }
+}
+
+// ========== SAVE FUNCTIONS ==========
+
+function saveContactData() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    var contactData = {
+        Id: contactId,
+        Salutation: document.getElementById('contactSalutation').value,
+        FirstName: document.getElementById('contactFirstName').value,
+        LastName: document.getElementById('contactLastName').value,
+        Designation__c: document.getElementById('contactDesignation').value,
+        Department: document.getElementById('contactDepartment').value,
+        Email: document.getElementById('contactEmail').value,
+        MobilePhone: document.getElementById('contactPhone').value,
+        MailingCountry: document.getElementById('contactCountry').value,
+        MailingStreet: document.getElementById('contactStreet').value,
+        MailingState: document.getElementById('contactState').value,
+        MailingCity: document.getElementById('contactCity').value,
+        MailingPostalCode: document.getElementById('contactPostalCode').value,
+        AccountName: document.getElementById('contactInstitution').value
+    };
+    
+    // Ensure Visualforce remoting is available
+    if (typeof Visualforce === 'undefined' || !Visualforce.remoting || !Visualforce.remoting.Manager) {
+        showMessage('messages', 'Error: Visualforce remoting not available. Please refresh the page.', 'error');
+        console.error('Visualforce remoting not available');
+        return;
+    }
+    
+    try {
+        var remotingManager = Visualforce.remoting.Manager;
+        var remoteAction = REMOTE_ACTION_SAVE_CONTACT;
+        
+        console.log('Calling remoting action:', remoteAction);
+        
+        // If the action wasn't resolved, try direct name
+        if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+            console.warn('Remote action not resolved, trying direct name');
+            remoteAction = 'ApplicantPortal_Contoller.saveContactProfile';
+        }
+        
+        // Make the remoting call
+        remotingManager.invokeAction(
+            remoteAction,
+            contactData,
+            function (result, event) {
+                console.log('Remoting result:', result);
+                console.log('Remoting event:', event);
+                
+                if (event.status) {
+                    if (result === 'SUCCESS') {
+                        showMessage('messages', 'Profile saved successfully!', 'success');
+                        // Reload page data after successful save
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showMessage('messages', result, 'error');
+                    }
+                } else {
+                    var errorMsg = 'Unknown error';
+                    if (event.message) {
+                        errorMsg = event.message;
+                    } else if (event.type === 'exception') {
+                        errorMsg = 'Exception occurred: ' + (event.where || 'Unknown location');
+                    }
+                    showMessage('messages', 'Error saving profile: ' + errorMsg, 'error');
+                    console.error('Full remoting error event:', JSON.stringify(event, null, 2));
+                }
+            },
+            { escape: true, timeout: 30000 }
+        );
+    } catch (e) {
+        showMessage('messages', 'Error: ' + e.message, 'error');
+        console.error('Exception calling remoting:', e);
+    }
+}
+
+function saveEducationData() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    var rows = document.querySelectorAll('#educationRowsContainer .grid-row');
+    var educationList = [];
+    
+    rows.forEach(function(row) {
+        var edu = {
+            Id: row.querySelector('.eduId').value || null,
+            Degree__c: row.querySelector('.eduDegree').value,
+            Institution_Name__c: row.querySelector('.eduInstitution').value,
+            Area_of_specialization__c: row.querySelector('.eduSpecialization').value,
+            Start_Date__c: row.querySelector('.eduStartDate').value,
+            End_Date__c: row.querySelector('.eduEndDate').value,
+            Contact__c: contactId
+        };
+        if (edu.Degree__c || edu.Institution_Name__c) {
+            educationList.push(edu);
+        }
+    });
+    
+    var remoteAction = REMOTE_ACTION_SAVE_EDUCATION;
+    if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+        remoteAction = 'ApplicantPortal_Contoller.saveEducationDetails';
+    }
+    
+    Visualforce.remoting.Manager.invokeAction(
+        remoteAction,
+        contactId,
+        JSON.stringify(educationList),
+        function (result, event) {
+            if (event.status) {
+                showMessage(
+                    'educationMessages',
+                    result === 'SUCCESS'
+                    ? 'Education details saved successfully!'
+                    : result,
+                    result === 'SUCCESS' ? 'success' : 'error'
+                );
+            } else {
+                showMessage('educationMessages', event.message, 'error');
+            }
+        },
+        { escape: true }
+    );
+}
+
+function saveEmploymentData() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    var rows = document.querySelectorAll('#employmentRowsContainer .grid-row');
+    var employmentList = [];
+    
+    rows.forEach(function(row) {
+        var emp = {
+            Id: row.querySelector('.empId').value || null,
+            Organization_Name__c: row.querySelector('.empOrganization').value,
+            Position__c: row.querySelector('.empPosition').value,
+            Start_Date__c: row.querySelector('.empStartDate').value,
+            End_Date__c: row.querySelector('.empEndDate').value,
+            Contact__c: contactId
+        };
+        if (emp.Organization_Name__c || emp.Position__c) {
+            employmentList.push(emp);
+        }
+    });
+    
+    var remoteAction = REMOTE_ACTION_SAVE_EMPLOYMENT;
+    if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+        remoteAction = 'ApplicantPortal_Contoller.saveEmploymentDetails';
+    }
+    
+    Visualforce.remoting.Manager.invokeAction(
+        remoteAction,
+        contactId,
+        JSON.stringify(employmentList),
+        function (result, event) {
+            if (event.status) {
+                if (result === 'SUCCESS') {
+                    showMessage(
+                        'employmentMessages',
+                        'Employment details saved successfully!',
+                        'success'
+                    );
+                } else {
+                    showMessage('employmentMessages', result, 'error');
+                }
+            } else {
+                showMessage(
+                    'employmentMessages',
+                    'Error saving employment: ' + event.message,
+                    'error'
+                );
+            }
+        },
+        { escape: true }
+    );
+}
+
+function saveAchievementData() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    
+    var achievement = {
+        Contact__c: contactId,
+        Awards_Honours__c: document.getElementById('achievementAwards').innerHTML,
+        List_of_Patents_filed__c: document.getElementById('achievementPatents').innerHTML,
+        Book_Chapters__c: document.getElementById('achievementBookChapters').innerHTML,
+        Any_other_achievements__c: document.getElementById('achievementOther').innerHTML,
+        List_of_Publications__c: document.getElementById('achievementPublications').innerHTML
+    };
+    
+    // Attach existing Id if present
+    try {
+        if (contactProfileData && contactProfileData.achievementListJSON) {
+            var list = JSON.parse(contactProfileData.achievementListJSON);
+            if (list && list.length > 0) {
+                achievement.Id = list[0].Id;
+            }
+        }
+    } catch (e) {}
+    
+    var remoteAction = REMOTE_ACTION_SAVE_ACHIEVEMENT;
+    if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+        remoteAction = 'ApplicantPortal_Contoller.saveAchievementDetails';
+    }
+    
+    Visualforce.remoting.Manager.invokeAction(
+        remoteAction,
+        contactId,
+        JSON.stringify([achievement]),
+        function (result, event) {
+            if (event.status) {
+                showMessage(
+                    'achievementMessages',
+                    result === 'SUCCESS'
+                    ? 'Achievements saved successfully!'
+                    : result,
+                    result === 'SUCCESS' ? 'success' : 'error'
+                );
+            } else {
+                showMessage('achievementMessages', event.message, 'error');
+            }
+        },
+        { escape: true }
+    );
+}
+
+function savePublicationData() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    
+    var achievement = {
+        Contact__c: contactId,
+        List_of_Publications__c: document.getElementById('achievementPublications').innerHTML
+    };
+    
+    // Attach existing Achievement Id if present
+    try {
+        if (contactProfileData && contactProfileData.achievementListJSON) {
+            var list = JSON.parse(contactProfileData.achievementListJSON);
+            if (list && list.length > 0) {
+                achievement.Id = list[0].Id;
+            }
+        }
+    } catch (e) {}
+    
+    var remoteAction = REMOTE_ACTION_SAVE_ACHIEVEMENT;
+    if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+        remoteAction = 'ApplicantPortal_Contoller.saveAchievementDetails';
+    }
+    
+    Visualforce.remoting.Manager.invokeAction(
+        remoteAction,
+        contactId,
+        JSON.stringify([achievement]),
+        function (result, event) {
+            if (event.status) {
+                showMessage(
+                    'publicationMessages',
+                    result === 'SUCCESS'
+                    ? 'Publications saved successfully!'
+                    : result,
+                    result === 'SUCCESS' ? 'success' : 'error'
+                );
+            } else {
+                showMessage('publicationMessages', event.message, 'error');
+            }
+        },
+        { escape: true }
+    );
+}
+
+function showMessage(containerId, message, type) {
+    var container = document.getElementById(containerId);
+    if (container) {
+        var className = type === 'success' ? 'success' : 'error';
+        container.innerHTML = '<div class="' + className + '" style="padding: 10px; margin: 10px 0; border-radius: 4px; background: ' + 
+            (type === 'success' ? '#d4edda' : '#f8d7da') + '; color: ' + 
+            (type === 'success' ? '#155724' : '#721c24') + ';">' + message + '</div>';
+        setTimeout(function() {
+            container.innerHTML = '';
+        }, 5000);
+    }
+}
+
+function uploadSignature() {
+    alert('Signature upload functionality to be implemented');
+}
+
+// Fix profile picture display after upload
+function refreshProfileImage() {
+    var contactId = contactProfileData ? contactProfileData.contactId : '';
+    if (contactId) {
+        var remoteAction = REMOTE_ACTION_GET_IMAGE;
+        if (!remoteAction || remoteAction === '' || remoteAction.indexOf('$RemoteAction') !== -1) {
+            remoteAction = 'ApplicantPortal_Contoller.getProfileImageUrl';
+        }
+        
+        Visualforce.remoting.Manager.invokeAction(
+            remoteAction,
+            contactId,
+            function(result, event) {
+                if (event.status && result && result !== 'null') {
+                    var img = document.getElementById('existingProfileImage');
+                    if (img) {
+                        img.src = result + '?t=' + new Date().getTime(); // Add timestamp to force refresh
+                        img.style.display = 'block';
+                        handleImageLoad(img);
+                    }
+                }
+            },
+            { escape: true }
+        );
+    }
+}
 
 
 

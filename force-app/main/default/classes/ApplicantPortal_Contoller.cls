@@ -50,6 +50,94 @@ public without sharing class ApplicantPortal_Contoller {
 
    public String yearList { get; set; } //Added by Karthik for year dropdown
 
+    // Contact Profile Properties
+    public Contact con { 
+        get {
+            if (con == null) {
+                con = new Contact();
+            }
+            return con;
+        }
+        set;
+    }
+    public List<Education_Details__c> educationList { 
+        get {
+            if (educationList == null) {
+                educationList = new List<Education_Details__c>();
+            }
+            return educationList;
+        }
+        set;
+    }
+    public List<Employment_Details__c> employmentList { 
+        get {
+            if (employmentList == null) {
+                employmentList = new List<Employment_Details__c>();
+            }
+            return employmentList;
+        }
+        set;
+    }
+    public List<Achievement__c> achievementList { 
+        get {
+            if (achievementList == null) {
+                achievementList = new List<Achievement__c>();
+            }
+            return achievementList;
+        }
+        set;
+    }
+    public Id profileImageId { get; set; }
+    
+    public String getProfileImageUrl() {
+        if (profileImageId != null) {
+            String attId = String.valueOf(profileImageId);
+            return '/servlet/servlet.FileDownload?file=' + attId;
+        }
+        return '';
+    }
+    
+    public String getEducationListJSON() {
+        try {
+            if (educationList == null) {
+                educationList = new List<Education_Details__c>();
+            }
+            String jsonStr = JSON.serialize(educationList);
+            System.debug('EducationListJSON: ' + jsonStr);
+            return jsonStr;
+        } catch (Exception e) {
+            System.debug('Error serializing educationList: ' + e.getMessage());
+            return '[]';
+        }
+    }
+    
+    public String getEmploymentListJSON() {
+        try {
+            if (employmentList == null) {
+                employmentList = new List<Employment_Details__c>();
+            }
+            String jsonStr = JSON.serialize(employmentList);
+            System.debug('EmploymentListJSON: ' + jsonStr);
+            return jsonStr;
+        } catch (Exception e) {
+            System.debug('Error serializing employmentList: ' + e.getMessage());
+            return '[]';
+        }
+    }
+    
+    public String getAchievementListJSON() {
+        try {
+            if (achievementList == null) {
+                achievementList = new List<Achievement__c>();
+            }
+            String jsonStr = JSON.serialize(achievementList);
+            System.debug('AchievementListJSON: ' + jsonStr);
+            return jsonStr;
+        } catch (Exception e) {
+            System.debug('Error serializing achievementList: ' + e.getMessage());
+            return '[]';
+        }
+    }
     
     public ApplicantPortal_Contoller() {
         ApplicantPortalSiteURL = Constants.CANDIDATE_SITE ;
@@ -95,6 +183,13 @@ public without sharing class ApplicantPortal_Contoller {
         currencyPickList = JSON.serialize(Utility.getPicklistValues('Existing_Grants__c' , 'Currency__c'));
         signDate = System.today();
         system.debug('candidateId---'+candidateId);
+        
+        // Initialize contact profile lists
+        educationList = new List<Education_Details__c>();
+        employmentList = new List<Employment_Details__c>();
+        achievementList = new List<Achievement__c>();
+        con = new Contact();
+        
         if(!string.isBlank(candidateId)){
             List<contact> applicantDetails = [SELECT Id,Email,Status__c,account.Is_Coordinator__c,name,Account.Id,Proposals__c,Proposals__r.Campaign__r.Name,Email_Verified__c,Is_Primary__c,Campaign__c,Login_Hash_Code__c,(SELECT Id, Proposals__r.Id, Proposals__r.Stage__c, Proposals__r.Proposal_Stages__c FROM Applicant_Proposal_Associations__r) FROM contact WHERE Login_hash_code__c =:candidateId];
             for(Contact conRec : applicantDetails){
@@ -106,7 +201,7 @@ public without sharing class ApplicantPortal_Contoller {
             //     proposalStage = proposal.Proposal_Stages__c;
             // }
             proposalWrapperList = new List<proposalWrap>();
-            if(!applicantDetails[0].Applicant_Proposal_Associations__r.isEmpty()){
+            if(!applicantDetails.isEmpty() && !applicantDetails[0].Applicant_Proposal_Associations__r.isEmpty()){
                 for(Applicant_Proposal_Association__c apa : applicantDetails[0].Applicant_Proposal_Associations__r) {
                     proposalWrap wrap = new proposalWrap();
                     wrap.apaId = apa.Id;
@@ -138,9 +233,111 @@ public without sharing class ApplicantPortal_Contoller {
                     partnerSubmission = false;
                 }
                 
+                // Load contact profile data
+                loadContactProfileData(contactId);
             }
+        } else if (!String.isBlank(contactId)) {
+            // If contactId is set directly (e.g., from URL parameter), load profile data
+            loadContactProfileData(contactId);
         }
         
+    }
+    
+    // Load contact profile data for Profile section
+    private void loadContactProfileData(Id conId) {
+        System.debug('loadContactProfileData called with conId: ' + conId);
+        if (conId != null) {
+            try {
+                List<Contact> contactList = [
+                    SELECT Id, Salutation, FirstName, LastName, Email, Phone, MobilePhone,
+                           MailingCountry, MailingCity, MailingPostalCode, MailingState,
+                           MailingStreet, Title, Designation__c, Department, AccountId, Account.Id, Account.Name,
+                           Profile_Pic_Attachment_Id__c, Uploaded__c,
+                           (SELECT Id, Name, Degree__c, Institution_Name__c, Area_of_specialization__c, 
+                                   Start_Year__c, End_Year__c, CGPA__c, Percentage__c, Percentage_cgpa__c,
+                                   Start_Date__c, End_Date__c, Nature_of_PhD_Work__c, Nature_of_Thesis_Work__c,
+                                   Thesis_Supervisor__c, Thesis_Type__c, Title_Thesis__c, Contact__c
+                            FROM Education_Details__r
+                            ORDER BY End_Year__c DESC NULLS LAST, Start_Year__c DESC NULLS LAST),
+                           (SELECT Id, Name, Organization_Name__c, Position__c, Start_Date__c, End_Date__c,
+                                   Start_Year__c, End_Year__c, Nature_of_Job__c, current_employement__c, Contact__c
+                            FROM Employment_Details__r
+                            ORDER BY End_Date__c DESC NULLS LAST, Start_Date__c DESC NULLS LAST),
+                           (SELECT Id, Name, Awards_Honours__c, List_of_Publications__c, Book_Chapters__c, 
+                                   List_of_Patents_filed__c, Any_other_achievements__c, Contact__c                                   
+                            FROM Achievements__r
+                            ORDER BY CreatedDate DESC)
+                    FROM Contact
+                    WHERE Id = :conId
+                    LIMIT 1
+                ];
+                
+                if (!contactList.isEmpty()) {
+                    con = contactList[0];
+                    
+                    educationList = con.Education_Details__r != null ? con.Education_Details__r : new List<Education_Details__c>();
+                    employmentList = con.Employment_Details__r != null ? con.Employment_Details__r : new List<Employment_Details__c>();
+                    
+                    System.debug('Loaded educationList size: ' + educationList.size());
+                    System.debug('Loaded employmentList size: ' + employmentList.size());
+                    
+                    try {
+                        achievementList = con.Achievements__r != null && !con.Achievements__r.isEmpty()
+                            ? con.Achievements__r
+                            : new List<Achievement__c>();
+                        System.debug('Loaded achievementList size: ' + achievementList.size());
+                    } catch (Exception ex) {
+                        System.debug('Error loading achievements from relationship: ' + ex.getMessage());
+                        achievementList = new List<Achievement__c>();
+                        try {
+                            List<Achievement__c> achList = [
+                                SELECT Id, Name, Awards_Honours__c, List_of_Publications__c, 
+                                       Book_Chapters__c, List_of_Patents_filed__c, Any_other_achievements__c, Contact__c
+                                FROM Achievement__c
+                                WHERE Contact__c = :con.Id
+                                ORDER BY CreatedDate DESC
+                                LIMIT 10
+                            ];
+                            achievementList = achList;
+                            System.debug('Loaded achievementList from direct query size: ' + achievementList.size());
+                        } catch (Exception e2) {
+                            System.debug('Error loading achievements from direct query: ' + e2.getMessage());
+                            achievementList = new List<Achievement__c>();
+                        }
+                    }
+                    
+                    // Load profile image
+                    if (con.Profile_Pic_Attachment_Id__c != null) {
+                        try {
+                            String attIdStr = String.valueOf(con.Profile_Pic_Attachment_Id__c);
+                            profileImageId = Id.valueOf(attIdStr);
+                            System.debug('Loaded profileImageId: ' + profileImageId);
+                        } catch (Exception e) {
+                            System.debug('Error loading profile image ID: ' + e.getMessage());
+                        }
+                    }
+                } else {
+                    System.debug('No contact found with Id: ' + conId);
+                    con = new Contact();
+                    educationList = new List<Education_Details__c>();
+                    employmentList = new List<Employment_Details__c>();
+                    achievementList = new List<Achievement__c>();
+                }
+            } catch (Exception e) {
+                System.debug('Error loading contact profile data: ' + e.getMessage());
+                System.debug('Stack trace: ' + e.getStackTraceString());
+                con = new Contact();
+                educationList = new List<Education_Details__c>();
+                employmentList = new List<Employment_Details__c>();
+                achievementList = new List<Achievement__c>();
+            }
+        } else {
+            System.debug('conId is null, initializing empty lists');
+            con = new Contact();
+            educationList = new List<Education_Details__c>();
+            employmentList = new List<Employment_Details__c>();
+            achievementList = new List<Achievement__c>();
+        }
     }
 
     public class proposalWrap {
@@ -3204,6 +3401,186 @@ public static void updateProposalStage(Id proposalId) {
     @RemoteAction
     public static string deleteWorkPackageDetails(string workPackageId){
         return IndustrialFellowshipHelper.deleteWorkPackageDetails(workPackageId);
+    }
+    
+    // ========== CONTACT PROFILE METHODS (moved from ContactProfileController) ==========
+    
+    @RemoteAction
+    public static String saveContactProfile(Map<String, Object> contactData) {
+        try {
+            Contact c = new Contact();
+            c.Id = (String) contactData.get('Id');
+            c.Salutation = (String) contactData.get('Salutation');
+            c.FirstName = (String) contactData.get('FirstName');
+            c.LastName = (String) contactData.get('LastName');
+            c.Designation__c = (String) contactData.get('Designation__c');
+            c.Department = (String) contactData.get('Department');
+            c.Email = (String) contactData.get('Email');
+            c.MobilePhone = (String) contactData.get('MobilePhone');
+            c.MailingCountry = (String) contactData.get('MailingCountry');
+            c.MailingStreet = (String) contactData.get('MailingStreet');
+            c.MailingState = (String) contactData.get('MailingState');
+            c.MailingCity = (String) contactData.get('MailingCity');
+            c.MailingPostalCode = (String) contactData.get('MailingPostalCode');
+            
+            // Handle Account
+            String accountName = (String) contactData.get('AccountName');
+            if (String.isNotBlank(accountName)) {
+                Account acc;
+                List<Account> accList = [
+                    SELECT Id
+                    FROM Account
+                    WHERE Name = :accountName
+                    LIMIT 1
+                ];
+                
+                if (!accList.isEmpty()) {
+                    acc = accList[0];
+                } else {
+                    acc = new Account(Name = accountName);
+                    insert acc;
+                }
+                
+                c.AccountId = acc.Id;
+            }
+            
+            upsert c;
+            return 'SUCCESS';
+            
+        } catch (Exception e) {
+            return 'ERROR: ' + e.getMessage();
+        }
+    }
+    
+    @RemoteAction
+    public static String saveEducationDetails(String contactId, String educationJson) {
+        try {
+            List<Object> rawList = (List<Object>) JSON.deserializeUntyped(educationJson);
+            List<Education_Details__c> educationList = new List<Education_Details__c>();
+            
+            for (Object obj : rawList) {
+                Map<String, Object> row = (Map<String, Object>) obj;
+                
+                Education_Details__c edu = new Education_Details__c();
+                edu.Id = (String) row.get('Id');
+                edu.Contact__c = contactId;
+                edu.Degree__c = (String) row.get('Degree__c');
+                edu.Institution_Name__c = (String) row.get('Institution_Name__c');
+                edu.Area_of_specialization__c = (String) row.get('Area_of_specialization__c');
+                
+                // Safe date handling
+                String startDateStr = (String) row.get('Start_Date__c');
+                if (String.isNotBlank(startDateStr)) {
+                    edu.Start_Date__c = Date.valueOf(startDateStr);
+                }
+                
+                String endDateStr = (String) row.get('End_Date__c');
+                if (String.isNotBlank(endDateStr)) {
+                    edu.End_Date__c = Date.valueOf(endDateStr);
+                }
+                
+                educationList.add(edu);
+            }
+            
+            if (educationList.isEmpty()) {
+                return 'ERROR: No education data provided';
+            }
+            
+            upsert educationList;
+            return 'SUCCESS';
+            
+        } catch (Exception e) {
+            System.debug('Error saving education: ' + e.getMessage());
+            return 'ERROR: ' + e.getMessage();
+        }
+    }
+    
+    @RemoteAction
+    public static String saveEmploymentDetails(String contactId, String employmentJson) {
+        try {
+            List<Employment_Details__c> employmentList = (List<Employment_Details__c>) JSON.deserialize(
+                employmentJson,
+                List<Employment_Details__c>.class
+            );
+            
+            if (employmentList == null || employmentList.isEmpty()) {
+                return 'ERROR: No employment data provided';
+            }
+            
+            for (Employment_Details__c emp : employmentList) {
+                if (emp.Contact__c == null) {
+                    emp.Contact__c = contactId;
+                }
+            }
+            
+            upsert employmentList;
+            return 'SUCCESS';
+            
+        } catch (Exception e) {
+            return 'ERROR: ' + e.getMessage();
+        }
+    }
+    
+    @RemoteAction
+    public static String saveAchievementDetails(String contactId, String achievementJson) {
+        try {
+            List<Achievement__c> achievements = (List<Achievement__c>) JSON.deserialize(
+                achievementJson,
+                List<Achievement__c>.class
+            );
+            
+            if (achievements == null || achievements.isEmpty()) {
+                return 'ERROR: No achievement data provided';
+            }
+            
+            for (Achievement__c ach : achievements) {
+                if (ach.Contact__c == null) {
+                    ach.Contact__c = contactId;
+                }
+            }
+            
+            upsert achievements;
+            return 'SUCCESS';
+            
+        } catch (Exception e) {
+            System.debug('Error saving achievement: ' + e.getMessage());
+            return 'ERROR: ' + e.getMessage();
+        }
+    }
+    
+    @RemoteAction
+    public static String deleteEducationRecord(String recordId) {
+        try {
+            delete new Education_Details__c(Id = recordId);
+            return 'SUCCESS';
+        } catch (Exception e) {
+            return 'ERROR: ' + e.getMessage();
+        }
+    }
+    
+    @RemoteAction
+    public static String deleteEmploymentRecord(String recordId) {
+        try {
+            delete new Employment_Details__c(Id = recordId);
+            return 'SUCCESS';
+        } catch (Exception e) {
+            return 'ERROR: ' + e.getMessage();
+        }
+    }
+    
+    @RemoteAction
+    public static String getProfileImageUrl(String contactId) {
+        try {
+            Contact con = [SELECT Id, Profile_Pic_Attachment_Id__c FROM Contact WHERE Id = :contactId LIMIT 1];
+            if (con.Profile_Pic_Attachment_Id__c != null) {
+                String attId = con.Profile_Pic_Attachment_Id__c;
+                return '/servlet/servlet.FileDownload?file=' + attId;
+            }
+            return null;
+        } catch (Exception e) {
+            System.debug('Error getting profile image URL: ' + e.getMessage());
+            return null;
+        }
     }
     
 }
