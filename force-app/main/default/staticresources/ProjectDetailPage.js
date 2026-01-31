@@ -1,11 +1,21 @@
 angular.module('cp_app').controller('ProjectDetailCtrl', function ($scope, $rootScope) {
 
     debugger;
-
+    $rootScope.apaId=null
     // Fetching the proposalId from Local Storage
     if (localStorage.getItem('yearlyCallId')) {
         $rootScope.yearlyCallId = localStorage.getItem('yearlyCallId');
         console.log('Loaded proposalId from localStorage:', $rootScope.yearlyCallId);
+    }
+
+    if(localStorage.getItem('proposalId')){
+        $rootScope.proposalId = localStorage.getItem('proposalId');
+        console.log('Loaded proposalId from localStorage:', $rootScope.proposalId);
+    }
+        
+    if (localStorage.getItem('apaId')) {
+        $rootScope.apaId = localStorage.getItem('apaId');
+        console.log('Loaded apaId from localStorage:', $rootScope.apaId);
     }
 
     $scope.siteURL = siteURL;
@@ -27,19 +37,13 @@ angular.module('cp_app').controller('ProjectDetailCtrl', function ($scope, $root
     $scope.bulletCondition = $rootScope.secondStage && $rootScope.isPrimaryContact == "true" ? true : false;
     $scope.proposalStage = $rootScope.proposalStage ? true : ($rootScope.isPrimaryContact == "false" ? true : false);
     CKEDITOR.config.readOnly = $scope.proposalStage;
-    // $scope.proposalStage = $rootScope.proposalStage;
-    // if($rootScope.isPrimaryContact=="false" && $rootScope.proposalStage == false){
-    //     $scope.proposalStage = true;
-    //     CKEDITOR.config.readOnly = true;
-    // }
-    //till here
     $scope.getApplicantDetail = function () {
         console.log('Inside getApplicantDetail=======================> ');
         console.log('$rootScope.userId====================>' + $rootScope.userId);
         console.log('thematicAreaList value:', $scope.thematicAreaList);
         console.log('thematicAreaList length:', $scope.thematicAreaList ? $scope.thematicAreaList.length : 0);
         debugger;
-        ApplicantPortal_Contoller.getApplicantDetails($rootScope.candidateId, function (result, event) {
+        ApplicantPortal_Contoller.getApplicantDetails($rootScope.candidateId,$rootScope.apaId, function (result, event) {
             console.log('Apex called===============>');
             console.log('Result===================>' + JSON.stringify(result));
             console.log('Event=================>' + JSON.stringify(event));
@@ -47,33 +51,28 @@ angular.module('cp_app').controller('ProjectDetailCtrl', function ($scope, $root
             if (event.status) {
                 debugger;
                 if (result != null) {
-                    var thematicAreaId = []
-                    $rootScope.projectId = result.Id;
-                    /*  for(var i=0;i<$scope.thematicAreaList.length;i++){
-                          thematicAreaId.push($scope.thematicAreaList[i].Id);
-                          $scope.thematicAreaToDisplay.push({"Id":$scope.thematicAreaList[i].Id,"Name":$scope.thematicAreaList[i].Name,"checked":false});
-                      } */
-                    // $scope.tentitiveStartDate = result.Tentative_Start_Date__c;
-                    if (result.Tentative_Start_Date__c != null) {
-                        $scope.startDate = true;
-                        $scope.tentitiveStartDate = new Date(result.Tentative_Start_Date__c);
+                    var thematicAreaId = [];
+                    let proposal=result.proposal;
+                    $rootScope.apaId = result.apa?.Id;
+                    // Get coordinator status from APA
+                    $rootScope.isCoordinator = result.apa != null && result.apa.Is_Coordinator__c == true ? 'true' : 'false';
+                    
+                    if (proposal.Summary__c != undefined || proposal.Summary__c != "") {
+                        proposal.Summary__c = proposal.Summary__c ? proposal.Summary__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : proposal.Summary__c;
                     }
-                    if (result.Summary__c != undefined || result.Summary__c != "") {
-                        result.Summary__c = result.Summary__c ? result.Summary__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Summary__c;
+                    if (proposal.Acronym__c != undefined || proposal.Acronym__c != "") {
+                        proposal.Acronym__c = proposal.Acronym__c ? proposal.Acronym__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : proposal.Acronym__c;
                     }
-                    if (result.Acronym__c != undefined || result.Acronym__c != "") {
-                        result.Acronym__c = result.Acronym__c ? result.Acronym__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Acronym__c;
+                    if (proposal.Title_Of__c != undefined || proposal.Title_Of__c != "") {
+                        proposal.Title_Of__c = proposal.Title_Of__c ? proposal.Title_Of__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : proposal.Title_Of__c;
                     }
-                    if (result.Title_Of__c != undefined || result.Title_Of__c != "") {
-                        result.Title_Of__c = result.Title_Of__c ? result.Title_Of__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Title_Of__c;
+                    if (proposal.Title_In_German__c != undefined || proposal.Title_In_German__c != "") {
+                        proposal.Title_In_German__c = proposal.Title_In_German__c ? proposal.Title_In_German__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : proposal.Title_In_German__c;
                     }
-                    if (result.Title_In_German__c != undefined || result.Title_In_German__c != "") {
-                        result.Title_In_German__c = result.Title_In_German__c ? result.Title_In_German__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Title_In_German__c;
+                    if (proposal.KeyWords__c != undefined || proposal.KeyWords__c != "") {
+                        proposal.KeyWords__c = proposal.KeyWords__c ? proposal.KeyWords__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : proposal.KeyWords__c;
                     }
-                    if (result.KeyWords__c != undefined || result.KeyWords__c != "") {
-                        result.KeyWords__c = result.KeyWords__c ? result.KeyWords__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replace(/&#39;/g, '\'').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.KeyWords__c;
-                    }
-                    $scope.applicantDetails = result;
+                    $scope.applicantDetails = proposal;
                     //$scope.applicantDetails.Duration_In_Months_Max_36__c = Math.round($scope.applicantDetails.Duration_In_Months_Max_36__c);
                     if ($scope.applicantDetails.Application_Thematic_Area__r != undefined) {
                         $scope.thematicAreaToDisplay = [];
@@ -425,7 +424,7 @@ angular.module('cp_app').controller('ProjectDetailCtrl', function ($scope, $root
 
     $scope.redirectPageURL = function (pageName) {
         debugger;
-        if ($rootScope.isPrimaryContact == "false" && $rootScope.proposalStage == false) {
+        if ($rootScope.isCoordinator == "false" && $rootScope.proposalStage == false) {
             CKEDITOR.config.readOnly = false;
         }
         var link = document.createElement("a");

@@ -217,10 +217,57 @@ public without sharing class ContactProfileController {
             //         return 'ERROR: ' + e.getMessage();
         //     }
     // }
+    // @RemoteAction
+    // public static String saveContactProfile(Map<String, Object> contactData) {
+    //     try {
+            
+    //         Contact c = new Contact();
+    //         c.Id = (String) contactData.get('Id');
+    //         c.Salutation = (String) contactData.get('Salutation');
+    //         c.FirstName = (String) contactData.get('FirstName');
+    //         c.LastName = (String) contactData.get('LastName');
+    //         c.Designation__c = (String) contactData.get('Designation__c');
+    //         c.Department = (String) contactData.get('Department');
+    //         c.Email = (String) contactData.get('Email');
+    //         c.MobilePhone = (String) contactData.get('MobilePhone');
+    //         c.MailingCountry = (String) contactData.get('MailingCountry');
+    //         c.MailingStreet = (String) contactData.get('MailingStreet');
+    //         c.MailingState = (String) contactData.get('MailingState');
+    //         c.MailingCity = (String) contactData.get('MailingCity');
+    //         c.MailingPostalCode = (String) contactData.get('MailingPostalCode');
+            
+    //         // ✅ HANDLE ACCOUNT
+    //         String accountName = (String) contactData.get('AccountName');
+    //         if (String.isNotBlank(accountName)) {
+    //             Account acc;
+                
+    //             List<Account> accList = [
+    //             SELECT Id
+    //             FROM Account
+    //             WHERE Name = :accountName
+    //             LIMIT 1
+    //         ];
+                
+    //             if (!accList.isEmpty()) {
+    //                 acc = accList[0];
+    //             } else {
+    //                 acc = new Account(Name = accountName);
+    //                 insert acc;
+    //             }
+                
+    //             c.AccountId = acc.Id;
+    //         }
+            
+    //         upsert c;
+    //         return 'SUCCESS';
+            
+    //     } catch (Exception e) {
+    //         return 'ERROR: ' + e.getMessage();
+    //     }
+    // }
     @RemoteAction
     public static String saveContactProfile(Map<String, Object> contactData) {
         try {
-            
             Contact c = new Contact();
             c.Id = (String) contactData.get('Id');
             c.Salutation = (String) contactData.get('Salutation');
@@ -235,36 +282,51 @@ public without sharing class ContactProfileController {
             c.MailingState = (String) contactData.get('MailingState');
             c.MailingCity = (String) contactData.get('MailingCity');
             c.MailingPostalCode = (String) contactData.get('MailingPostalCode');
-            
-            // ✅ HANDLE ACCOUNT
+
+            /* ================= ACCOUNT HANDLING ================= */
+
             String accountName = (String) contactData.get('AccountName');
+            String institutionType = (String) contactData.get('InstitutionType');
+
             if (String.isNotBlank(accountName)) {
                 Account acc;
-                
                 List<Account> accList = [
-                SELECT Id
-                FROM Account
-                WHERE Name = :accountName
-                LIMIT 1
-            ];
-                
+                    SELECT Id, Academia__c, Industry__c
+                    FROM Account
+                    WHERE Name = :accountName
+                    LIMIT 1
+                ];
+
                 if (!accList.isEmpty()) {
                     acc = accList[0];
                 } else {
                     acc = new Account(Name = accountName);
-                    insert acc;
                 }
-                
+
+                // ✅ Reset both checkboxes first
+                acc.Academia__c = false;
+                acc.Industry__c = false;
+
+                // ✅ Set based on selection
+                if (institutionType == 'Academia') {
+                    acc.Academia__c = true;
+                } else if (institutionType == 'Industry') {
+                    acc.Industry__c = true;
+                }
+
+                upsert acc;
                 c.AccountId = acc.Id;
             }
-            
+
             upsert c;
             return 'SUCCESS';
-            
+
         } catch (Exception e) {
             return 'ERROR: ' + e.getMessage();
         }
     }
+
+
     
     
     @RemoteAction

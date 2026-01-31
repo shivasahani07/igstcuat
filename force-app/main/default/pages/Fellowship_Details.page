@@ -276,7 +276,7 @@
                     </div>
 
                     <!-- SUBTOPIC SECTION -->
-                    <div class="row mt-5 mx-5">
+                    <!-- <div class="row mt-5 mx-5">
                         <div class="col-md-12">    
                             <label class="pb-3 color-theme"><b>Subtopic</b>
                                 <span class="required-asterisk" style="color:red;">*</span>
@@ -289,7 +289,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- KEYWORDS SECTION -->
                     <div class="row mt-5 mx-5">
@@ -318,6 +318,23 @@
                         </div>
                     </div>
                     <!-- END KEYWORDS SECTION -->
+
+                    <div class="row mt-5 mx-5">
+                        <div class="col-md-6">
+                            <label class="font-if color-theme"><b>Broad area of research</b><span
+                                    class="required-asterisk text-danger">*</span></label>
+                            <input name="BroadAreaOfResearch" class="form-control" type="text"
+                                ng-focus="removeClass('txtBroadArea')" id="txtBroadArea"
+                                ng-model="BroadAreaOfResearch" ng-disabled="proposalStage" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="font-if color-theme"><b>Non-technical title of the project</b><span
+                                    class="required-asterisk text-danger">*</span></label>
+                            <input name="NonTechTitle" class="form-control" type="text"
+                                ng-focus="removeClass('txtNonTechTitle')" id="txtNonTechTitle"
+                                ng-model="NonTechTitle" ng-disabled="proposalStage" />
+                        </div>
+                    </div>
 
 
 
@@ -390,10 +407,12 @@
                     <div class="row mt-3 mx-5">
                         <div class="col-md-12 mt-3">
                             <p>
-                            <h5 class="" style="color:#138808; font-family: 'Montserrat', sans-serif;">"Fellowship
-                                should tentatively start after  <span class=""
+                            <h5 class="" style="color:#138808; font-family: 'Montserrat', sans-serif;">"Travel shall be scheduled between
+                                  <span class=""
                                     style="color:#138808; font-family: 'Montserrat', sans-serif;"
-                                    ng-bind="Pecfar_dateInformationText | date:'dd/MM/yyyy'"></span> and not before."
+                                    ng-bind="Pecfar_dateInformationText | date:'dd/MM/yyyy'"></span>  to  <span class=""
+                                    style="color:#138808; font-family: 'Montserrat', sans-serif;"
+                                    ng-bind="Pecfar_dateInformationText2 | date:'dd/MM/yyyy'"></span>"
                             </h5>
                             </p>
                         </div>
@@ -406,7 +425,7 @@
                             </label>
                             <span class="required-asterisk" style="color:red;">*</span>
                             <input name="Proposed Start Date" placeholder="Proposed Start Date" class="form-control"
-                                ng-init="tentitiveStartDate=(tentitiveStartDate | date:'yyyy-MM-dd')" type="date"
+                                type="date"
                                 ng-model="tentitiveStartDate" ng-focus="removeClass2('txtSD')" id="txtSD"
                                 ng-disabled="proposalStage" />
                         </div>
@@ -417,11 +436,12 @@
                             </label>
                             <span class="required-asterisk" style="color:red;">*</span>
                             <input name="Proposed End Date" placeholder="Proposed End Date" class="form-control"
-                                ng-init="tentitiveEndDate=(tentitiveEndDate | date:'yyyy-MM-dd')" type="date"
+                                type="date"
                                 ng-model="tentitiveEndDate" ng-focus="removeClass2('txtED')" id="txtED"
                                 ng-disabled="proposalStage" />
                         </div>
                     </div>
+                    
 
                     <div class="row mt-3 mx-5">
                         <div class="col-md-6 mt-3">

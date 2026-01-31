@@ -470,7 +470,7 @@ angular.module('cp_app').controller('declarationplus2_ctrl', function ($scope, $
         })
             .then((willDelete) => {
                 if (willDelete) {
-                    ApplicantPortal_Contoller.submitPartner2plus2($scope.decDetails, year, month, day, function (result, event) {
+                    ApplicantPortal_Contoller.submitPartner2plus2($scope.decDetails, year, month, day, $rootScope.proposalId, function (result, event) {
                         if (event.status) {
                             debugger;
                             Swal.fire(

@@ -280,17 +280,17 @@
                     </div>
                 </div>
                 <div class="row mx-5">
-                    <div class="col-md-6" ng-show="isCoordinator=='true'">
-                        <button class="blue-btn w-100" type="button" ng-click="setCurrentDiv('coordinator')">Coordinator
+                    <div class="col-md-6" ng-show="isCoordinatorr=='true'">
+                        <button class="blue-btn w-100" type="button" ng-click="setCurrentDiv('coordinator')">Coordinator o
                             Details</button>
                     </div>
-                    <div class="col-md-6" ng-show="isCoordinator=='true'">
+                    <div class="col-md-6" ng-show="isCoordinatorr=='true'">
                         <button class="blue-btn w-100" type="button" ng-click="setCurrentDiv('partner')">Project Partner
                             Details</button>
                     </div>
                 </div>
                 <div ng-show="divPartner">
-                    <div class="row mx-5 mt-3" ng-show="isCoordinator=='true'">
+                    <div class="row mx-5 mt-3" ng-show="isCoordinatorr=='true'">
                         <div class="col-md-8">
                             <label class="font-if">Search Partner by Email</label>
                             <input type="email" ng-model="searchEmail" class="form-control"
@@ -650,7 +650,7 @@
                     </div>
                 </div> -->
                 </div>
-                <div ng-show="divCoordinator==true && isCoordinator=='true'">
+                <div ng-show="divCoordinator==true && isCoordinatorr=='true'">
                     <!-- <div class="row mt-5 mx-5">
                 <div class="col-md-12 pt-4 ps-5">
                     <h4>

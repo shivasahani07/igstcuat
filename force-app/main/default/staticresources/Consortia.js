@@ -29,7 +29,8 @@ angular.module('cp_app').controller('Consortia_Ctrl', function ($scope, $rootSco
     $scope.searchEmail = '';
     debugger
     $scope.proposalStage = $scope.proposalStage ? true : ($scope.secondstage ? true : false);
-    $scope.isCoordinatorr = $rootScope.isCoordinator
+    $scope.isCoordinatorr = $rootScope.isCoordinator;
+    $scope.isCoordinator = $rootScope.isCoordinator;
     // if($rootScope.isCoordinatorr=="true"){
     //     $("#divCoordinatorInfo").show();
     //     $("#divProjectPartnerInfo").hide();
@@ -40,6 +41,11 @@ angular.module('cp_app').controller('Consortia_Ctrl', function ($scope, $rootSco
     if ($scope.isCoordinatorr == 'false' || $scope.isCoordinatorr === false) {
         $scope.divCoordinator = true;
         $scope.divPartner = false;
+    }
+    if($scope.isCoordinator == true){
+        $scope.isCoordinator='true';
+    }else{
+        $scope.isCoordinator='false';
     }
     console.log('is coordinator ::=>' + $scope.isCoordinatorr);
     $scope.arrySaveStatus = [{ status: true }, { status: true }, { status: true }, { status: true }, { status: true }, { status: true }];
@@ -1265,10 +1271,8 @@ angular.module('cp_app').controller('Consortia_Ctrl', function ($scope, $rootSco
         for (var i = 0; i < $scope.allCoordinatorDetails.length; i++) {
             if (i == index) {
                 $scope.allCoordinatorDetails[i].Is_Coordinator__c = true;
-                $scope.allCoordinatorDetails[i].Is_Primary__c = true;
             } else {
                 $scope.allCoordinatorDetails[i].Is_Coordinator__c = false;
-                $scope.allCoordinatorDetails[i].Is_Primary__c = false;
             }
         }
     }
@@ -1508,8 +1512,8 @@ angular.module('cp_app').controller('Consortia_Ctrl', function ($scope, $rootSco
             debugger;
         }
 
-        if ($scope.emailCheck == true) {
-            swal('info', 'Email already exists.', 'info');
+        if ($scope.emailCheck == true && $scope.isCoordinator != 'false') {
+            swal('info', 'Contact Does Not Exist.', 'info');
             //$("#email"+ind+"").addClass('border-theme');
             return;
         }
@@ -1659,9 +1663,9 @@ angular.module('cp_app').controller('Consortia_Ctrl', function ($scope, $rootSco
             if (event.status) {
                 debugger;
                 if (result.length > 0) {
-                    $scope.emailCheck = true;
-                } else {
                     $scope.emailCheck = false;
+                } else {
+                    $scope.emailCheck = true;
                 }
                 $scope.submitDetails(flag);
                 $scope.$apply();

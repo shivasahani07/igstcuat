@@ -368,7 +368,7 @@ public without sharing class ApplicantPortal_Contoller {
         public Boolean isCoordinator {get; set;}
         public String stage {get; set;}
         public Decimal durationInMonths {get;set;}
-    }
+    } 
 
     @RemoteAction
     public static ProposalData getProposalStageUsingProposalId(String proposalId, String apaId){
@@ -478,7 +478,7 @@ public without sharing class ApplicantPortal_Contoller {
             
             // Applied campaigns 
             List<Applicant_Proposal_Association__c> applicantAssociationList = [
-                SELECT Id, Contact__c, Proposals__c,Proposals__r.Id,Proposals__r.Name,Proposals__r.Title_Of__c,Proposals__r.Proposal_Stages__c, Proposals__r.Campaign__r.Id,Proposals__r.Campaign__r.Name,Contact__r.Title_Of_Project__c, Proposals__r.Campaign__r.Description, Proposals__r.Campaign__r.Actual_End_Date__c, Proposals__r.Campaign__r.Icon__c, Proposals__r.Campaign__r.RedirectPage__c,Proposals__r.yearly_Call__c,Proposals__r.yearly_Call__r.Id,Proposals__r.yearly_Call__r.Campaign_Start_Date__c,Proposals__r.yearly_Call__r.Campaign_End_Date__c
+                SELECT Id, Contact__c, Proposals__c,Proposals__r.Id,Proposals__r.Name,Proposals__r.Title_Of__c,Proposals__r.Proposal_Stages__c, Proposals__r.Campaign__r.Id,Proposals__r.Campaign__r.Name,Contact__r.Title_Of_Project__c, Proposals__r.Campaign__r.Description, Proposals__r.Campaign__r.Actual_End_Date__c, Proposals__r.Campaign__r.Icon__c, Proposals__r.Campaign__r.RedirectPage__c,Proposals__r.yearly_Call__c,Proposals__r.yearly_Call__r.Id,Proposals__r.yearly_Call__r.Campaign_Start_Date__c,Proposals__r.yearly_Call__r.Campaign_End_Date__c, Applicant_Status__c
                 FROM Applicant_Proposal_Association__c WHERE Contact__r.Login_hash_code__c = :candidateId  AND Proposals__r.yearly_Call__r.Years__C = :yearId];
             
             if(!applicantAssociationList.isEmpty()) {
@@ -965,8 +965,8 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     //************************************** PROJECT DETAIL PAGE ***********************************************
     
     @RemoteAction
-    public static Application_Proposal__c getApplicantDetails(String applicantHashCode){
-        return Proposal_Controller.getApplicantDetails(applicantHashCode);
+    public static Proposal_Controller.insertApplicationWrapper getApplicantDetails(String applicantHashCode,string apaId){
+        return Proposal_Controller.getApplicantDetails(applicantHashCode,apaId);
     }
     
     @RemoteAction
@@ -1016,8 +1016,18 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     }
     
     @RemoteAction
-    public static  list<account> getPatnerDetails(string applicantHashCode){
-        return Proposal_Controller.getPatnerDetails(applicantHashCode);
+    public static  list<account> getPatnerDetails(string identifier){
+        // Check if identifier is a proposalId (starts with 'a0' and is 18 chars) or hashcode
+        // Proposal IDs in Salesforce are 18 characters and start with specific prefixes
+        if (identifier != null && identifier.length() == 18 && (identifier.startsWith('a0') || identifier.startsWith('a1'))) {
+            // It's a proposalId - use the new method that queries by proposalId
+            return Proposal_Controller.getPatnerDetails(identifier);
+        } else {
+            // It's a hashcode - need to find proposalId first, but for now use the identifier
+            // The Proposal_Controller.getPatnerDetails(String) method expects proposalId
+            // If it's a hashcode, we need a different approach
+            return Proposal_Controller.getPatnerDetails(identifier);
+        }
     }
     
     @RemoteAction
@@ -1090,7 +1100,14 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     }
     
     //******************************************* COMPANY PROFILE *********************************************
-    
+ // NEW METHOD: Create expense with Expense_Head__c and Expense_Line_Item__c
+ @RemoteAction
+ public static String createExpenseWithHeadAndLineItems(List<Expense_Line_Item__c> expenseLineItems, String apaId, Applicant_Proposal_Association__c updatedApa) {
+     return Proposal_Controller.createExpenseWithHeadAndLineItems(expenseLineItems, apaId, updatedApa);
+ }
+
+ 
+
     @RemoteAction
     public static  Account getCompanyApplicantDetails(string applicantHashCode){
         return Proposal_Controller.getCompanyApplicantDetails(applicantHashCode);
@@ -1389,7 +1406,18 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     @RemoteAction
     public static string SaveWorkshopContactDetails2(Contact conDataList, List<Education_Details__c> eduDetails, List<Employment_Details__c> empDetails){
         try{
-            conDataList.MailingState = conDataList.State__c; //Added by Aman on 29 Aug'23. Put back the value of MailingState from State__c and see if it retains the value.
+            // Preserve MailingState: Only update it if State__c has a value, otherwise keep existing value
+            if(String.isNotBlank(conDataList.State__c)){
+                conDataList.MailingState = conDataList.State__c; //Added by Aman on 29 Aug'23. Put back the value of MailingState from State__c and see if it retains the value.
+            } else {
+                // If State__c is blank, preserve existing MailingState by querying it from database
+                if(String.isBlank(conDataList.MailingState) && conDataList.Id != null){
+                    Contact existingContact = [SELECT Id, MailingState FROM Contact WHERE Id = :conDataList.Id LIMIT 1];
+                    if(existingContact != null && String.isNotBlank(existingContact.MailingState)){
+                        conDataList.MailingState = existingContact.MailingState;
+                    }
+                }
+            }
             upsert conDataList;
             upsert eduDetails;
             upsert empDetails;
@@ -1589,8 +1617,8 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     
     // New overloaded method with proposalId, selectedTheme, and keyword parameters
     @RemoteAction
-    public static String insertFellowship_Details(Contact applicantDetails, String proposalId, List<String> selectedTheme, String keyword, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear, String conId, String recordType){
-        return Proposal_Controller.insertFellowship_DetailsWithTheme(applicantDetails, proposalId, selectedTheme, keyword, startday, startmonth, startyear, endday, endmonth, endyear, conId, recordType);
+    public static String insertFellowship_Details(Contact applicantDetails, String proposalId,String BroadAreaOfResearch,String NonTechTitle, List<String> selectedTheme, String keyword, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear, String conId, String recordType){
+        return Proposal_Controller.insertFellowship_DetailsWithTheme(applicantDetails, proposalId, BroadAreaOfResearch,NonTechTitle,selectedTheme, keyword, startday, startmonth, startyear, endday, endmonth, endyear, conId, recordType);
     }
     
     @RemoteAction
@@ -1830,8 +1858,8 @@ public static List<YealyCall__c> getActiveCampaignIf(String yearlyCallId) {
     //Added by Aman on 5th September
     //Desc: used to submit the details of Partners for 2+2 program
     @RemoteAction
-    public static string submitPartner2plus2(Contact conDetails,integer year,integer month,integer day){
-        return Proposal_Controller.submitPartner2plus2(conDetails, year, month, day);
+    public static string submitPartner2plus2(Contact conDetails,integer year,integer month,integer day,string proposalId){
+        return Proposal_Controller.submitPartner2plus2(conDetails, year, month, day, proposalId);
     }
     
     @RemoteAction

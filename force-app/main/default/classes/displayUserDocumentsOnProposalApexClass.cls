@@ -24,9 +24,7 @@ public class displayUserDocumentsOnProposalApexClass {
         List<contact> conList = new List<contact>();
     Application_Proposal__c propData = [Select id , RecordTypeId,RecordType.Name,IF_tranche__c from Application_Proposal__c where id = : proposalId];
     if(propData.RecordType.Name == 'WISER'){
-        Set<Id> coordinatorContactIds = new Set<Id>();
-        for (Applicant_Proposal_Association__c apa : [SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :proposalId AND Is_Coordinator__c = true]) coordinatorContactIds.add(apa.Contact__c);
-        conList = [SELECT Id, Name,Institution__c,Tentative_Start_Date__c,Tentative_End_Date__c, Fellowship_Duration__c, Industrial_Fellowship_Type__c, PhD_Enroll_Date__c, CONTACT_ADDRESS_FORMULA__c FROM Contact WHERE Id IN :coordinatorContactIds];
+        conList = [SELECT Id, Name,Institution__c,Tentative_Start_Date__c,Tentative_End_Date__c, Fellowship_Duration__c, Industrial_Fellowship_Type__c, PhD_Enroll_Date__c, CONTACT_ADDRESS_FORMULA__c ,Is_Primary__c FROM contact where Proposals__c=:proposalId and Is_Primary__c = true];
     }
     else {
         conList = [SELECT Id, Name,Institution__c,Tentative_Start_Date__c,Tentative_End_Date__c, Fellowship_Duration__c, Industrial_Fellowship_Type__c, PhD_Enroll_Date__c, CONTACT_ADDRESS_FORMULA__c  FROM contact where Proposals__c=:proposalId ];
@@ -40,9 +38,7 @@ public class displayUserDocumentsOnProposalApexClass {
         List<contact> conList = new List<contact>();
         Application_Proposal__c propData = [Select id , RecordTypeId,RecordType.Name,IF_tranche__c from Application_Proposal__c where id = : proposalId];
         if(propData.RecordType.Name == 'WISER'){
-            Set<Id> coordinatorContactIds = new Set<Id>();
-            for (Applicant_Proposal_Association__c apa : [SELECT Contact__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :proposalId AND Is_Coordinator__c = true]) coordinatorContactIds.add(apa.Contact__c);
-            conList = [SELECT Id, Name,Institution__c,Tentative_Start_Date__c,Tentative_End_Date__c, Fellowship_Duration__c, Industrial_Fellowship_Type__c, PhD_Enroll_Date__c, CONTACT_ADDRESS_FORMULA__c FROM Contact WHERE Id IN :coordinatorContactIds];
+            conList = [SELECT Id, Name,Institution__c,Tentative_Start_Date__c,Tentative_End_Date__c, Fellowship_Duration__c, Industrial_Fellowship_Type__c, PhD_Enroll_Date__c, CONTACT_ADDRESS_FORMULA__c , Is_Primary__c FROM contact where Proposals__c=:proposalId and Is_Primary__c = true];
         }
         else {
             conList = [SELECT Id, Name,Institution__c,Tentative_Start_Date__c,Tentative_End_Date__c, Fellowship_Duration__c, Industrial_Fellowship_Type__c, PhD_Enroll_Date__c, CONTACT_ADDRESS_FORMULA__c  FROM contact where Proposals__c=:proposalId ];

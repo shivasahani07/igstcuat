@@ -98,7 +98,7 @@ angular.module('cp_app').controller('parengOrg_ctrl', function($scope,$rootScope
         $scope.accountDetails['Shipping_State__c'] = $scope.accountDetails['BillingState'];
 
         if($scope.accDetails.Account.Name==undefined || $scope.accDetails.Account.Name==""){
-            swal('info','Please enter Organization Name','info');
+            swal('Info','Please enter Organization Name','info');
             $("#name").addClass('border-theme');
             return;
         }
@@ -118,30 +118,30 @@ angular.module('cp_app').controller('parengOrg_ctrl', function($scope,$rootScope
         //     }
         // }
         if($scope.accDetails.Account.BillingCountry==undefined || $scope.accDetails.Account.BillingCountry==""){
-            swal('info','Please enter Country','info');
+            swal('Info','Please enter Country','info');
             $("#country").addClass('border-theme');
             return;
         }
         if($scope.accDetails.Account.BillingPostalCode==undefined || $scope.accDetails.Account.BillingPostalCode==""){
-            swal('info','Please enter Pin Code','info');
+            swal('Info','Please enter Pin Code','info');
             $("#pincode").addClass('border-theme');
             return;
         }else{
             if($scope.accDetails.Account.BillingCountry == "India"){
                 if($scope.accDetails.Account.BillingPostalCode.length != 6){
-                    swal('info','For India, pin code should be 6 digit.','info');
+                    swal('Info','For India, pin code should be 6 digit.','info');
                     $("#pincode").addClass('border-theme');
                     return; 
                 }
             }
           }
         if($scope.accDetails.Account.Homepage_URL__c==undefined || $scope.accDetails.Account.Homepage_URL__c==""){
-            swal('info','Please enter Homepage URL','info');
+            swal('Info','Please enter Homepage URL','info');
             $("#homepage").addClass('border-theme');
             return;
         }
         if($scope.accDetails.Account.Organisation_Posrt__c==undefined || $scope.accDetails.Account.Organisation_Posrt__c==""){
-            swal('info','Please enter Organization portfolio','info');
+            swal('Info','Please enter Organization portfolio','info');
             return;
         }else{
                 // var div = document.createElement("div");
@@ -149,7 +149,7 @@ angular.module('cp_app').controller('parengOrg_ctrl', function($scope,$rootScope
                 // let abstractText = div.innerText.replace(/(\r\n\t|\t|\n|\r)/gm, "");
                 // abstractText = abstractText.replaceAll(/\s/g,'');
           if(charLength > 500){
-            swal('info','Max character limit for Brief Portfolio of the organisation is 500 only','info');
+            swal('Info','Max character limit for Brief Portfolio of the organisation is 500 only','info');
             return;
           }
         }
@@ -161,11 +161,23 @@ angular.module('cp_app').controller('parengOrg_ctrl', function($scope,$rootScope
             if(event.status){
                 debugger;
                 swal({
-                    title: "Parent Organization Details",
-                    text: 'Your parent organization details have been successfully saved.',
-                    icon: "success",
-                    button: "ok!",
-                  }).then((value) => {
+                    // title: "Parent Organization Details",
+                    // text: 'Your parent organization details have been saved \nsuccessfully.',
+                    // icon: "success",
+                    // button: "ok!",
+                     title: "Parent Organization Details",
+                        content: {
+                            element: "div",
+                            attributes: {
+                                innerHTML: `
+                                    <div>Your parent organization details have been successfully</div>
+                                    <div style="text-align:center;">saved.</div>
+                                `
+                            }
+                        },
+                        icon: "success",
+                        button: "ok!",
+                 }).then((value) => {
                     $scope.redirectPageURL('Education_Qualification');
                     $scope.accDetails = result;
                       });
@@ -226,7 +238,7 @@ angular.module('cp_app').controller('parengOrg_ctrl', function($scope,$rootScope
         debugger;
         if($scope.accDetails.Account.BillingCountry == "India"){
           if($scope.accDetails.Account.BillingPostalCode.length > 6){
-            swal('info','For India, pin code should be 6 digit.','info');
+            swal('Info','For India, pin code should be 6 digit.','info');
             $("#pincode").addClass('border-theme');
           return;
           }

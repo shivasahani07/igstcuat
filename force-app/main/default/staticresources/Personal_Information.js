@@ -198,7 +198,7 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
     if($scope.applicantDetails.MobilePhone != undefined && $scope.applicantDetails.MobilePhone != "" && $scope.applicantDetails.MailingCountry == "India"){
         if($scope.applicantDetails.MobilePhone.length < 10){
             swal(
-                'info',
+                'Info',
                 'Mobile No. should be 10 digit.',
                 'info'
             )
@@ -218,12 +218,12 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
             return;
     }
     if($scope.emailCheck == true){
-        swal('Info','Email already exists.','Info');
+        swal('Info','Email already exists.','info');
         $("#txtEmail").addClass('border-theme');
             return;
     }
     if ($scope.MailingStreet1 == undefined || $scope.MailingStreet1 == "") {
-        swal("Info", "Please enter Line 1.","Info");
+        swal("Info", "Please enter Line 1.","info");
         $("#txtMailingL1").addClass('border-theme');
         return; 
     }
@@ -249,7 +249,7 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
     if($scope.applicantDetails.MailingCountry != undefined && $scope.applicantDetails.MailingCountry == "India"){
         if($scope.applicantDetails.MailingPostalCode != undefined){
             if($scope.applicantDetails.MailingPostalCode.length != 6){
-                swal('info','For India, pin code should be 6 digit.','info');
+                swal('Info','For India, pin code should be 6 digit.','info');
                 $("#txtMailingPincode").addClass('border-theme');
               return;
             }
@@ -263,7 +263,7 @@ angular.module('cp_app').controller('personalInfo_ctrl', function($scope,$rootSc
     }
 
     if($scope.applicantDetails.Uploaded__c == false){
-        swal('info','Please upload image.','info');
+        swal('Info','Please upload image.','info');
         return;  
       }
     $scope.applicantDetails['State__c'] = $scope.applicantDetails['MailingState'];
@@ -364,7 +364,7 @@ $scope.getProjectdetils();
             if(typeOfFile[lengthOfType-1] == "jpg" || typeOfFile[lengthOfType-1] == "jpeg" || typeOfFile[lengthOfType-1] == "JPEG" || typeOfFile[lengthOfType-1] == "JPG"){
                 
             }else{
-                swal('info','Please choose jpg/jpeg file only.','info');
+                swal('Info','Please choose jpg/jpeg file only.','info');
                 $scope.setLostValues();
                 return;
             }
@@ -373,7 +373,7 @@ $scope.getProjectdetils();
         if (file != undefined) {
             if (file.size <= maxFileSize) {
                 if(file.size<fileSizeMin){
-                  swal("Info", "File must be between 30 to 500 kb in size.  Your file is too small.  Please try again.","Info");
+                  swal("Info", "File must be between 30 to 500 kb in size.  Your file is too small.  Please try again.","info");
                   $scope.setLostValues();
                   return; 
                     // alert("File must be between 30 to 50 kb in size.  Your file is too small.  Please try again.");
@@ -398,7 +398,7 @@ $scope.getProjectdetils();
                     if (fileSize < maxStringSize) {
                         $scope.uploadAttachment(type , userDocId, fileId);
                     } else {
-                      swal("Info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".","Info");
+                      swal("Info", "Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".","info");
                       $scope.setLostValues();
                       return;
                         // alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
@@ -406,13 +406,13 @@ $scope.getProjectdetils();
         
                 }
                 fileReader.onerror = function (e) {
-                  swal("Info", "There was an error reading the file.  Please try again.","Info");
+                  swal("Info", "There was an error reading the file.  Please try again.","info");
                   $scope.setLostValues();
                       return;
                     // alert("There was an error reading the file.  Please try again.");
                 }
                 fileReader.onabort = function (e) {
-                  swal("Info", "There was an error reading the file.  Please try again.","Info");
+                  swal("Info", "There was an error reading the file.  Please try again.","info");
                   $scope.setLostValues();
                       return;
                     // alert("There was an error reading the file.  Please try again.");
@@ -421,7 +421,7 @@ $scope.getProjectdetils();
                 fileReader.readAsBinaryString(file);  //Read the body of the file
         
             } else {
-              swal("Info", "File must be under 500 kb in size.  Your file is too large.  Please try again.","Info");
+              swal("Info", "File must be under 500 kb in size.  Your file is too large.  Please try again.","info");
               $scope.setLostValues();
              // $scope.getContactWiser();
                       return;
@@ -429,7 +429,7 @@ $scope.getProjectdetils();
                 $scope.showSpinnereditProf = false;
             }
         } else {
-          swal("Info", "You must choose a file before trying to upload it","Info");
+          swal("Info", "You must choose a file before trying to upload it","info");
           $scope.setLostValues();
             return;
             // alert("You must choose a file before trying to upload it");
@@ -466,7 +466,7 @@ $scope.getProjectdetils();
                     if (doneUploading == true) {
                       $scope.applicantDetails.Uploaded__c = true;
                         swal(
-                            'success',
+                            'Success',
                             'Uploaded successfully.',
                             'success'
                         );
@@ -502,7 +502,7 @@ $scope.getProjectdetils();
             debugger;
             if($scope.applicantDetails.MailingCountry == "India"){
               if($scope.applicantDetails.MailingPostalCode.length > 6){
-                swal('info','For India, pin code should be 6 digit.','info');
+                swal('Info','For India, pin code should be 6 digit.','info');
                 $("#txtMailingPincode").addClass('border-theme');
               return;
               }

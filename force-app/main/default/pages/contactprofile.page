@@ -976,6 +976,17 @@
             if (salutation) {
                 document.getElementById('contactSalutation').value = salutation;
             }
+
+            var academia = '{!con.Account.Academia__c}';
+            var industry = '{!con.Account.Industry__c}';
+
+            if (academia === 'true') {
+                document.getElementById('instTypeAcademia').checked = true;
+            }
+            if (industry === 'true') {
+                document.getElementById('instTypeIndustry').checked = true;
+            }
+
         }
         
         function loadEducationData() {
@@ -1256,6 +1267,14 @@
                 row.remove();
             }
         }
+
+
+        function getInstitutionType() {
+            debugger
+            var selected = document.querySelector('input[name="instType"]:checked');
+            return selected ? selected.value : null;
+        }
+
         
         
         // ========== SAVE FUNCTIONS ==========
@@ -1263,6 +1282,8 @@
         function saveContactData() {
             debugger
             var contactId = '{!con.Id}';
+            var instType = getInstitutionType();
+
             var contactData = {
                 Id: contactId,
                 Salutation: document.getElementById('contactSalutation').value,
@@ -1279,7 +1300,8 @@
                 MailingCity: document.getElementById('contactCity').value,
                 MailingPostalCode: document.getElementById('contactPostalCode').value,
                 
-                AccountName: document.getElementById('contactInstitution').value
+                AccountName: document.getElementById('contactInstitution').value,
+                InstitutionType: instType
             };
             
             debugger

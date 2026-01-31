@@ -12,6 +12,11 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
     $rootScope.availingFellowship;
     $rootScope.pairedApplicant;
     $scope.Pecfar_dateInformationText;
+    $scope.Pecfar_dateInformationText2;
+
+    $scope.BroadAreaOfResearch = '';
+    $scope.NonTechTitle = '';
+
     $scope.objKeyword = [];
     $scope.thematicAreaToDisplay = [];
     $scope.thematicAreaList = [];
@@ -94,27 +99,37 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
             if (event.status) {
                 if (result != null) {
                     $scope.Pecfar_dateInformationText = new Date(result.Applicant_Proposal_Associations__r[0].Proposals__r.yearly_Call__r.Pecfar_Information_Text__c);
+                    $scope.Pecfar_dateInformationText2 = new Date(result.Applicant_Proposal_Associations__r[0].Proposals__r.yearly_Call__r.Pecfar_Information_Text_2__c);
+                  // $scope.BroadAreaOfResearch =result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c;
+                   // $scope.NonTechTitle=result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c;
                     // $rootScope.projectId = result.Id;
                     if (result.Applicant_Proposal_Associations__r[0].Proposals__r.yearly_Call__r.Result_Announcement_Date__c != null) {
                         $scope.announcementDate = new Date(result.Applicant_Proposal_Associations__r[0].Proposals__r.yearly_Call__r.Result_Announcement_Date__c)
                     }
+
+
                     if (result.Tentative_Start_Date__c != null) {
                         $scope.startDate = true;
-                        var startDateObj = new Date(result.Tentative_Start_Date__c);
-                        // Format date as yyyy-MM-dd for HTML date input (avoid timezone issues)
-                        var year = startDateObj.getFullYear();
-                        var month = String(startDateObj.getMonth() + 1).padStart(2, '0');
-                        var day = String(startDateObj.getDate()).padStart(2, '0');
-                        $scope.tentitiveStartDate = year + '-' + month + '-' + day;
+                        $scope.tentitiveStartDate = new Date(result.Tentative_Start_Date__c);
+                    //     var startDateObj = new Date(result.Tentative_Start_Date__c);
+                    //     // Format date as yyyy-MM-dd for HTML date input (avoid timezone issues)
+                    //     var year = startDateObj.getFullYear();
+                    //     var month = String(startDateObj.getMonth() + 1).padStart(2, '0');
+                    //     var day = String(startDateObj.getDate()).padStart(2, '0');
+                    //     $scope.tentitiveStartDate = year + '-' + month + '-' + day;
+                    //    // $scope.tentitiveStartDate = day + '-' + month + '-' + year;
                     }
                     if (result.Tentative_End_Date__c != null) {
-                        var endDateObj = new Date(result.Tentative_End_Date__c);
-                        // Format date as yyyy-MM-dd for HTML date input (avoid timezone issues)
-                        var year = endDateObj.getFullYear();
-                        var month = String(endDateObj.getMonth() + 1).padStart(2, '0');
-                        var day = String(endDateObj.getDate()).padStart(2, '0');
-                        $scope.tentitiveEndDate = year + '-' + month + '-' + day;
+                        $scope.tentitiveEndDate = new Date(result.Tentative_End_Date__c);
+                        // var endDateObj = new Date(result.Tentative_End_Date__c);
+                        // // Format date as yyyy-MM-dd for HTML date input (avoid timezone issues)
+                        // var year = endDateObj.getFullYear();
+                        // var month = String(endDateObj.getMonth() + 1).padStart(2, '0');
+                        // var day = String(endDateObj.getDate()).padStart(2, '0');
+                        // $scope.tentitiveEndDate = year + '-' + month + '-' + day;
+                        // //$scope.tentitiveEndDate = day + '-' + month + '-' + year;
                     }   
+                    $scope.$apply();
                 }
 
                 debugger;
@@ -122,6 +137,9 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
                 if (result.Title_Of_Project__c != undefined || result.Title_Of_Project__c != "") {
                     result.Title_Of_Project__c = result.Title_Of_Project__c ? result.Title_Of_Project__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Title_Of_Project__c;
                 }
+
+                
+               
                 if (result.Planned_research_activities_of_the_visit__c != undefined || result.Planned_research_activities_of_the_visit__c != "") {
                     result.Planned_research_activities_of_the_visit__c = result.Planned_research_activities_of_the_visit__c ? result.Planned_research_activities_of_the_visit__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Planned_research_activities_of_the_visit__c;
                 }
@@ -161,6 +179,17 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
                     // Add one empty keyword input if no keywords exist
                     $scope.objKeyword.push({ keyword: "" });
                 }
+
+                if (result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c != undefined||result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c !="") {                        
+                         result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c = result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c ? result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c;
+                         $scope.NonTechTitle = result.Applicant_Proposal_Associations__r[0].Proposals__r.Non_Technical_Title_Of_Project__c;
+                 }
+
+                 if (result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c != undefined||result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c !="") {                        
+                         result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c = result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c ? result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c.replace(/&amp;/g, '&').replaceAll('&amp;amp;', '&').replaceAll('&amp;gt;', '>').replaceAll('&lt;', '<').replaceAll('lt;', '<').replaceAll('&gt;', '>').replaceAll('gt;', '>').replaceAll('&amp;', '&').replaceAll('amp;', '&').replaceAll('&quot;', '\'') : result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c;
+                         $scope.BroadAreaOfResearch = result.Applicant_Proposal_Associations__r[0].Proposals__r.Broad_area_of_research__c;
+                 }
+
 
                 // Store proposalId for loading thematic areas
                 var proposalId = null;
@@ -208,14 +237,14 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
     }
 
     // Thematic Area (Subtopic) checkbox toggle function
-    $scope.thematicArea = function (theme, index) {
-        debugger;
-        if ($scope.thematicAreaToDisplay[index].checked) {
-            $scope.thematicAreaToDisplay[index].checked = false;
-        } else {
-            $scope.thematicAreaToDisplay[index].checked = true;
-        }
-    }
+    // $scope.thematicArea = function (theme, index) {
+    //     debugger;
+    //     if ($scope.thematicAreaToDisplay[index].checked) {
+    //         $scope.thematicAreaToDisplay[index].checked = false;
+    //     } else {
+    //         $scope.thematicAreaToDisplay[index].checked = true;
+    //     }
+    // }
 
     // Fetch thematic areas first, then load project details
     $scope.fetchThematicAreas(function() {
@@ -236,27 +265,44 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
 
         if ($scope.proposalDetails.Title_Of_Project__c == undefined || $scope.proposalDetails.Title_Of_Project__c == "") {
             $scope.proposalDetails.Title_Of__c=$scope.proposalDetails.Title_Of_Project__c;
-            swal("Info", "Please Enter Title of project.", "Info");
+            swal("Info", "Please Enter Title of project.", "info");
             $("#txtTitle").addClass('border-theme');    
+            return;
+        }
+
+        /* ✅ ADD BROAD AREA VALIDATION HERE */
+        if ($scope.BroadAreaOfResearch == undefined || 
+            $scope.BroadAreaOfResearch.trim() === "") {
+
+            swal("Info", "Please enter Broad Area of Research.", "info");
+            $("#txtBroadArea").addClass('border-theme');
+            return;
+        }
+
+        // Non-Technical Title
+        if ($scope.NonTechTitle == undefined || 
+            $scope.NonTechTitle.trim() === "") {
+            swal("Info", "Please enter Non-technical title of the project.", "info");
+            $("#txtNonTechTitle").addClass('border-theme');
             return;
         }
 
         // Validate Subtopic selection (optional - only if thematic areas are available)
         $scope.selectedTheme = [];
-        if ($scope.thematicAreaToDisplay && $scope.thematicAreaToDisplay.length > 0) {
-            for (var i = 0; i < $scope.thematicAreaToDisplay.length; i++) {
-                if ($scope.thematicAreaToDisplay[i].checked) {
-                    $scope.selectedTheme.push($scope.thematicAreaToDisplay[i].Id);
-                }
-            }
-            if ($scope.selectedTheme.length <= 0) {
-                swal("Info", "Please select at least one Subtopic.", "Info");
-                return;
-            }
-        }
+        // if ($scope.thematicAreaToDisplay && $scope.thematicAreaToDisplay.length > 0) {
+        //     for (var i = 0; i < $scope.thematicAreaToDisplay.length; i++) {
+        //         if ($scope.thematicAreaToDisplay[i].checked) {
+        //             $scope.selectedTheme.push($scope.thematicAreaToDisplay[i].Id);
+        //         }
+        //     }
+        //     // if ($scope.selectedTheme.length <= 0) {
+        //     //     swal("Info", "Please select at least one Subtopic.", "info");
+        //     //     return;
+        //     // }
+        // }
 
         if (date1 < date2) {
-            swal("Basic Details", "Fellowship should tentatively start after  " + testdatedate + "/" + testdatemonth + "/" + testdateyear, "Info");
+            swal("Basic Details", "Fellowship should tentatively start after  " + testdatedate + "/" + testdatemonth + "/" + testdateyear, "info");
             $("#txtBirthdate").addClass('border-theme');
             return;
         }
@@ -266,7 +312,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         } else {
 
             if ($scope.objRtf[0].charCount > 1500) {
-                swal('info', 'Max character limit for Planned research activities of the visit is 1500 only', 'info');
+                swal('Info', 'Max character limit for Planned research activities of the visit is 1500 only', 'info');
                 return;
             }
         }
@@ -277,7 +323,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         } else {
 
             if ($scope.objRtf[1].charCount > 500) {
-                swal('info', 'Max character limit for Expected outcomes including future plans emerging out of the visit and value addition to the parent organization is 500 only', 'info');
+                swal('Info', 'Max character limit for Expected outcomes including future plans emerging out of the visit and value addition to the parent organization is 500 only', 'info');
                 return;
             }
         }
@@ -288,7 +334,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         } else {
 
             if ($scope.objRtf[2].charCount > 500) {
-                swal('info', 'Max character limit for What is the basis for choosing the pairing fellow is 500 only', 'info');
+                swal('Info', 'Max character limit for What is the basis for choosing the pairing fellow is 500 only', 'info');
                 return;
             }
         }
@@ -296,7 +342,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         if ($scope.proposalDetails.Tentative_plans__c != undefined) {
 
             if ($scope.objRtf[3].charCount > 500) {
-                swal('info', 'Max character limit for Tentative plans for networking visits to different institutions during the fellowship is 500 only', 'info');
+                swal('Info', 'Max character limit for Tentative plans for networking visits to different institutions during the fellowship is 500 only', 'info');
                 return;
             }
         }
@@ -377,6 +423,25 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
             return;
         }
 
+        // 🔴 NEW VALIDATION: End Date <= Pecfar End Date
+        if (endDateForCompare.getTime() > new Date($scope.Pecfar_dateInformationText2).getTime()) {
+
+            var pecfarEnd = new Date($scope.Pecfar_dateInformationText2);
+            var d = pecfarEnd.getDate();
+            var m = pecfarEnd.getMonth() + 1;
+            var y = pecfarEnd.getFullYear();
+
+            swal(
+                "Basic Details",
+                "Fellowship should tentatively end on" + d + "/" + m + "/" + y,
+                "info"
+            );
+
+            $("#txtED").addClass('border-theme');
+            return;
+        }
+
+
         if (startDateForCompare > endDateForCompare) {
             swal("Proposal Detail", "Tentative End Date should not be previous to Tentative Start Date.");
             $("#txtSD").addClass('border-theme');
@@ -429,15 +494,17 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         var endDate = moment(endDateForMoment);
         var starDate = moment(startDateForMoment);
         var years = endDate.diff(starDate, 'days');
+        
+        /*Commented for Replacing Other Validation*/
 
-        if (years > 60) {
-            swal("Basic Details", "Duration should not be more than 2 months", "Info");
-            $("#txtED").addClass('border-theme');
-            return;
-        }
+        // if (years > 60) {
+        //     swal("Basic Details", "Duration should not be more than 2 months", "Info");
+        //     $("#txtED").addClass('border-theme');
+        //     return;
+        // }
 
         if (years < 30) {
-            swal("Basic Details", "Duration should not be less than 1 month.", "Info");
+            swal("Basic Details", "Duration should not be less than 1 month.", "info");
             $("#txtED").addClass('border-theme');
             return;
         }
@@ -463,7 +530,7 @@ angular.module('cp_app').controller('fellowshipP_ctrl', function ($scope, $rootS
         console.log('keyword:', keyword);
         console.log('contactId:', $rootScope.contactId);
         
-        ApplicantPortal_Contoller.insertFellowship_Details($scope.proposalDetails, $rootScope.proposalId, $scope.selectedTheme, keyword, startday, startmonth, startyear, endday, endmonth, endyear, $rootScope.contactId, 'PECFAR', function (result, event) {
+        ApplicantPortal_Contoller.insertFellowship_Details($scope.proposalDetails, $rootScope.proposalId, $scope.BroadAreaOfResearch,$scope.NonTechTitle,$scope.selectedTheme, keyword, startday, startmonth, startyear, endday, endmonth, endyear, $rootScope.contactId, 'PECFAR', function (result, event) {
             debugger;
             console.log('insertFellowship_Details result:', result);
             console.log('insertFellowship_Details event:', event);

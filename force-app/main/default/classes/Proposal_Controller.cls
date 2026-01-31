@@ -46,26 +46,39 @@ return proposalRecord;
 
 }
 */
-    public static Application_Proposal__c getApplicantDetails(string applicantHashCode){
-        
+    public static insertApplicationWrapper getApplicantDetails(string applicantHashCode,string apaId){
+        insertApplicationWrapper datawrapper = new insertApplicationWrapper();
+        Application_Proposal__c proposalRecord;
         contact conRec = [select name,id,Proposals__c from contact where Login_Hash_Code__c =:applicantHashCode limit 1];
         Id twoPlusTwoRtId = [SELECT Id FROM RecordType WHERE SobjectType = 'Application_Proposal__c' AND DeveloperName = 'Two_Plus_Two' LIMIT 1].Id;
+        if(!string.isBlank(apaId)){
+            applicant_proposal_association__c apaRec = [select id,proposals__c,is_coordinator__c from applicant_proposal_association__c where id = :apaId limit 1];
+            proposalRecord = [SELECT Id, Name, Acronym__c, Title_Of__c, Title_In_German__c,Thematic_Topic__c, Duration_In_Months_Max_36__c,Tentative_Start_Date__c, Summary__c, KeyWords__c,Abstract_of_proposed__c, Project_Description__c,Stage__c, Proposed_Venue__c, Proposed_Date__c,Proposal_Stages__c,(SELECT Name, Id, Thematic_Area_Name__c FROM Application_Thematic_Area__r) FROM Application_Proposal__c WHERE Id = :apaRec.Proposals__c AND RecordTypeId = :twoPlusTwoRtId];
+            datawrapper.proposal = proposalRecord;
+            datawrapper.apa = apaRec;
+            return datawrapper;
+        }else{
+            if(!string.isBlank(conRec.Proposals__c)){
+                proposalRecord = [SELECT Id, Name, Acronym__c, Title_Of__c, Title_In_German__c,Thematic_Topic__c, Duration_In_Months_Max_36__c,Tentative_Start_Date__c, Summary__c, KeyWords__c,Abstract_of_proposed__c, Project_Description__c,Stage__c, Proposed_Venue__c, Proposed_Date__c,(SELECT Name, Id, Thematic_Area_Name__c FROM Application_Thematic_Area__r) FROM Application_Proposal__c WHERE Id = :conRec.Proposals__c AND RecordTypeId = :twoPlusTwoRtId];
+                return datawrapper;
+            }
+        }
         
         system.debug('applicantHashCode' +applicantHashCode);
-        Application_Proposal__c proposalRecord;
+       
         
         if(!string.isBlank(conRec.Proposals__c)){
             // Option 1: Use direct lookup (if this is what you want)
             proposalRecord = [SELECT Id, Name, Acronym__c, Title_Of__c, Title_In_German__c,Thematic_Topic__c, Duration_In_Months_Max_36__c,Tentative_Start_Date__c, Summary__c, KeyWords__c,Abstract_of_proposed__c, Project_Description__c,Stage__c, Proposed_Venue__c, Proposed_Date__c,(SELECT Name, Id, Thematic_Area_Name__c FROM Application_Thematic_Area__r) FROM Application_Proposal__c WHERE Id = :conRec.Proposals__c AND RecordTypeId = :twoPlusTwoRtId];
             
             system.debug('proposalRecord----'+proposalRecord);
-            return proposalRecord;
+            return datawrapper;
         } else {
             // Option 2: If no direct lookup, try junction object
             List<Application_Proposal__c> proposalRecords = [SELECT Id, Name, Acronym__c, Title_Of__c, Title_In_German__c,Thematic_Topic__c, Duration_In_Months_Max_36__c,Tentative_Start_Date__c, Summary__c, KeyWords__c,Abstract_of_proposed__c, Project_Description__c,Stage__c, Proposed_Venue__c, Proposed_Date__c,(SELECT Name, Id, Thematic_Area_Name__c FROM Application_Thematic_Area__r) FROM Application_Proposal__c WHERE Id IN (SELECT Proposals__c FROM Applicant_Proposal_Association__c WHERE Contact__c = :conRec.Id) AND RecordTypeId = :twoPlusTwoRtId LIMIT 1];
             
             if(!proposalRecords.isEmpty()) {
-                return proposalRecords[0];
+                return datawrapper;
             }
         }
         
@@ -384,9 +397,9 @@ return accountContactList;
     public static List<Account> getPatnerDetails(String proposalId) {
         System.debug('proposalId --- ' + proposalId);
         
-        // Get all APA records using Proposal Id
+        // Get all APA records using Proposal Id with Is_Coordinator__c
         List<Applicant_Proposal_Association__c> associations = [
-            SELECT Id, Contact__c, Proposals__c
+            SELECT Id, Contact__c, Proposals__c, Is_Coordinator__c
             FROM Applicant_Proposal_Association__c
             WHERE Proposals__c = :proposalId
         ];
@@ -396,11 +409,13 @@ return accountContactList;
             return new List<Account>();
         }
         
-        // Collect Contact IDs
+        // Map Contact ID to Is_Coordinator__c from APA
+        Map<Id, Boolean> contactToCoordinatorMap = new Map<Id, Boolean>();
         Set<Id> contactIdSet = new Set<Id>();
         for (Applicant_Proposal_Association__c apa : associations) {
             if (apa.Contact__c != null) {
                 contactIdSet.add(apa.Contact__c);
+                contactToCoordinatorMap.put(apa.Contact__c, apa.Is_Coordinator__c == true);
             }
         }
         
@@ -435,9 +450,9 @@ return accountContactList;
             return new List<Account>();
         }
         
-        // Fetch Accounts with their Contacts
+        // Fetch Accounts with their Contacts (without nested APA subquery)
         List<Account> accountContactList = [
-            SELECT Name, Website, Id, Is_Coordinator__c, Is_Primary__c, Year_Of_Establishment__c,
+            SELECT Name, Website, Id, Is_Primary__c, Year_Of_Establishment__c,
             Last_Year_s_Balance__c, SME__c, Homepage_URL__c, Country_Type__c, Industry__c,
             Email__c, Is_DSIR_Available__c, DSIR_Recoginition_Details__c, Company_Profile__c,
             Ownership_Profile__c, Company_Website__c, Academia__c, Phone, Main_Business_Area__c,
@@ -450,8 +465,43 @@ return accountContactList;
              ORDER BY CreatedDate ASC)
             FROM Account
             WHERE Id IN :accountIds
-            ORDER BY Is_Coordinator__c DESC NULLS LAST, CreatedDate ASC
+            ORDER BY CreatedDate ASC
         ];
+        
+        // Use the contactToCoordinatorMap that was already populated above (line 413)
+        // Map APA.Is_Coordinator__c to Account.Is_Coordinator__c based on Contact
+        Map<Id, Account> accountMap = new Map<Id, Account>();
+        for (Account acc : accountContactList) {
+            accountMap.put(acc.Id, acc);
+            // Initialize to false
+            acc.Is_Coordinator__c = false;
+        }
+        
+        // Set Account.Is_Coordinator__c based on APA.Is_Coordinator__c from Contacts
+        for (Account acc : accountContactList) {
+            if (acc.Contacts != null && acc.Contacts.size() > 0) {
+                for (Contact con : acc.Contacts) {
+                    if (contactToCoordinatorMap.containsKey(con.Id) && contactToCoordinatorMap.get(con.Id) == true) {
+                        acc.Is_Coordinator__c = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Sort by Is_Coordinator__c DESC - coordinators first
+        List<Account> coordinatorAccounts = new List<Account>();
+        List<Account> partnerAccounts = new List<Account>();
+        for (Account acc : accountContactList) {
+            if (acc.Is_Coordinator__c == true) {
+                coordinatorAccounts.add(acc);
+            } else {
+                partnerAccounts.add(acc);
+            }
+        }
+        accountContactList.clear();
+        accountContactList.addAll(coordinatorAccounts);
+        accountContactList.addAll(partnerAccounts);
         
         System.debug('accountContactList : ' + accountContactList);
         return accountContactList;
@@ -802,6 +852,262 @@ return null;
         }
         return null;
     }
+    
+        // NEW METHOD: Save expense data to Expense_Head__c and Expense_Line_Item__c
+    // Uses Yearly_Expense__c which has lookup to Applicant_Proposal_Association__c
+    public static String createExpenseWithHeadAndLineItems(List<Expense_Line_Item__c> expenseLineItems, String apaId, Applicant_Proposal_Association__c updatedApa) {
+        System.debug('expenseLineItems::' + expenseLineItems);
+        System.debug('apaId::' + apaId);
+        
+        try {
+            // Get Proposal duration to determine number of years needed
+            Decimal durationMonths = null;
+            if(updatedApa != null && updatedApa.Proposals__r != null && updatedApa.Proposals__r.Duration_In_Months_Max_36__c != null) {
+                durationMonths = updatedApa.Proposals__r.Duration_In_Months_Max_36__c;
+            } else {
+                // Query Proposal if not provided in updatedApa
+                List<Applicant_Proposal_Association__c> apaRecords = [
+                    SELECT Id, Proposals__r.Duration_In_Months_Max_36__c 
+                    FROM Applicant_Proposal_Association__c 
+                    WHERE Id = :apaId 
+                    LIMIT 1
+                ];
+                if(!apaRecords.isEmpty() && apaRecords[0].Proposals__r != null) {
+                    durationMonths = apaRecords[0].Proposals__r.Duration_In_Months_Max_36__c;
+                }
+            }
+            
+            // Calculate number of years based on duration
+            Integer numberOfYears = 3; // Default to 3 years
+            if(durationMonths != null) {
+                numberOfYears = (Integer)Math.ceil(durationMonths / 12);
+                if(numberOfYears < 1) numberOfYears = 1;
+                if(numberOfYears > 3) numberOfYears = 3;
+            }
+            
+            // Get Yearly_Expense__c records for this APA
+            List<Yearly_Expense__c> yearlyExpenseList = [SELECT Id, Year__c, Applicant_Proposal_Association__c 
+                                                         FROM Yearly_Expense__c 
+                                                         WHERE Applicant_Proposal_Association__c = :apaId 
+                                                         ORDER BY Year__c ASC];
+            
+            // Check which years already exist
+            Set<String> existingYears = new Set<String>();
+            for(Yearly_Expense__c ye : yearlyExpenseList) {
+                if(ye.Year__c != null) {
+                    existingYears.add(ye.Year__c);
+                }
+            }
+            
+            // Create Yearly_Expense__c records only for missing years (up to numberOfYears)
+            List<Yearly_Expense__c> newYearlyExpenses = new List<Yearly_Expense__c>();
+            for(Integer i = 1; i <= numberOfYears; i++) {
+                String yearStr = String.valueOf(i);
+                if(!existingYears.contains(yearStr)) {
+                    Yearly_Expense__c ye = new Yearly_Expense__c();
+                    ye.Year__c = yearStr;
+                    ye.Applicant_Proposal_Association__c = apaId;
+                    newYearlyExpenses.add(ye);
+                }
+            }
+            
+            if(!newYearlyExpenses.isEmpty()) {
+                insert newYearlyExpenses;
+                yearlyExpenseList.addAll(newYearlyExpenses);
+            }
+            
+            // Re-query to get all IDs (including newly created ones)
+            yearlyExpenseList = [SELECT Id, Year__c, Applicant_Proposal_Association__c 
+                                 FROM Yearly_Expense__c 
+                                 WHERE Applicant_Proposal_Association__c = :apaId 
+                                 ORDER BY Year__c ASC];
+            
+            // Map year number to Yearly_Expense__c record
+            Map<String, Yearly_Expense__c> yearToExpenseMap = new Map<String, Yearly_Expense__c>();
+            Set<Id> yearlyExpenseIds = new Set<Id>();
+            for(Yearly_Expense__c ye : yearlyExpenseList) {
+                yearToExpenseMap.put(ye.Year__c, ye);
+                yearlyExpenseIds.add(ye.Id);
+            }
+            
+            // Get existing Expense_Head__c records
+            List<Expense_Head__c> existingHeads = [SELECT Id, Name, Yearly_Expense__c 
+                                                   FROM Expense_Head__c 
+                                                   WHERE Yearly_Expense__c IN :yearlyExpenseIds];
+            
+            // Map: Year + Head Name -> Expense_Head__c
+            Map<String, Expense_Head__c> yearHeadMap = new Map<String, Expense_Head__c>();
+            for(Expense_Head__c eh : existingHeads) {
+                String key = eh.Yearly_Expense__c + '_' + eh.Name;
+                yearHeadMap.put(key, eh);
+            }
+            
+            // Collect unique expense types from line items
+            Set<String> expenseTypes = new Set<String>();
+            for(Expense_Line_Item__c eli : expenseLineItems) {
+                if(String.isNotBlank(eli.Expense_Type__c)) {
+                    expenseTypes.add(eli.Expense_Type__c);
+                }
+            }
+            
+            // Create Expense_Head__c records for each year and expense type
+            List<Expense_Head__c> headsToUpsert = new List<Expense_Head__c>();
+            for(String expenseType : expenseTypes) {
+                for(String year : yearToExpenseMap.keySet()) {
+                    String key = yearToExpenseMap.get(year).Id + '_' + expenseType;
+                    if(!yearHeadMap.containsKey(key)) {
+                        Expense_Head__c newHead = new Expense_Head__c();
+                        newHead.Name = expenseType;
+                        newHead.Yearly_Expense__c = yearToExpenseMap.get(year).Id;
+                        headsToUpsert.add(newHead);
+                    }
+                }
+            }
+            
+            if(!headsToUpsert.isEmpty()) {
+                insert headsToUpsert;
+            }
+            
+            // Re-query all heads after insert
+            existingHeads = [SELECT Id, Name, Yearly_Expense__c, Yearly_Expense__r.Year__c 
+                            FROM Expense_Head__c 
+                            WHERE Yearly_Expense__c IN :yearlyExpenseIds];
+            
+            // Rebuild map with all heads
+            yearHeadMap.clear();
+            Map<String, Expense_Head__c> yearNumHeadMap = new Map<String, Expense_Head__c>();
+            for(Expense_Head__c eh : existingHeads) {
+                String key = eh.Yearly_Expense__c + '_' + eh.Name;
+                yearHeadMap.put(key, eh);
+                String yearKey = eh.Yearly_Expense__r.Year__c + '_' + eh.Name;
+                yearNumHeadMap.put(yearKey, eh);
+            }
+            
+            // Get existing line items by head and index
+            Set<Id> headIds = new Set<Id>();
+            for(Expense_Head__c eh : existingHeads) {
+                headIds.add(eh.Id);
+            }
+            
+            List<Expense_Line_Item__c> existingLineItems = [SELECT Id, Expense_Head__c, Index__c 
+                                                            FROM Expense_Line_Item__c 
+                                                            WHERE Expense_Head__c IN :headIds];
+            
+            // Map: Head Id + Index -> Line Item Id
+            Map<String, Id> headIndexToLineItemId = new Map<String, Id>();
+            for(Expense_Line_Item__c eli : existingLineItems) {
+                String key = eli.Expense_Head__c + '_' + eli.Index__c;
+                headIndexToLineItemId.put(key, eli.Id);
+            }
+            
+            // Create line items for each year
+            List<Expense_Line_Item__c> lineItemsToUpsert = new List<Expense_Line_Item__c>();
+            
+            for(Expense_Line_Item__c eli : expenseLineItems) {
+                if(String.isBlank(eli.Expense_Type__c)) continue;
+                
+                // Year 1 Line Item
+                if(eli.Year1_Expense__c != null && eli.Year1_Expense__c >= 0) {
+                    Expense_Head__c head1 = yearNumHeadMap.get('1_' + eli.Expense_Type__c);
+                    if(head1 != null) {
+                        Expense_Line_Item__c newELI = new Expense_Line_Item__c();
+                        newELI.Description__c = eli.Description__c;
+                        newELI.Position__c = eli.Position__c;
+                        newELI.Number__c = eli.Number__c;
+                        newELI.Person_Month__c = eli.Person_Month__c;
+                        newELI.Salary_Month__c = eli.Salary_Month__c;
+                        newELI.Unit_Price__c = eli.Unit_Price__c;
+                        newELI.Multiplier__c = eli.Multiplier__c;
+                        newELI.Year1_Expense__c = eli.Year1_Expense__c;
+                        newELI.Year2_Expense__c = 0;
+                        newELI.Year3_Expense__c = 0;
+                        newELI.Year1_Approved_Amount__c = eli.Year1_Approved_Amount__c;
+                        newELI.Expense_Head__c = head1.Id;
+                        newELI.Index__c = eli.Index__c;
+                        newELI.Expense_Type__c = eli.Expense_Type__c;
+                        
+                        // Check if exists for update
+                        String key = head1.Id + '_' + eli.Index__c;
+                        if(headIndexToLineItemId.containsKey(key)) {
+                            newELI.Id = headIndexToLineItemId.get(key);
+                        }
+                        lineItemsToUpsert.add(newELI);
+                    }
+                }
+                
+                // Year 2 Line Item
+                if(eli.Year2_Expense__c != null && eli.Year2_Expense__c >= 0) {
+                    Expense_Head__c head2 = yearNumHeadMap.get('2_' + eli.Expense_Type__c);
+                    if(head2 != null) {
+                        Expense_Line_Item__c newELI = new Expense_Line_Item__c();
+                        newELI.Description__c = eli.Description__c;
+                        newELI.Position__c = eli.Position__c;
+                        newELI.Number__c = eli.Number__c;
+                        newELI.Person_Month__c = eli.Person_Month__c;
+                        newELI.Salary_Month__c = eli.Salary_Month__c;
+                        newELI.Unit_Price__c = eli.Unit_Price__c;
+                        newELI.Multiplier__c = eli.Multiplier__c;
+                        newELI.Year1_Expense__c = 0;
+                        newELI.Year2_Expense__c = eli.Year2_Expense__c;
+                        newELI.Year3_Expense__c = 0;
+                        newELI.Year2_Approved_Amount__c = eli.Year2_Approved_Amount__c;
+                        newELI.Expense_Head__c = head2.Id;
+                        newELI.Index__c = eli.Index__c;
+                        newELI.Expense_Type__c = eli.Expense_Type__c;
+                        
+                        String key = head2.Id + '_' + eli.Index__c;
+                        if(headIndexToLineItemId.containsKey(key)) {
+                            newELI.Id = headIndexToLineItemId.get(key);
+                        }
+                        lineItemsToUpsert.add(newELI);
+                    }
+                }
+                
+                // Year 3 Line Item
+                if(eli.Year3_Expense__c != null && eli.Year3_Expense__c >= 0) {
+                    Expense_Head__c head3 = yearNumHeadMap.get('3_' + eli.Expense_Type__c);
+                    if(head3 != null) {
+                        Expense_Line_Item__c newELI = new Expense_Line_Item__c();
+                        newELI.Description__c = eli.Description__c;
+                        newELI.Position__c = eli.Position__c;
+                        newELI.Number__c = eli.Number__c;
+                        newELI.Person_Month__c = eli.Person_Month__c;
+                        newELI.Salary_Month__c = eli.Salary_Month__c;
+                        newELI.Unit_Price__c = eli.Unit_Price__c;
+                        newELI.Multiplier__c = eli.Multiplier__c;
+                        newELI.Year1_Expense__c = 0;
+                        newELI.Year2_Expense__c = 0;
+                        newELI.Year3_Expense__c = eli.Year3_Expense__c;
+                        newELI.Year3_Approved_Amount__c = eli.Year3_Approved_Amount__c;
+                        newELI.Expense_Head__c = head3.Id;
+                        newELI.Index__c = eli.Index__c;
+                        newELI.Expense_Type__c = eli.Expense_Type__c;
+                        
+                        String key = head3.Id + '_' + eli.Index__c;
+                        if(headIndexToLineItemId.containsKey(key)) {
+                            newELI.Id = headIndexToLineItemId.get(key);
+                        }
+                        lineItemsToUpsert.add(newELI);
+                    }
+                }
+            }
+            
+            if(!lineItemsToUpsert.isEmpty()) {
+                upsert lineItemsToUpsert;
+            }
+            
+            // Update APA with funding details
+            if(updatedApa != null && updatedApa.Id != null) {
+                update updatedApa;
+            }
+            
+            return 'success';
+        } catch(Exception e) {
+            System.debug('Error creating expense head and line items ===> ' + e.getMessage() + ' at Line ===> ' + e.getLineNumber() + ' stack Trace ===> ' + e.getStackTraceString());
+            return 'error: ' + e.getMessage();
+        }
+    }
+    
     
     // ORIGINAL EXISTING METHOD
     /*
@@ -1737,18 +2043,51 @@ return appProposal;
             system.debug('conList::'+conList);
             upsert accList;
             upsert conList;
-            Map<Id, Id> existingAssocMap = new Map<Id, Id>();
-            for (Applicant_Proposal_Association__c assoc : [ SELECT Id, Contact__c, Proposals__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :proposalId AND Contact__c IN :conIds ]) {
-                existingAssocMap.put(assoc.Contact__c, assoc.Id);
+            // Map Contact to Account to determine coordinator status
+            Map<Id, Id> contactToAccountMap = new Map<Id, Id>();
+            for (Contact con : conList) {
+                if (con.AccountId != null) {
+                    contactToAccountMap.put(con.Id, con.AccountId);
+                }
             }
+            
+            // Map Account to Is_Coordinator__c
+            Map<Id, Boolean> accountToCoordinatorMap = new Map<Id, Boolean>();
+            for (Account acc : accList) {
+                accountToCoordinatorMap.put(acc.Id, acc.Is_Coordinator__c == true);
+            }
+            
+            Map<Id, Id> existingAssocMap = new Map<Id, Id>();
+            List<Applicant_Proposal_Association__c> updateAssocList = new List<Applicant_Proposal_Association__c>();
+            for (Applicant_Proposal_Association__c assoc : [ SELECT Id, Contact__c, Proposals__c, Is_Coordinator__c FROM Applicant_Proposal_Association__c WHERE Proposals__c = :proposalId AND Contact__c IN :conIds ]) {
+                existingAssocMap.put(assoc.Contact__c, assoc.Id);
+                // Update Is_Coordinator__c based on Account
+                Id accountId = contactToAccountMap.get(assoc.Contact__c);
+                if (accountId != null && accountToCoordinatorMap.containsKey(accountId)) {
+                    Boolean shouldBeCoordinator = accountToCoordinatorMap.get(accountId);
+                    if (assoc.Is_Coordinator__c != shouldBeCoordinator) {
+                        assoc.Is_Coordinator__c = shouldBeCoordinator;
+                        updateAssocList.add(assoc);
+                    }
+                }
+            }
+            
             List<Applicant_Proposal_Association__c> newAssocList = new List<Applicant_Proposal_Association__c>();
             for (Contact con : conList) {
                 if (!existingAssocMap.containsKey(con.Id)) {
+                    Id accountId = contactToAccountMap.get(con.Id);
+                    Boolean isCoordinator = (accountId != null && accountToCoordinatorMap.containsKey(accountId)) 
+                        ? accountToCoordinatorMap.get(accountId) : false;
                     newAssocList.add(new Applicant_Proposal_Association__c(
                         Contact__c = con.Id,
-                        Proposals__c = proposalId
+                        Proposals__c = proposalId,
+                        Is_Coordinator__c = isCoordinator
                     ));
                 }
+            }
+            
+            if (!updateAssocList.isEmpty()) {
+                update updateAssocList;
             }
             if (!newAssocList.isEmpty()) {
                 insert newAssocList;
@@ -3640,64 +3979,80 @@ return 'success';
     
     
     
-    public static edWrapper getExpenseDetails(String ProposalId, String ContactId) {
-        edWrapper wrap = new edWrapper();
-        List<Expense_Detail__c> listOfExpense = new List<Expense_Detail__c>();
-        List<Expense_Category__c> listOfCategory = new List<Expense_Category__c>();
-        List<Contact> conList = new List<Contact>();
-        List<Account> accList = new List<Account>();
-        System.debug('ProposalId ===> ' + ProposalId);
-        System.debug('ContactId ===> ' + ContactId);
-        if(ContactId == null || ContactId == '' || ProposalId == null || ProposalId == '') {
-            System.debug('ProposalId or ContactId is empty!');
+public static edWrapper getExpenseDetails(String ProposalId, String ContactId) {
+    edWrapper wrap = new edWrapper();
+    List<Expense_Detail__c> listOfExpense = new List<Expense_Detail__c>();
+    List<Expense_Category__c> listOfCategory = new List<Expense_Category__c>();
+    List<Contact> conList = new List<Contact>();
+    List<Account> accList = new List<Account>();
+    System.debug('ProposalId ===> ' + ProposalId);
+    System.debug('ContactId ===> ' + ContactId);
+    if(ContactId == null || ContactId == '' || ProposalId == null || ProposalId == '') {
+        System.debug('ProposalId or ContactId is empty!');
+        return wrap;
+    }
+    try {
+        // Fetch proposal to get Duration_In_Months_Max_36__c
+        List<Application_Proposal__c> proposalList = [SELECT Id, Duration_In_Months_Max_36__c FROM Application_Proposal__c WHERE Id = :ProposalId LIMIT 1];
+        if (!proposalList.isEmpty() && proposalList[0].Duration_In_Months_Max_36__c != null) {
+            wrap.durationInMonths = proposalList[0].Duration_In_Months_Max_36__c;
+            // Calculate number of years: 36 months = 3 years, 24 months = 2 years, 12 months = 1 year
+            Integer years = (Integer)Math.ceil(proposalList[0].Duration_In_Months_Max_36__c / 12);
+            if (years < 1) years = 1;
+            if (years > 3) years = 3;
+            wrap.numberOfYears = years;
+        } else {
+            wrap.numberOfYears = 3; // Default to 3 years
+            wrap.durationInMonths = 36;
+        }
+        
+        List<Applicant_Proposal_Association__c> requiredApa = [SELECT Id, Contact__c, Proposals__c, IGSTC_Funding_Year_1__c, IGSTC_Funding_Year_2__c, IGSTC_Funding_Year_3__c, IGSTC_Total_Funding__c, Industry_Contribution_Year_1__c, Industry_Contribution_Year_2__c, Industry_Contribution_Year_3__c, Total_Industry_Contribution__c,
+                                                               (SELECT Id, Name, Own_Contribution__c, IGSTC_Contribution__c, Total__c FROM Financial_Contribution__r)
+                                                               FROM Applicant_Proposal_Association__c 
+                                                               WHERE Contact__c = :ContactId 
+                                                               AND Proposals__c = :ProposalId 
+                                                               LIMIT 1];
+        if(requiredApa.isEmpty()) {
+            System.debug('Applicant Proposal Association not found!');
             return wrap;
         }
-        try {
-            List<Applicant_Proposal_Association__c> requiredApa = [SELECT Id, Contact__c, Proposals__c, IGSTC_Funding_Year_1__c, IGSTC_Funding_Year_2__c, IGSTC_Funding_Year_3__c, IGSTC_Total_Funding__c, Industry_Contribution_Year_1__c, Industry_Contribution_Year_2__c, Industry_Contribution_Year_3__c, Total_Industry_Contribution__c,
-                                                                   (SELECT Id, Name, Own_Contribution__c, IGSTC_Contribution__c, Total__c FROM Financial_Contribution__r)
-                                                                   FROM Applicant_Proposal_Association__c 
-                                                                   WHERE Contact__c = :ContactId 
-                                                                   AND Proposals__c = :ProposalId 
-                                                                   LIMIT 1];
-            if(requiredApa.isEmpty()) {
-                System.debug('Applicant Proposal Association not found!');
-                return wrap;
-            }
-            conList = [SELECT Id,Name,AccountId,account.id,account.name,account.Country_Type__c,account.BillingCountry,account.Academia__c,account.Industry__c FROM Contact WHERE Id =:ContactId LIMIT 1];
-            if(!conList.isEmpty() && conList[0].AccountId != null) {
-                accList = [SELECT ID, Name, IGSTC_Funding_Year_1__c, IGSTC_Funding_Year_2__c, IGSTC_Funding_Year_3__c, IGSTC_Total_Funding__c, Industry_Contribution_Year_1__c, Industry_Contribution_Year_2__c, Industry_Contribution_Year_3__c, Total_Industry_Contribution__c FROM Account WHERE Id = :conList[0].AccountId];
-            }
-            wrap.conList = conList;
-            wrap.accList = accList;
-            listOfCategory = [SELECT Id, Name, Account__c, Applicant_Proposal_Association__c 
-                              FROM Expense_Category__c 
-                              WHERE Applicant_Proposal_Association__c = :requiredApa[0].Id];
-            listOfExpense = [SELECT Id, Name, Description__c, Position__c, Number__c, Person_Month__c, 
-                             Salary_Month__c, Unit_Price__c, Total_Expense__c, Year1_Expense__c, Year2_Expense__c, 
-                             Year3_Expense__c, Expense_Category__c, Expense_Category__r.Account__c, 
-                             Expense_Category__r.Name, Expense_Category__r.Overall_Expense__c, 
-                             Expense_Category__r.Total_Expense_Year1__c, Expense_Category__r.Total_Expense_Year2__c, 
-                             Expense_Category__r.Total_Expense_Year3__c, Expense_Category__r.Annual_Expense__r.Total_Expense__c,
-                             Expense_Category__r.Annual_Expense__r.Name, Expense_Category__r.Annual_Expense__r.Year__c 
-                             FROM Expense_Detail__c WHERE Expense_Category__r.Applicant_Proposal_Association__c = :requiredApa[0].Id ORDER BY Index__c ASC];
-            System.debug('listOfExpense ==> ' + listOfExpense);
-            wrap.ecList = listOfCategory;
-            wrap.edList = listOfExpense;
-            wrap.apa = requiredApa;
-            return wrap;
-        }catch(Exception e) {
-            System.debug('Error querying Expense_Detail__c ===> ' + e.getMessage() + ' at Line ===> ' + e.getLineNumber() + ' stack Trace ===> ' + e.getStackTraceString());
-            return wrap;
+        conList = [SELECT Id,Name,AccountId,account.id,account.name,account.Country_Type__c,account.BillingCountry,account.Academia__c,account.Industry__c FROM Contact WHERE Id =:ContactId LIMIT 1];
+        if(!conList.isEmpty() && conList[0].AccountId != null) {
+            accList = [SELECT ID, Name, IGSTC_Funding_Year_1__c, IGSTC_Funding_Year_2__c, IGSTC_Funding_Year_3__c, IGSTC_Total_Funding__c, Industry_Contribution_Year_1__c, Industry_Contribution_Year_2__c, Industry_Contribution_Year_3__c, Total_Industry_Contribution__c FROM Account WHERE Id = :conList[0].AccountId];
         }
+        wrap.conList = conList;
+        wrap.accList = accList;
+        listOfCategory = [SELECT Id, Name, Account__c, Applicant_Proposal_Association__c 
+                          FROM Expense_Category__c 
+                          WHERE Applicant_Proposal_Association__c = :requiredApa[0].Id];
+        listOfExpense = [SELECT Id, Name, Description__c, Position__c, Number__c, Person_Month__c, 
+                         Salary_Month__c, Unit_Price__c, Total_Expense__c, Year1_Expense__c, Year2_Expense__c, 
+                         Year3_Expense__c, Expense_Category__c, Expense_Category__r.Account__c, 
+                         Expense_Category__r.Name, Expense_Category__r.Overall_Expense__c, 
+                         Expense_Category__r.Total_Expense_Year1__c, Expense_Category__r.Total_Expense_Year2__c, 
+                         Expense_Category__r.Total_Expense_Year3__c, Expense_Category__r.Annual_Expense__r.Total_Expense__c,
+                         Expense_Category__r.Annual_Expense__r.Name, Expense_Category__r.Annual_Expense__r.Year__c 
+                         FROM Expense_Detail__c WHERE Expense_Category__r.Applicant_Proposal_Association__c = :requiredApa[0].Id ORDER BY Index__c ASC];
+        System.debug('listOfExpense ==> ' + listOfExpense);
+        wrap.ecList = listOfCategory;
+        wrap.edList = listOfExpense;
+        wrap.apa = requiredApa;
+        return wrap;
+    }catch(Exception e) {
+        System.debug('Error querying Expense_Detail__c ===> ' + e.getMessage() + ' at Line ===> ' + e.getLineNumber() + ' stack Trace ===> ' + e.getStackTraceString());
+        return wrap;
     }
-    
-    public class edWrapper {
-        public List<Expense_Detail__c> edList;
-        public List<Expense_Category__c> ecList; 
-        public List<Applicant_Proposal_Association__c> apa;
-        public List<Contact> conList;
-        public List<Account> accList;
-    }
+}
+
+public class edWrapper {
+    public List<Expense_Detail__c> edList;
+    public List<Expense_Category__c> ecList; 
+    public List<Applicant_Proposal_Association__c> apa;
+    public List<Contact> conList;
+    public List<Account> accList;
+    public Integer numberOfYears;
+    public Decimal durationInMonths;
+}
     
     public static List<Expense_Line_Item__c> getExpenseRecords(String ProposalId){
         List<Expense_Line_Item__c> listOfExpense=[SELECT id,Index__c,name,Description__c,Position__c,Number__c,Salary_Month__c,Person_Month__c,Expense_Type__c,Multiplier__c,Total_Expense__c,Total_ELI_Sum__c,Unit_Price__c,Year3_Approved_Amount__c,year2_Approved_Amount__c,Year1_Approved_Amount__c,Year1_Expense__c,Year2_Expense__c,Year3_Expense__c,Expense_Head__c,
@@ -4564,16 +4919,30 @@ return null;
             
             for (Applicant_Proposal_Association__c apa : apaList) {
                 PairingContactWrapper wrapper = new PairingContactWrapper();
-                wrapper.contact = apa.Contact__r;
-                wrapper.Is_Coordinator__c = apa.Is_Coordinator__c == true;
+                Contact con = apa.Contact__r;
+                if (con.AccountId != null && con.Account != null) {
+                    Account acc = new Account();
+                    acc.Id = con.AccountId;
+                    acc.Name = con.Account.Name;
+                    con.Account = acc;
+                }
+                wrapper.contact = con;
+                wrapper.isCoordinator = apa.Is_Coordinator__c == true;
                 wrapper.apaId = apa.Id;
                 wrapperList.add(wrapper);
             }
         } else {
             PairingContactWrapper wrapper = new PairingContactWrapper();
-            wrapper.contact = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Birthdate 
-                              FROM Contact WHERE Id = :conRec.Id];
-            wrapper.Is_Coordinator__c = true;
+            Contact con = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Birthdate 
+                          FROM Contact WHERE Id = :conRec.Id];
+            if (con.AccountId != null && con.Account != null) {
+                Account acc = new Account();
+                acc.Id = con.AccountId;
+                acc.Name = con.Account.Name;
+                con.Account = acc;
+            }
+            wrapper.contact = con;
+            wrapper.isCoordinator = true;
             wrapper.apaId = null;
             wrapperList.add(wrapper);
         }
@@ -4610,7 +4979,7 @@ return null;
             for (Applicant_Proposal_Association__c apa : apaList) {
                 PairingContactWrapper wrapper = new PairingContactWrapper();
                 wrapper.contact = apa.Contact__r;
-                wrapper.Is_Coordinator__c = apa.Is_Coordinator__c == true;
+                wrapper.isCoordinator = apa.Is_Coordinator__c == true;
                 wrapper.apaId = apa.Id;
                 wrapperList.add(wrapper);
             }
@@ -4618,7 +4987,7 @@ return null;
             PairingContactWrapper wrapper = new PairingContactWrapper();
             wrapper.contact = [SELECT Id, FirstName, LastName, Email, AccountId, Account.Name, MailingCountry, Birthdate 
                               FROM Contact WHERE Id = :conRec.Id];
-            wrapper.Is_Coordinator__c = true;
+            wrapper.isCoordinator = true;
             wrapper.apaId = null;
             wrapperList.add(wrapper);
         }
@@ -4989,7 +5358,7 @@ public class insertPairingWrapper {
 
 public class PairingContactWrapper {
     public Contact contact { get; set; }
-    public Boolean Is_Coordinator__c { get; set; }
+    public Boolean isCoordinator { get; set; }
     public Id apaId { get; set; }
 }
 
@@ -5344,7 +5713,21 @@ public class insertPairingWrapperinWiser {
                 Date newDate=Date.newInstance(year,month,day);
                 conDetails.Declaration_Sign_Date__c=newDate;
             }
-            conDetails.Status__c = 'Draft';
+            
+            // Update APA.Applicant_Status__c instead of Contact.Status__c
+            List<Applicant_Proposal_Association__c> apaList = [
+                SELECT Id, Applicant_Status__c, Proposals__c 
+                FROM Applicant_Proposal_Association__c 
+                WHERE Contact__c = :conDetails.Id 
+                ORDER BY CreatedDate DESC 
+                LIMIT 1
+            ];
+            
+            if(!apaList.isEmpty()){
+                apaList[0].Applicant_Status__c = 'Draft';
+                update apaList[0];
+            }
+            
             update conDetails;
             return 'Success';
         }catch(Exception e){
@@ -5352,7 +5735,7 @@ public class insertPairingWrapperinWiser {
         }
     }
     
-    public static string submitPartner2plus2(Contact conDetails,integer year,integer month,integer day){
+    public static string submitPartner2plus2(Contact conDetails,integer year,integer month,integer day,string proposalId){
         try{
             if(year == 0 && month == 0 && day == 0){
                 
@@ -5360,7 +5743,26 @@ public class insertPairingWrapperinWiser {
                 Date newDate=Date.newInstance(year,month,day);
                 conDetails.Declaration_Sign_Date__c=newDate;
             }
-            conDetails.Status__c = !conDetails.isPrimary_Contact__c ? 'Submitted' : conDetails.Status__c;
+            
+            // Find APA for this contact and update Applicant_Status__c based on Is_Coordinator__c
+            List<Applicant_Proposal_Association__c> apaList = [
+                SELECT Id, Is_Coordinator__c, Applicant_Status__c, Proposals__c 
+                FROM Applicant_Proposal_Association__c 
+                WHERE Contact__c = :conDetails.Id 
+                AND Proposals__c = :proposalId
+                ORDER BY CreatedDate DESC 
+                LIMIT 1
+            ];
+            
+            if(!apaList.isEmpty()){
+                Applicant_Proposal_Association__c apa = apaList[0];
+                // If NOT coordinator (i.e., partner), set status to Submitted
+                // if(!apa.Is_Coordinator__c){
+                    apa.Applicant_Status__c = 'Submitted';
+                    update apa;
+                // }
+            }
+            
             update conDetails;
             return 'Success';
         }catch(Exception e){
@@ -5378,37 +5780,30 @@ public class insertPairingWrapperinWiser {
             
             system.debug('Inside submit2plus2');
             
-            // STEP 1: Get all Contact IDs linked to this Proposal
+            // STEP 1: Get all APAs linked to this Proposal
             List<Applicant_Proposal_Association__c> apaList = [
-                SELECT Contact__c 
+                SELECT Id, Contact__c, Applicant_Status__c, Is_Coordinator__c
                 FROM Applicant_Proposal_Association__c 
                 WHERE Proposals__c = :proposalId
             ];
             
-            Set<Id> partnerContactIds = new Set<Id>();
-            for (Applicant_Proposal_Association__c apa : apaList) {
-                partnerContactIds.add(apa.Contact__c);
-            }
-            
-            system.debug('Partner Contact IDs = ' + partnerContactIds);
+            system.debug('APA List = ' + apaList);
             
             // STEP 2: Get partners’ status
-            List<Contact> partnerContacts = [
-                SELECT Id, Status__c 
-                FROM Contact 
-                WHERE Id IN :partnerContactIds
-            ];
             
-            // STEP 3: Check if all have submitted
             Boolean allSubmitted = true;
-            for (Contact c : partnerContacts) {
-                if (c.Id != conDetails.Id && c.Status__c != 'Submitted') {
+            Applicant_Proposal_Association__c currentAPA = null;
+            for (Applicant_Proposal_Association__c apa : apaList) {
+                if (apa.Contact__c == conDetails.Id) {
+                    currentAPA = apa;
+                }
+                if (apa.Contact__c != conDetails.Id && apa.Applicant_Status__c != 'Submitted') {
                     allSubmitted = false;
                     break;
                 }
             }
             
-            if (allSubmitted) {
+            if (allSubmitted && currentAPA != null) {
                 system.debug('All partners submitted');
                 
                 Application_Proposal__c prop = new Application_Proposal__c(Id = proposalId);
@@ -5416,7 +5811,10 @@ public class insertPairingWrapperinWiser {
                 prop.Submitted__c = true;
                 update prop;
                 
-                conDetails.Status__c = 'Submitted';
+                // Update APA.Applicant_Status__c instead of Contact.Status__c
+                currentAPA.Applicant_Status__c = 'Submitted';
+                update currentAPA;
+                
                 update conDetails;
                 
                 return 'Success';
@@ -5424,7 +5822,12 @@ public class insertPairingWrapperinWiser {
             else {
                 system.debug('Partial submit');
                 
-                conDetails.Status__c = 'Draft';
+                // Update APA.Applicant_Status__c instead of Contact.Status__c
+                if (currentAPA != null) {
+                    currentAPA.Applicant_Status__c = 'Draft';
+                    update currentAPA;
+                }
+                
                 update conDetails;
                 
                 return 'Partial Success';
@@ -6758,7 +7161,7 @@ return null;
         if(String.isNotBlank(proposalId)){
             Contact conRec = [SELECT Id,Planned_research_activities_of_the_visit__c,Expected_outcomes__c,Basis_for_choosing_your_paired_member__c,Tentative_plans__c,Tentative_Start_Date__c,Tentative_End_Date__c, Title_Of_Project__c,
                               Availing_Fellowship__c,Associated_with_IGSTC__c,Give_Fellowship_Details__c,Give_Associated_Details__c,
-                              (SELECT Id,Proposals__r.Id,Proposals__r.KeyWords__c,Proposals__r.yearly_Call__r.Result_Announcement_Date__c,Proposals__r.yearly_Call__r.Pecfar_Information_Text__c
+                              (SELECT Id,Proposals__r.Id,Proposals__r.KeyWords__c,Proposals__r.yearly_Call__r.Result_Announcement_Date__c,Proposals__r.yearly_Call__r.Pecfar_Information_Text__c,Proposals__r.yearly_Call__r.Pecfar_Information_Text_2__c,Proposals__r.Broad_area_of_research__c,Proposals__r.Non_Technical_Title_Of_Project__c
                                FROM Applicant_Proposal_Associations__r WHERE Proposals__r.Id =: proposalId AND Proposals__r.RecordType_Name__c='PECFAR' LIMIT 1)
                               FROM Contact WHERE Login_Hash_Code__c =: applicantHashCode];
             return conRec;
@@ -7153,7 +7556,7 @@ public static List<Application_Thematic_Area__c> getApplicationThematicAreas(Str
         }
     }
     
-    public static String insertFellowship_DetailsWithTheme(Contact proposalDetails, String proposalId, List<String> selectedTheme, String keyword, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear, String conId, String recordType){
+    public static String insertFellowship_DetailsWithTheme(Contact proposalDetails, String proposalId,String BroadAreaOfResearch,String NonTechTitle, List<String> selectedTheme, String keyword, integer startday, integer startmonth, integer startyear, integer endday, integer endmonth, integer endyear, String conId, String recordType){
     try{
         system.debug('startday ::'+startday);
         system.debug('startmonth ::'+startmonth);
@@ -7194,6 +7597,8 @@ public static List<Application_Thematic_Area__c> getApplicationThematicAreas(Str
         if(!String.isBlank(proposalId) && !String.isBlank(keyword)){
             Application_Proposal__c proposal = new Application_Proposal__c(Id = proposalId);
             proposal.KeyWords__c = keyword;
+            proposal.Non_Technical_Title_Of_Project__c = NonTechTitle;
+            proposal.Broad_area_of_research__c = BroadAreaOfResearch;
             update proposal;
         }
         

@@ -5,14 +5,43 @@ angular.module('cp_app').controller('revSubmit_ctrl', function($scope,$sce,$root
     $scope.objDocFirst={};
     $scope.objDocSecond={};
     debugger
-    if($rootScope.isPrimaryContact!="false") { 
-        $('#btnSubmit').show();
-    }
-     // Fetching the proposalId from Local Storage
+    
+    // Fetching the proposalId from Local Storage
     if (localStorage.getItem('proposalId')) {
         $rootScope.proposalId = localStorage.getItem('proposalId');
         console.log('Loaded proposalId from localStorage:', $rootScope.proposalId +'--'+$rootScope.proposalDetails +'--'+$scope.proposalDetails);
     }
+    
+    // Check if user is coordinator using Applicant_Proposal_Associations__r.Is_Coordinator__c
+    $scope.checkIsCoordinator = function() {
+        if ($rootScope.candidateId && $rootScope.proposalId) {
+            ApplicantPortal_Contoller.getcampaigntype($rootScope.candidateId, $rootScope.proposalId, function(result, event) {
+                if (event.status && result != null && result.Is_Coordinator__c == true) {
+                    $('#btnSubmit').show();
+                } else {
+                    $('#btnSubmit').hide();
+                }
+                $scope.$apply();
+            });
+        } else {
+            // Fallback: try to get proposalId from first APA if not in localStorage
+            ApplicantPortal_Contoller.getcampaigntype($rootScope.candidateId, null, function(result, event) {
+                if (event.status && result != null && result.Is_Coordinator__c == true) {
+                    $('#btnSubmit').show();
+                    if (result.Proposals__c) {
+                        $rootScope.proposalId = result.Proposals__c;
+                        localStorage.setItem('proposalId', result.Proposals__c);
+                    }
+                } else {
+                    $('#btnSubmit').hide();
+                }
+                $scope.$apply();
+            });
+        }
+    };
+    
+    // Call checkIsCoordinator on page load
+    $scope.checkIsCoordinator();
     
     
     debugger

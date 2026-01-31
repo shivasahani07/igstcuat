@@ -48,6 +48,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                       FirstName: result[0].FirstName || '',
                       LastName: result[0].LastName || '',
                       Email: result[0].Email || '',
+                      Id:result[0].Id || '',
                       Birthdate: result[0].Birthdate
                 ? new Date(Number(result[0].Birthdate))
                 : '',
@@ -156,12 +157,34 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
         }
         ApplicantPortal_Contoller.getPairingDetails($rootScope.candidateId,$rootScope.campaignId,function (result, event) {
             if (event.status) {
+                console.log('getPairingDetails result:', result);
                 var listToUse = result;
                 if (result != null && result.length > 0 && result[0].contact != null) {
                     listToUse = [];
                     for (var k = 0; k < result.length; k++) {
-                        var flat = angular.copy(result[k].contact);
-                        flat.Is_Coordinator__c = result[k].Is_Coordinator__c;
+                        var contactData = result[k].contact;
+                        var flat = {
+                            Id: contactData.Id,
+                            FirstName: contactData.FirstName,
+                            LastName: contactData.LastName,
+                            Email: contactData.Email,
+                            MailingCountry: contactData.MailingCountry,
+                            Birthdate: contactData.Birthdate,
+                            AccountId: contactData.AccountId,
+                            Is_Coordinator__c: result[k].isCoordinator
+                        };
+                        if (contactData.Account) {
+                            flat.Account = {
+                                Id: contactData.Account.Id || contactData.AccountId,
+                                Name: contactData.Account.Name || ''
+                            };
+                        } else if (contactData.AccountId) {
+                            flat.Account = {
+                                Id: contactData.AccountId,
+                                Name: ''
+                            };
+                        }
+                        console.log('Flattened contact ' + k + ':', flat);
                         listToUse.push(flat);
                     }
                 }
@@ -294,7 +317,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                                 swal(
                                     'Info',
                                     'Check Your Registered Email.',
-                                    'Info'
+                                    'info'
                                 )
                                 $("#txtIndEmail").addClass('border-theme');
                                 return;
@@ -324,7 +347,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                            
  
                         if($scope.emailCheck == true){
-                            swal('Info','Email does not exists.','Info');
+                            swal('Info','Email does not exists.','info');
                             $("#txtIndEmail").addClass('border-theme');
                                 return;
                         }
@@ -358,7 +381,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                                     swal(
                                         'Info',
                                         'Check Your Registered Email.',
-                                        'Info'
+                                        'info'
                                     )
                                     $("#txtGerEmail").addClass('border-theme');
                                     return;
@@ -386,7 +409,7 @@ angular.module('cp_app').controller('pairing_ctrl', function($scope,$rootScope){
                             }
    
                             if($scope.emailCheck == true){
-                                swal('Info','Email does not exists.','Info');
+                                swal('Info','Email does not exists.','info');
                                 $("#txtGerEmail").addClass('border-theme');
                                     return;
                             }

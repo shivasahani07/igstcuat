@@ -100,7 +100,7 @@ $scope.uploadFile = function (type, userDocId, fileId,maxSize,minFileSize) {
         var typeOfFile = fileName.split(".");
         lengthOfType =  typeOfFile.length;
         if(typeOfFile[lengthOfType-1] != "pdf"){
-            swal('info','Please choose pdf file only.','info');
+            swal('Info','Please choose pdf file only.','info');
             return;
         }
     console.log(file);
@@ -123,29 +123,29 @@ $scope.uploadFile = function (type, userDocId, fileId,maxSize,minFileSize) {
                 if (fileSize < maxStringSize) {
                     $scope.uploadAttachment(type , userDocId, null);
                 } else {
-                    swal('info','Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".','info');
+                    swal('Info','Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".','info');
                     return;
                 }
 
             }
             fileReader.onerror = function (e) {
-                swal('info','There was an error reading the file.  Please try again.','info');
+                swal('Info','There was an error reading the file.  Please try again.','info');
                 return;
             }
             fileReader.onabort = function (e) {
-                swal('info','There was an error reading the file.  Please try again.','info');
+                swal('Info','There was an error reading the file.  Please try again.','info');
                 return;
             }
 
             fileReader.readAsBinaryString(file);  //Read the body of the file
 
         } else {
-            swal('info','Your file is too large.  Please try again.','info');
+            swal('Info','Your file is too large.  Please try again.','info');
             return;
             $scope.showSpinnereditProf = false;
         }
     } else {
-        swal('info','You must choose a file before trying to upload it','info');
+        swal('Info','You must choose a file before trying to upload it','info');
         return;
         $scope.showSpinnereditProf = false;
     }
@@ -178,7 +178,7 @@ $scope.uploadAttachment = function (type, userDocId, fileId) {
                     $scope.getProjectdetils();
                     
                     swal(
-                        'success',
+                        'Success',
                         'Uploaded Successfully!',
                         'success'
                     )
@@ -206,12 +206,12 @@ $scope.saveandNext = function(){
     for(var i=0;i<$scope.allDocs.length;i++){
         if($scope.allDocs[i].userDocument.Name == 'Scan copy of Passport/Proof of Date of birth.'){
             if($scope.allDocs[i].userDocument.Status__c != 'Uploaded'){
-                swal('info','Please upload Scan copy of Passport/Proof of Date of birth.','info');
+                swal('Info','Please upload Scan copy of Passport/Proof of Date of birth.','info');
                 return;
             }
         }else if($scope.allDocs[i].userDocument.Name == 'Educational Qualification certificates.'){
             if($scope.allDocs[i].userDocument.Status__c != 'Uploaded'){
-                swal('info','Please upload Educational Qualification certificates.','info');
+                swal('Info','Please upload Educational Qualification certificates.','info');
                 return;
             }
         }else if($scope.allDocs[i].userDocument.Name == 'Invitation letter from Host Organization'){
@@ -221,12 +221,12 @@ $scope.saveandNext = function(){
             }  
         }else if($scope.allDocs[i].userDocument.Name == 'No Objection Certificate'){
             if($scope.allDocs[i].userDocument.Status__c != 'Uploaded'){
-                swal('info','Please upload no objection certificate.','info');
+                swal('Info','Please upload no objection certificate.','info');
                 return;
             } 
         }else if($scope.allDocs[i].userDocument.Name == 'Proof of employment'){
             if($scope.allDocs[i].userDocument.Status__c != 'Uploaded'){
-                swal('info','Please upload Proof of employment.','info');
+                swal('Info','Please upload Proof of employment.','info');
                 return;
             } 
         }

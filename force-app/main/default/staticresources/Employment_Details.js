@@ -81,31 +81,31 @@ $scope.insertEmploymentDetails = function(){
 
         for(var i=0;i<$scope.empDetails.length;i++){
             if($scope.empDetails[i].Start_Date__c == undefined || $scope.empDetails[i].Start_Date__c == ""){
-                swal('Info','Please enter Start date','Info');
+                swal('Info','Please enter Start date','info');
                 $("#txtSD"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].End_Date__c == undefined || $scope.empDetails[i].End_Date__c == ""){
-                swal('Info','Please enter End date','Info');
+                swal('Info','Please enter End date','info');
                 $("#txtED1"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].Position__c == undefined || $scope.empDetails[i].Position__c == ""){
-                swal('Info','Please enter Position','Info');
+                swal('Info','Please enter Position','info');
                 $("#txtPos"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].Organization_Name__c == undefined || $scope.empDetails[i].Organization_Name__c == ""){
-                swal('Info','Please enter Organization/Institute name','Info');
+                swal('Info','Please enter Organization/Institute name','info');
                 $("#txtOrg"+i+"").addClass('border-theme');
                 return;
             }
 
             if($scope.empDetails[i].Nature_of_Job__c == undefined || $scope.empDetails[i].Nature_of_Job__c == ""){
-                swal('Info','Please enter Nature of work','Info');
+                swal('Info','Please enter Nature of work','info');
                 $("#txtNature"+i+"").addClass('border-theme');
                 return;
             }
